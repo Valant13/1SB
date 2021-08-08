@@ -3,8 +3,14 @@
 {% block title %}Login{% endblock %}
 
 {% block body %}
-    <div class="row bg-primary h-100 align-items-center">
-        <main class="col-lg-6 offset-lg-3 pt-4 pb-4 bg-light">
+    <style>
+        html, body {
+            height: 100%;
+        }
+    </style>
+
+    <div class="row bg-primary h-100 d-flex align-items-center">
+        <main class="col-10 offset-1 col-lg-6 offset-lg-3 pt-4 pb-4 bg-light">
             {{ include('_errors.html.twig', {errors: viewModel.errors}) }}
             <form action="{{ url('user_login') }}" method="post">
                 <div class="form-group">
