@@ -1,8 +1,9 @@
 <?php
 
-namespace App\Entity;
+namespace App\Entity\Catalog;
 
-use App\Repository\ProductRepository;
+use App\Entity\User\User;
+use App\Repository\Catalog\ProductRepository;
 use Doctrine\ORM\Mapping as ORM;
 
 /**

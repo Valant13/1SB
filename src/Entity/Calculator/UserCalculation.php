@@ -1,8 +1,9 @@
 <?php
 
-namespace App\Entity;
+namespace App\Entity\Calculator;
 
-use App\Repository\UserCalculationRepository;
+use App\Repository\Calculator\UserCalculationRepository;
+use App\Entity\User\User;
 use Doctrine\ORM\Mapping as ORM;
 
 /**

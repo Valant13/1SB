@@ -1,8 +1,8 @@
 <?php
 
-namespace App\Repository;
+namespace App\Repository\Catalog;
 
-use App\Entity\ProductAuctionPrice;
+use App\Entity\Catalog\ProductAuctionPrice;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 

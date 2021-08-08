@@ -1,26 +1,26 @@
 <?php
 
-namespace App\Repository;
+namespace App\Repository\User;
 
-use App\Entity\User;
+use App\Entity\User\UserLogRecord;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
- * @method User|null find($id, $lockMode = null, $lockVersion = null)
- * @method User|null findOneBy(array $criteria, array $orderBy = null)
- * @method User[]    findAll()
- * @method User[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
+ * @method UserLogRecord|null find($id, $lockMode = null, $lockVersion = null)
+ * @method UserLogRecord|null findOneBy(array $criteria, array $orderBy = null)
+ * @method UserLogRecord[]    findAll()
+ * @method UserLogRecord[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
  */
-class UserRepository extends ServiceEntityRepository
+class UserLogRecordRepository extends ServiceEntityRepository
 {
     public function __construct(ManagerRegistry $registry)
     {
-        parent::__construct($registry, User::class);
+        parent::__construct($registry, UserLogRecord::class);
     }
 
     // /**
-    //  * @return User[] Returns an array of User objects
+    //  * @return UserLogRecord[] Returns an array of UserLogRecord objects
     //  */
     /*
     public function findByExampleField($value)
@@ -37,7 +37,7 @@ class UserRepository extends ServiceEntityRepository
     */
 
     /*
-    public function findOneBySomeField($value): ?User
+    public function findOneBySomeField($value): ?UserLogRecord
     {
         return $this->createQueryBuilder('u')
             ->andWhere('u.exampleField = :val')

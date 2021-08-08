@@ -1,14 +1,15 @@
 <?php
 
-namespace App\Entity;
+namespace App\Entity\Catalog;
 
-use App\Repository\UserInventoryMaterialRepository;
+use App\Entity\User\User;
+use App\Repository\Catalog\UserInterestMaterialRepository;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
- * @ORM\Entity(repositoryClass=UserInventoryMaterialRepository::class)
+ * @ORM\Entity(repositoryClass=UserInterestMaterialRepository::class)
  */
-class UserInventoryMaterial
+class UserInterestMaterial
 {
     /**
      * @ORM\Id
@@ -30,9 +31,9 @@ class UserInventoryMaterial
     private $material;
 
     /**
-     * @ORM\Column(type="integer", options={"unsigned":true})
+     * @ORM\Column(type="boolean")
      */
-    private $qty;
+    private $isExcluded;
 
     public function getId(): ?int
     {
@@ -63,14 +64,14 @@ class UserInventoryMaterial
         return $this;
     }
 
-    public function getQty(): ?int
+    public function getIsExcluded(): ?bool
     {
-        return $this->qty;
+        return $this->isExcluded;
     }
 
-    public function setQty(int $qty): self
+    public function setIsExcluded(bool $isExcluded): self
     {
-        $this->qty = $qty;
+        $this->isExcluded = $isExcluded;
 
         return $this;
     }

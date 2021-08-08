@@ -1,8 +1,8 @@
 <?php
 
-namespace App\Entity;
+namespace App\Entity\User;
 
-use App\Repository\UserLogRecordRepository;
+use App\Repository\User\UserLogRecordRepository;
 use Doctrine\ORM\Mapping as ORM;
 
 /**

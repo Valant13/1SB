@@ -1,26 +1,26 @@
 <?php
 
-namespace App\Repository;
+namespace App\Repository\Catalog;
 
-use App\Entity\UserLogRecord;
+use App\Entity\Catalog\UserInventoryMaterial;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
- * @method UserLogRecord|null find($id, $lockMode = null, $lockVersion = null)
- * @method UserLogRecord|null findOneBy(array $criteria, array $orderBy = null)
- * @method UserLogRecord[]    findAll()
- * @method UserLogRecord[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
+ * @method UserInventoryMaterial|null find($id, $lockMode = null, $lockVersion = null)
+ * @method UserInventoryMaterial|null findOneBy(array $criteria, array $orderBy = null)
+ * @method UserInventoryMaterial[]    findAll()
+ * @method UserInventoryMaterial[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
  */
-class UserLogRecordRepository extends ServiceEntityRepository
+class UserInventoryMaterialRepository extends ServiceEntityRepository
 {
     public function __construct(ManagerRegistry $registry)
     {
-        parent::__construct($registry, UserLogRecord::class);
+        parent::__construct($registry, UserInventoryMaterial::class);
     }
 
     // /**
-    //  * @return UserLogRecord[] Returns an array of UserLogRecord objects
+    //  * @return UserInventoryMaterial[] Returns an array of UserInventoryMaterial objects
     //  */
     /*
     public function findByExampleField($value)
@@ -37,7 +37,7 @@ class UserLogRecordRepository extends ServiceEntityRepository
     */
 
     /*
-    public function findOneBySomeField($value): ?UserLogRecord
+    public function findOneBySomeField($value): ?UserInventoryMaterial
     {
         return $this->createQueryBuilder('u')
             ->andWhere('u.exampleField = :val')

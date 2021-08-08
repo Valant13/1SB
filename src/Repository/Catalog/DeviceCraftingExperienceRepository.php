@@ -1,8 +1,8 @@
 <?php
 
-namespace App\Repository;
+namespace App\Repository\Catalog;
 
-use App\Entity\DeviceCraftingExperience;
+use App\Entity\Catalog\DeviceCraftingExperience;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 

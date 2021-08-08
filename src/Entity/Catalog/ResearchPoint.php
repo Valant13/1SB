@@ -1,8 +1,8 @@
 <?php
 
-namespace App\Entity;
+namespace App\Entity\Catalog;
 
-use App\Repository\ResearchPointRepository;
+use App\Repository\Catalog\ResearchPointRepository;
 use Doctrine\ORM\Mapping as ORM;
 
 /**

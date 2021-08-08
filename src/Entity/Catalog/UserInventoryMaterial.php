@@ -1,14 +1,15 @@
 <?php
 
-namespace App\Entity;
+namespace App\Entity\Catalog;
 
-use App\Repository\UserMiningMaterialRepository;
+use App\Entity\User\User;
+use App\Repository\Catalog\UserInventoryMaterialRepository;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
- * @ORM\Entity(repositoryClass=UserMiningMaterialRepository::class)
+ * @ORM\Entity(repositoryClass=UserInventoryMaterialRepository::class)
  */
-class UserMiningMaterial
+class UserInventoryMaterial
 {
     /**
      * @ORM\Id
@@ -30,9 +31,9 @@ class UserMiningMaterial
     private $material;
 
     /**
-     * @ORM\Column(type="boolean")
+     * @ORM\Column(type="integer", options={"unsigned":true})
      */
-    private $isAcceptable;
+    private $qty;
 
     public function getId(): ?int
     {
@@ -63,14 +64,14 @@ class UserMiningMaterial
         return $this;
     }
 
-    public function getIsAcceptable(): ?bool
+    public function getQty(): ?int
     {
-        return $this->isAcceptable;
+        return $this->qty;
     }
 
-    public function setIsAcceptable(bool $isAcceptable): self
+    public function setQty(int $qty): self
     {
-        $this->isAcceptable = $isAcceptable;
+        $this->qty = $qty;
 
         return $this;
     }

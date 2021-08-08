@@ -1,14 +1,14 @@
 <?php
 
-namespace App\Entity;
+namespace App\Entity\Catalog;
 
-use App\Repository\UserInterestMaterialRepository;
+use App\Repository\Catalog\DeviceCraftingComponentRepository;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
- * @ORM\Entity(repositoryClass=UserInterestMaterialRepository::class)
+ * @ORM\Entity(repositoryClass=DeviceCraftingComponentRepository::class)
  */
-class UserInterestMaterial
+class DeviceCraftingComponent
 {
     /**
      * @ORM\Id
@@ -18,10 +18,10 @@ class UserInterestMaterial
     private $id;
 
     /**
-     * @ORM\ManyToOne(targetEntity=User::class)
+     * @ORM\ManyToOne(targetEntity=Device::class, inversedBy="deviceCraftingComponents")
      * @ORM\JoinColumn(nullable=false)
      */
-    private $user;
+    private $device;
 
     /**
      * @ORM\ManyToOne(targetEntity=Material::class)
@@ -30,23 +30,23 @@ class UserInterestMaterial
     private $material;
 
     /**
-     * @ORM\Column(type="boolean")
+     * @ORM\Column(type="integer", options={"unsigned":true})
      */
-    private $isExcluded;
+    private $qty;
 
     public function getId(): ?int
     {
         return $this->id;
     }
 
-    public function getUser(): ?User
+    public function getDevice(): ?Device
     {
-        return $this->user;
+        return $this->device;
     }
 
-    public function setUser(?User $user): self
+    public function setDevice(?Device $device): self
     {
-        $this->user = $user;
+        $this->device = $device;
 
         return $this;
     }
@@ -63,14 +63,14 @@ class UserInterestMaterial
         return $this;
     }
 
-    public function getIsExcluded(): ?bool
+    public function getQty(): ?int
     {
-        return $this->isExcluded;
+        return $this->qty;
     }
 
-    public function setIsExcluded(bool $isExcluded): self
+    public function setQty(int $qty): self
     {
-        $this->isExcluded = $isExcluded;
+        $this->qty = $qty;
 
         return $this;
     }

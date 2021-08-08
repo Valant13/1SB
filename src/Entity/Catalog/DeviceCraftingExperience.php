@@ -1,14 +1,14 @@
 <?php
 
-namespace App\Entity;
+namespace App\Entity\Catalog;
 
-use App\Repository\DeviceCraftingComponentRepository;
+use App\Repository\Catalog\DeviceCraftingExperienceRepository;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
- * @ORM\Entity(repositoryClass=DeviceCraftingComponentRepository::class)
+ * @ORM\Entity(repositoryClass=DeviceCraftingExperienceRepository::class)
  */
-class DeviceCraftingComponent
+class DeviceCraftingExperience
 {
     /**
      * @ORM\Id
@@ -18,16 +18,10 @@ class DeviceCraftingComponent
     private $id;
 
     /**
-     * @ORM\ManyToOne(targetEntity=Device::class, inversedBy="deviceCraftingComponents")
+     * @ORM\ManyToOne(targetEntity=Device::class, inversedBy="craftingExperience")
      * @ORM\JoinColumn(nullable=false)
      */
     private $device;
-
-    /**
-     * @ORM\ManyToOne(targetEntity=Material::class)
-     * @ORM\JoinColumn(nullable=false)
-     */
-    private $material;
 
     /**
      * @ORM\Column(type="integer", options={"unsigned":true})
@@ -47,18 +41,6 @@ class DeviceCraftingComponent
     public function setDevice(?Device $device): self
     {
         $this->device = $device;
-
-        return $this;
-    }
-
-    public function getMaterial(): ?Material
-    {
-        return $this->material;
-    }
-
-    public function setMaterial(?Material $material): self
-    {
-        $this->material = $material;
 
         return $this;
     }

@@ -1,8 +1,8 @@
 <?php
 
-namespace App\Entity;
+namespace App\Entity\Catalog;
 
-use App\Repository\MaterialRepository;
+use App\Repository\Catalog\MaterialRepository;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
