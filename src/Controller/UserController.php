@@ -4,13 +4,14 @@ namespace App\Controller;
 
 use App\Auth;
 use App\Config;
+use App\ViewModel\User\Account;
 use App\ViewModel\User\Login;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 class UserController extends AbstractController
 {
@@ -25,15 +26,23 @@ class UserController extends AbstractController
     private $auth;
 
     /**
+     * @var ValidatorInterface
+     */
+    private $validator;
+
+    /**
      * @param RequestStack $requestStack
      * @param Auth $auth
+     * @param ValidatorInterface $validator
      */
     public function __construct(
         RequestStack $requestStack,
-        Auth $auth
+        Auth $auth,
+        ValidatorInterface $validator
     ) {
         $this->request = $requestStack->getCurrentRequest();
         $this->auth = $auth;
+        $this->validator = $validator;
     }
 
     /**
@@ -96,9 +105,9 @@ class UserController extends AbstractController
     }
 
     /**
-     * @Route("/user/login", methods="GET|POST", name="post_user_login")
+     * @Route("/user/login", methods="GET|POST", name="user_login")
      */
-    public function postUserLogin(): Response
+    public function login(): Response
     {
         if ($this->auth->isAuthorized()) {
             return $this->redirectToRoute('homepage');
@@ -111,7 +120,7 @@ class UserController extends AbstractController
                 'viewModel' => $viewModel
             ]);
         } else {
-            $viewModel->fillByRequest($this->request);
+            $viewModel->fillFromRequest($this->request);
 
             $nickname = $viewModel->getNickname();
 
@@ -134,9 +143,9 @@ class UserController extends AbstractController
     }
 
     /**
-     * @Route("/user/logout", methods="GET|POST", name="post_user_logout")
+     * @Route("/user/logout", methods="GET|POST", name="user_logout")
      */
-    public function postUserLogout(): Response
+    public function logout(): Response
     {
         if (!$this->auth->isAuthorized()) {
             return $this->auth->getRedirectToLogin();
@@ -144,49 +153,49 @@ class UserController extends AbstractController
 
         $this->auth->logout();
 
-        return $this->redirectToRoute('post_user_login');
+        return $this->redirectToRoute('user_login');
     }
 
     /**
-     * @Route("/user/account", methods="GET", name="get_user_account")
+     * @Route("/user/account", methods="GET|POST", name="user_account")
      */
-    public function getUserAccount(): Response
+    public function account(): Response
     {
         if (!$this->auth->isAuthorized()) {
-            return $this->forward($this->auth->getRedirectToLogin());
+            return $this->auth->getRedirectToLogin();
         }
 
-        return $this->render('user/index.html.twig', [
-            'controller_name' => 'UserController',
+        $user = $this->auth->getUser();
+        $viewModel = new Account();
+
+        if ($this->request->getMethod() === 'GET') {
+            $viewModel->fillFromUser($user);
+        } else {
+            $viewModel->fillFromRequest($this->request);
+            $viewModel->fillUser($user);
+
+            $errors = $this->validator->validate($user);
+            if (count($errors) > 0) {
+                $viewModel->addError($errors[0]->getMessage());
+            } else {
+                $this->getDoctrine()->getManager()->flush();
+                $viewModel->addNotice('Saved');
+            }
+        }
+
+        return $this->render('user/account.html.twig', [
+            'viewModel' => $viewModel,
         ]);
-    }
 
-    /**
-     * @Route("/user/account", methods="PUT", name="put_user_account")
-     */
-    public function putUserAccount(): Response
-    {
-        if (!$this->auth->isAuthorized()) {
-            return $this->forward($this->auth->getRedirectToLogin());
-        }
-
-        // TODO: use form
-        // TODO: validate nickname
-        $nickname = (string)$this->request->request->get('nickname');
-
-        if (!is_array($this->request->request->get('interest-materials'))) {
-            return new Response(400);
-        }
-
-        if (!is_array($this->request->request->get('interest-devices'))) {
-            return new Response(400);
-        }
-
-        $interestMaterials = (array)$this->request->request->get('interest-materials');
-        $interestDevices = (array)$this->request->request->get('interest-devices');
-
-        return $this->render('user/index.html.twig', [
-            'controller_name' => 'UserController',
-        ]);
+//        if (!is_array($this->request->request->get('interest-materials'))) {
+//            return new Response(400);
+//        }
+//
+//        if (!is_array($this->request->request->get('interest-devices'))) {
+//            return new Response(400);
+//        }
+//
+//        $interestMaterials = (array)$this->request->request->get('interest-materials');
+//        $interestDevices = (array)$this->request->request->get('interest-devices');
     }
 }

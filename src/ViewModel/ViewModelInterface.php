@@ -9,7 +9,7 @@ interface ViewModelInterface
     /**
      * @param Request $request
      */
-    public function fillByRequest(Request $request): void;
+    public function fillFromRequest(Request $request): void;
 
     /**
      * @param string[]
@@ -30,4 +30,24 @@ interface ViewModelInterface
      * @param string $error
      */
     public function addError(string $error): void;
+
+    /**
+     * @param string[]
+     */
+    public function getNotices(): array;
+
+    /**
+     * @param array $notices
+     */
+    public function setNotices(array $notices): void;
+
+    /**
+     * @return bool
+     */
+    public function hasNotices(): bool;
+
+    /**
+     * @param string $notice
+     */
+    public function addNotice(string $notice): void;
 }

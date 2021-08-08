@@ -12,9 +12,14 @@ class AbstractViewModel implements ViewModelInterface
     protected $errors = [];
 
     /**
+     * @var string[]
+     */
+    protected $notices = [];
+
+    /**
      * @inheritDoc
      */
-    public function fillByRequest(Request $request): void
+    public function fillFromRequest(Request $request): void
     {
 
     }
@@ -49,5 +54,37 @@ class AbstractViewModel implements ViewModelInterface
     public function addError(string $error): void
     {
         $this->errors[] = $error;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function getNotices(): array
+    {
+        return $this->notices;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function setNotices(array $notices): void
+    {
+        $this->notices = $notices;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function hasNotices(): bool
+    {
+        return count($this->notices) > 0;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function addNotice(string $notice): void
+    {
+        $this->notices[] = $notice;
     }
 }

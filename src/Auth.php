@@ -10,15 +10,12 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
+use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 class Auth
 {
     const COOKIE_USER_NICKNAME_KEY = 'user_nickname';
     const SESSION_USER_ID_KEY = 'user_id';
-
-    const USER_NICKNAME_MAX_LENGTH = 32;
-    const USER_NICKNAME_MIN_LENGTH = 2;
-    const USER_NICKNAME_PATTERN = '/\w+/';
 
     /**
      * @var Request
@@ -41,21 +38,29 @@ class Auth
     private $urlGenerator;
 
     /**
+     * @var ValidatorInterface
+     */
+    private $validator;
+
+    /**
      * @param RequestStack $requestStack
      * @param UserRepository $userRepository
      * @param EntityManagerInterface $entityManager
      * @param UrlGeneratorInterface $urlGenerator
+     * @param ValidatorInterface $validator
      */
     public function __construct(
         RequestStack $requestStack,
         UserRepository $userRepository,
         EntityManagerInterface $entityManager,
-        UrlGeneratorInterface $urlGenerator
+        UrlGeneratorInterface $urlGenerator,
+        ValidatorInterface $validator
     ) {
         $this->request = $requestStack->getCurrentRequest();
         $this->userRepository = $userRepository;
         $this->entityManager = $entityManager;
         $this->urlGenerator = $urlGenerator;
+        $this->validator = $validator;
     }
 
     /**
@@ -81,7 +86,7 @@ class Auth
      */
     public function getRedirectToLogin(): Response
     {
-        return new RedirectResponse($this->urlGenerator->generate('post_user_login'));
+        return new RedirectResponse($this->urlGenerator->generate('user_login'));
     }
 
     /**
@@ -133,12 +138,15 @@ class Auth
      */
     public function register(string $userNickname, bool $isLoginNeeded = true): void
     {
-        $this->validateUserNickname($userNickname);
-
         $user = new User();
         $user->setNickname($userNickname);
         $user->setRegistrationTime(new \DateTime());
         $user->setRegistrationIp($this->request->getClientIp());
+
+        $errors = $this->validator->validate($user);
+        if (count($errors) > 0) {
+            throw new \InvalidArgumentException($errors[0]->getMessage());
+        }
 
         $this->entityManager->persist($user);
         $this->entityManager->flush();
@@ -172,31 +180,6 @@ class Auth
     private function isAuthorizedImpl(): bool
     {
         return $this->getUserIdFromSession() !== null;
-    }
-
-    /**
-     * @param string $userNickname
-     * @throws \InvalidArgumentException
-     */
-    private function validateUserNickname(string $userNickname): void
-    {
-        if (strlen($userNickname) > self::USER_NICKNAME_MAX_LENGTH) {
-            throw new \InvalidArgumentException('Nickname is too long');
-        }
-
-        if (strlen($userNickname) < self::USER_NICKNAME_MIN_LENGTH) {
-            throw new \InvalidArgumentException('Nickname is too short');
-        }
-
-        if (!preg_match(self::USER_NICKNAME_PATTERN, $userNickname)) {
-            throw new \InvalidArgumentException('Nickname has prohibited chars');
-        }
-
-        $user = $this->userRepository->findOneBy(['nickname' => $userNickname]);
-
-        if ($user !== null) {
-            throw new \InvalidArgumentException('Nickname is already in use');
-        }
     }
 
     /**

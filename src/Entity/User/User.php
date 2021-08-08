@@ -4,10 +4,13 @@ namespace App\Entity\User;
 
 use App\Repository\User\UserRepository;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
+use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * @ORM\Entity(repositoryClass=UserRepository::class)
  * @ORM\Table(name="user_entity")
+ * @UniqueEntity("nickname", message="Nickname is already in use")
  */
 class User
 {
@@ -20,6 +23,8 @@ class User
 
     /**
      * @ORM\Column(type="string", length=255, unique=true)
+     * @Assert\Regex("/^\w+/", message="Nickname has prohibited chars")
+     * @Assert\Length(min=2, max=32, minMessage="Nickname is too short", maxMessage="Nickname is too long")
      */
     private $nickname;
 

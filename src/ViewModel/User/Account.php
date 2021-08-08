@@ -2,10 +2,11 @@
 
 namespace App\ViewModel\User;
 
+use App\Entity\User\User;
 use App\ViewModel\AbstractViewModel;
 use Symfony\Component\HttpFoundation\Request;
 
-class Login extends AbstractViewModel
+class Account extends AbstractViewModel
 {
     /**
      * @var string|null
@@ -17,7 +18,23 @@ class Login extends AbstractViewModel
      */
     public function fillFromRequest(Request $request): void
     {
-        $this->nickname = (string)$request->request->get('nickname');
+        $this->nickname = $request->request->get('nickname');
+    }
+
+    /**
+     * @param User $user
+     */
+    public function fillFromUser(User $user): void
+    {
+        $this->nickname = $user->getNickname();
+    }
+
+    /**
+     * @param User $user
+     */
+    public function fillUser(User $user): void
+    {
+        $user->setNickname($this->nickname);
     }
 
     /**
