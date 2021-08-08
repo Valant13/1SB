@@ -1,0 +1,14 @@
+{% extends 'layout.html.twig' %}
+
+{% block title %}{{ viewModel.name }}{% endblock %}
+
+{% block main %}
+    {{ include('_errors.html.twig', {errors: viewModel.errors}) }}
+    {{ include('_notices.html.twig', {notices: viewModel.notices}) }}
+
+    <form action="{{ url('materials_edit', {id: viewModel.id}) }}" method="post">
+        {{ include('_product.html.twig') }}
+
+        <button type="submit" class="btn btn-primary">Save</button>
+    </form>
+{% endblock %}

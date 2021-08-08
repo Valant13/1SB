@@ -19,7 +19,7 @@ class Material
 
     /**
      * @ORM\OneToOne(targetEntity=Product::class, cascade={"persist", "remove"})
-     * @ORM\JoinColumn(nullable=false, unique=true)
+     * @ORM\JoinColumn(nullable=false, onDelete="CASCADE", unique=true)
      */
     private $product;
 

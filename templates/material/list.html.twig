@@ -1,0 +1,32 @@
+{% extends 'layout.html.twig' %}
+
+{% block title %}Materials{% endblock %}
+
+{% block main %}
+    <div class="table-responsive">
+        <table class="table table-bordered table-sm">
+            <thead class="thead-dark">
+            <tr>
+                <th>Image</th>
+                <th>Name</th>
+                <th>Marketplace price</th>
+                <th>Modified</th>
+                <th>Actions</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for item in viewModel.items %}
+                <tr>
+                    <td>{{ item.imageUrl }}</td>
+                    <td>{{ item.name }}</td>
+                    <td>{{ item.marketplacePrice }}</td>
+                    <td>{{ item.modifiedString }}</td>
+                    <td>
+                        <a href="{{ url('materials_edit', {id: item.id}) }}" class="btn btn-secondary btn-sm">Edit</a>
+                    </td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+{% endblock %}

@@ -12,5 +12,5 @@ class Config
         'gear'
     ];
 
-    const HOME_CONTROLLER = 'App\Controller\IndexController::index';
+    const QUERY_SELECT_LIMIT = 10000;
 }

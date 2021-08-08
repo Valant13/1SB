@@ -1,9 +1,14 @@
 {% if notices %}
-    <div class="card text-white bg-info mb-3">
+    <div class="card text-white bg-info mb-3" id="notice-container">
         <div class="card-body">
             {% for notice in notices %}
                 <p class="card-text">{{ notice }}</p>
             {% endfor %}
         </div>
     </div>
+    <script>
+        setTimeout(function () {
+            document.getElementById('notice-container').remove();
+        }, 2500)
+    </script>
 {% endif %}

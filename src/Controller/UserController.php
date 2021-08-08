@@ -16,14 +16,14 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
 class UserController extends AbstractController
 {
     /**
-     * @var Request
-     */
-    private $request;
-
-    /**
      * @var Auth
      */
     private $auth;
+
+    /**
+     * @var Request
+     */
+    private $request;
 
     /**
      * @var ValidatorInterface
@@ -31,17 +31,17 @@ class UserController extends AbstractController
     private $validator;
 
     /**
-     * @param RequestStack $requestStack
      * @param Auth $auth
+     * @param RequestStack $requestStack
      * @param ValidatorInterface $validator
      */
     public function __construct(
-        RequestStack $requestStack,
         Auth $auth,
+        RequestStack $requestStack,
         ValidatorInterface $validator
     ) {
-        $this->request = $requestStack->getCurrentRequest();
         $this->auth = $auth;
+        $this->request = $requestStack->getCurrentRequest();
         $this->validator = $validator;
     }
 
