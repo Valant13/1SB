@@ -1,0 +1,14 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+    <div class="container-fluid bg-primary h-100">
+        {% block header %}{% endblock %}
+        {% block sticky_header %}{% endblock %}
+        <div class="row h-100">
+            <div class="col-md-6 offset-md-3 bg-light">
+                {% block content %}{% endblock %}
+            </div>
+        </div>
+        {% block footer %}{% endblock %}
+    </div>
+{% endblock %}

@@ -5,12 +5,20 @@ namespace App;
 use App\Entity\User\User;
 use App\Repository\User\UserRepository;
 use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Component\HttpFoundation\RedirectResponse;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 class Auth
 {
     const COOKIE_USER_NICKNAME_KEY = 'user_nickname';
     const SESSION_USER_ID_KEY = 'user_id';
+
+    const USER_NICKNAME_MAX_LENGTH = 32;
+    const USER_NICKNAME_MIN_LENGTH = 2;
+    const USER_NICKNAME_PATTERN = '/\w+/';
 
     /**
      * @var Request
@@ -28,18 +36,26 @@ class Auth
     private $entityManager;
 
     /**
-     * @param Request $request
+     * @var UrlGeneratorInterface
+     */
+    private $urlGenerator;
+
+    /**
+     * @param RequestStack $requestStack
      * @param UserRepository $userRepository
      * @param EntityManagerInterface $entityManager
+     * @param UrlGeneratorInterface $urlGenerator
      */
     public function __construct(
-        Request $request,
+        RequestStack $requestStack,
         UserRepository $userRepository,
-        EntityManagerInterface $entityManager
+        EntityManagerInterface $entityManager,
+        UrlGeneratorInterface $urlGenerator
     ) {
-        $this->request = $request;
+        $this->request = $requestStack->getCurrentRequest();
         $this->userRepository = $userRepository;
         $this->entityManager = $entityManager;
+        $this->urlGenerator = $urlGenerator;
     }
 
     /**
@@ -47,22 +63,25 @@ class Auth
      */
     public function getUser(): ?User
     {
-        $userId = $this->getUserIdFromSession();
+        if (!$this->isAuthorizedImpl()) {
+            $this->tryAutologin();
+        }
 
-        if ($userId !== null) {
+        if ($this->isAuthorizedImpl()) {
+            $userId = $this->getUserIdFromSession();
+
             return $this->userRepository->find($userId);
         }
 
-        $userNickname = $this->getUserNicknameFromCookie();
-
-        $user = $this->userRepository->findOneBy(['nickname' => $userNickname]);
-        if ($user !== null) {
-            $this->setUserIdToSession($user->getId());
-
-            return $user;
-        }
-
         return null;
+    }
+
+    /**
+     * @return Response
+     */
+    public function getRedirectToLogin(): Response
+    {
+        return new RedirectResponse($this->urlGenerator->generate('post_user_login'));
     }
 
     /**
@@ -70,45 +89,114 @@ class Auth
      */
     public function isAuthorized(): bool
     {
-        return $this->getUser() !== null;
+        if (!$this->isAuthorizedImpl()) {
+            $this->tryAutologin();
+        }
+
+        return $this->isAuthorizedImpl();
     }
 
     /**
      * @param string $userNickname
+     * @throws \InvalidArgumentException
+     * @throws \BadMethodCallException
      */
-    public function login(string $userNickname)
+    public function login(string $userNickname): void
     {
-        $existingUser = $this->userRepository->findOneBy(['nickname' => $userNickname]);
-
-        if ($existingUser !== null) {
-            $this->setUserIdToSession($existingUser->getId());
-            $this->setUserNicknameToCookie($existingUser->getNickname());
-        } else {
-            $newUser = new User();
-            $newUser->setNickname($userNickname);
-            $newUser->setRegistrationTime(new \DateTime());
-            $newUser->setRegistrationIp($this->request->getClientIp());
-
-            $this->entityManager->persist($newUser);
-            $this->entityManager->flush();
-
-            $this->setUserIdToSession($newUser->getId());
-            $this->setUserNicknameToCookie($newUser->getNickname());
+        if ($this->isAuthorizedImpl()) {
+            throw new \BadMethodCallException('Already authorized');
         }
+
+        $user = $this->userRepository->findOneBy(['nickname' => $userNickname]);
+
+        if ($user === null) {
+            throw new \InvalidArgumentException('User with this nickname does not exist');
+        }
+
+        $this->setUserIdToSession($user->getId());
+        $this->setUserNicknameToCookie($user->getNickname());
     }
 
     /**
      *
      */
-    public function logout()
+    public function logout(): void
     {
-        $this->removeUserIdFromSession();
-        $this->removeUserNicknameFromCookie();
+        $this->setUserIdToSession(null);
     }
 
-    public function getRedirectToLogin()
+    /**
+     * @param string $userNickname
+     * @param bool $isLoginNeeded
+     * @throws \InvalidArgumentException
+     * @throws \BadMethodCallException
+     */
+    public function register(string $userNickname, bool $isLoginNeeded = true): void
     {
-        // TODO: implement
+        $this->validateUserNickname($userNickname);
+
+        $user = new User();
+        $user->setNickname($userNickname);
+        $user->setRegistrationTime(new \DateTime());
+        $user->setRegistrationIp($this->request->getClientIp());
+
+        $this->entityManager->persist($user);
+        $this->entityManager->flush();
+
+        if ($isLoginNeeded) {
+            $this->login($userNickname);
+        }
+    }
+
+    /**
+     * @return bool
+     */
+    private function tryAutologin(): bool
+    {
+        $userNickname = $this->getUserNicknameFromCookie();
+
+        if ($userNickname === null) {
+            return false;
+        }
+
+        try {
+            $this->login($userNickname);
+        } finally {
+            return $this->isAuthorized();
+        }
+    }
+
+    /**
+     * @return bool
+     */
+    private function isAuthorizedImpl(): bool
+    {
+        return $this->getUserIdFromSession() !== null;
+    }
+
+    /**
+     * @param string $userNickname
+     * @throws \InvalidArgumentException
+     */
+    private function validateUserNickname(string $userNickname): void
+    {
+        if (strlen($userNickname) > self::USER_NICKNAME_MAX_LENGTH) {
+            throw new \InvalidArgumentException('Nickname is too long');
+        }
+
+        if (strlen($userNickname) < self::USER_NICKNAME_MIN_LENGTH) {
+            throw new \InvalidArgumentException('Nickname is too short');
+        }
+
+        if (!preg_match(self::USER_NICKNAME_PATTERN, $userNickname)) {
+            throw new \InvalidArgumentException('Nickname has prohibited chars');
+        }
+
+        $user = $this->userRepository->findOneBy(['nickname' => $userNickname]);
+
+        if ($user !== null) {
+            throw new \InvalidArgumentException('Nickname is already in use');
+        }
     }
 
     /**
@@ -122,19 +210,15 @@ class Auth
     }
 
     /**
-     * @param int $userId
+     * @param int|null $userId
      */
-    private function setUserIdToSession(int $userId)
+    private function setUserIdToSession(?int $userId)
     {
-        $this->request->getSession()->set(self::SESSION_USER_ID_KEY, $userId);
-    }
-
-    /**
-     *
-     */
-    private function removeUserIdFromSession()
-    {
-        $this->request->getSession()->remove(self::SESSION_USER_ID_KEY);
+        if ($userId === null) {
+            $this->request->getSession()->remove(self::SESSION_USER_ID_KEY);
+        } else {
+            $this->request->getSession()->set(self::SESSION_USER_ID_KEY, $userId);
+        }
     }
 
     /**
@@ -150,18 +234,14 @@ class Auth
     }
 
     /**
-     * @param string $userNickname
+     * @param string|null $userNickname
      */
-    private function setUserNicknameToCookie(string $userNickname)
+    private function setUserNicknameToCookie(?string $userNickname)
     {
-        $this->request->cookies->set(self::COOKIE_USER_NICKNAME_KEY, $userNickname);
-    }
-
-    /**
-     *
-     */
-    private function removeUserNicknameFromCookie()
-    {
-        $this->request->cookies->remove(self::COOKIE_USER_NICKNAME_KEY);
+        if ($userNickname === null) {
+            $this->request->cookies->remove(self::COOKIE_USER_NICKNAME_KEY);
+        } else {
+            $this->request->cookies->set(self::COOKIE_USER_NICKNAME_KEY, $userNickname);
+        }
     }
 }

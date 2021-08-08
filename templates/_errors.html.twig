@@ -1,0 +1,9 @@
+{% if errors %}
+    <div class="card text-white bg-danger mb-3">
+        <div class="card-body">
+            {% for error in errors %}
+                <p class="card-text">{{ error }}</p>
+            {% endfor %}
+        </div>
+    </div>
+{% endif %}

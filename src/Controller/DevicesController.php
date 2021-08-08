@@ -2,7 +2,9 @@
 
 namespace App\Controller;
 
+use App\Auth;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
@@ -10,10 +12,36 @@ use Symfony\Component\Routing\Annotation\Route;
 class DevicesController extends AbstractController
 {
     /**
+     * @var Request
+     */
+    private $request;
+
+    /**
+     * @var Auth
+     */
+    private $auth;
+
+    /**
+     * @param RequestStack $requestStack
+     * @param Auth $auth
+     */
+    public function __construct(
+        RequestStack $requestStack,
+        Auth $auth
+    ) {
+        $this->request = $requestStack->getCurrentRequest();
+        $this->auth = $auth;
+    }
+
+    /**
      * @Route("/devices", methods="GET", name="get_devices")
      */
     public function getDevices(): Response
     {
+        if (!$this->auth->isAuthorized()) {
+            return $this->forward($this->auth->getRedirectToLogin());
+        }
+
         return $this->render('devices/index.html.twig', [
             'controller_name' => 'DevicesController',
         ]);
@@ -22,25 +50,29 @@ class DevicesController extends AbstractController
     /**
      * @Route("/devices", methods="POST", name="post_devices")
      */
-    public function postDevices(Request $request): Response
+    public function postDevices(): Response
     {
+        if (!$this->auth->isAuthorized()) {
+            return $this->forward($this->auth->getRedirectToLogin());
+        }
+
         // TODO: use form
         // TODO: validate name
-        $name = (string)$request->request->get('name');
-        $marketplacePrice = (int)$request->request->get('marketplace-price');
-        $imageUrl = (string)$request->request->get('image-url');
-        $wikiPageUrl = (string)$request->request->get('wiki-page-url');
+        $name = (string)$this->request->request->get('name');
+        $marketplacePrice = (int)$this->request->request->get('marketplace-price');
+        $imageUrl = (string)$this->request->request->get('image-url');
+        $wikiPageUrl = (string)$this->request->request->get('wiki-page-url');
 
-        if (!is_array($request->request->get('crafting-experience'))) {
+        if (!is_array($this->request->request->get('crafting-experience'))) {
             return new Response(400);
         }
 
-        if (!is_array($request->request->get('crafting-components'))) {
+        if (!is_array($this->request->request->get('crafting-components'))) {
             return new Response(400);
         }
 
-        $craftingExperience = (array)$request->request->get('crafting-experience');
-        $craftingComponents = (array)$request->request->get('crafting-components');
+        $craftingExperience = (array)$this->request->request->get('crafting-experience');
+        $craftingComponents = (array)$this->request->request->get('crafting-components');
 
         return $this->render('devices/index.html.twig', [
             'controller_name' => 'DevicesController',
@@ -50,23 +82,27 @@ class DevicesController extends AbstractController
     /**
      * @Route("/devices/{id}", methods="PUT", name="put_devices")
      */
-    public function putDevices(Request $request, int $id): Response
+    public function putDevices(int $id): Response
     {
+        if (!$this->auth->isAuthorized()) {
+            return $this->forward($this->auth->getRedirectToLogin());
+        }
+
         // TODO: use form
-        $marketplacePrice = (int)$request->request->get('marketplace-price');
-        $imageUrl = (string)$request->request->get('image-url');
-        $wikiPageUrl = (string)$request->request->get('wiki-page-url');
+        $marketplacePrice = (int)$this->request->request->get('marketplace-price');
+        $imageUrl = (string)$this->request->request->get('image-url');
+        $wikiPageUrl = (string)$this->request->request->get('wiki-page-url');
 
-        if (!is_array($request->request->get('crafting-experience'))) {
+        if (!is_array($this->request->request->get('crafting-experience'))) {
             return new Response(400);
         }
 
-        if (!is_array($request->request->get('crafting-components'))) {
+        if (!is_array($this->request->request->get('crafting-components'))) {
             return new Response(400);
         }
 
-        $craftingExperience = (array)$request->request->get('crafting-experience');
-        $craftingComponents = (array)$request->request->get('crafting-components');
+        $craftingExperience = (array)$this->request->request->get('crafting-experience');
+        $craftingComponents = (array)$this->request->request->get('crafting-components');
 
         return $this->render('devices/index.html.twig', [
             'controller_name' => 'DevicesController',
@@ -76,8 +112,12 @@ class DevicesController extends AbstractController
     /**
      * @Route("/devices/{id}", methods="DELETE", name="delete_devices")
      */
-    public function deleteDevices(Request $request, int $id): Response
+    public function deleteDevices(int $id): Response
     {
+        if (!$this->auth->isAuthorized()) {
+            return $this->forward($this->auth->getRedirectToLogin());
+        }
+
         return $this->render('devices/index.html.twig', [
             'controller_name' => 'DevicesController',
         ]);

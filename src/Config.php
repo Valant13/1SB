@@ -11,4 +11,6 @@ class Config
         'shield',
         'gear'
     ];
+
+    const HOME_CONTROLLER = 'App\Controller\IndexController::index';
 }
