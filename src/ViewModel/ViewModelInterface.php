@@ -3,6 +3,7 @@
 namespace App\ViewModel;
 
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\Validator\ConstraintViolationListInterface;
 
 interface ViewModelInterface
 {
@@ -30,6 +31,11 @@ interface ViewModelInterface
      * @param string $error
      */
     public function addError(string $error): void;
+
+    /**
+     * @param ConstraintViolationListInterface $violationList
+     */
+    public function addErrorsFromViolations(ConstraintViolationListInterface $violationList): void;
 
     /**
      * @param string[]

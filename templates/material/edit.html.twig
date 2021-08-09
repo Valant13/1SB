@@ -12,6 +12,6 @@
     {{ include('_notices.html.twig', {notices: viewModel.notices}) }}
 
     <form action="{{ url('materials_edit', {id: viewModel.id}) }}" method="post" id="form">
-        {{ include('_product.html.twig') }}
+        {{ include('_product_form.html.twig') }}
     </form>
 {% endblock %}

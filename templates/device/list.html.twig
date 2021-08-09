@@ -7,40 +7,5 @@
         <a href="{{ url('devices_new') }}" class="btn btn-primary btn-lg">New</a>
     </div>
 
-    <div class="table-responsive">
-        <table class="table table-bordered table-striped table-sm text-center small">
-            <thead class="thead-dark">
-            <tr>
-                <th class="align-middle" style="width: 15%">Image</th>
-                <th class="align-middle">Name</th>
-                <th class="align-middle" style="width: 15%">Marketplace</th>
-                <th class="align-middle" style="width: 15%">Modified</th>
-                <th class="align-middle" style="width: 15%">Actions</th>
-            </tr>
-            </thead>
-            <tbody>
-            {% for item in viewModel.items %}
-                <tr>
-                    <td class="align-middle">
-                        {% if item.imageUrl %}
-                            <img src="{{ item.imageUrl }}" class="img-fluid">
-                        {% endif %}
-                    </td>
-                    <td class="align-middle">
-                        {% if item.wikiPageUrl %}
-                            <a href="{{ item.wikiPageUrl }}">{{ item.name }}</a>
-                        {% else %}
-                            {{ item.name }}
-                        {% endif %}
-                    </td>
-                    <td class="align-middle">{{ item.marketplacePrice }}</td>
-                    <td class="align-middle">{{ item.modification|raw }}</td>
-                    <td class="align-middle">
-                        <a href="{{ url('devices_edit', {id: item.id}) }}" class="btn btn-secondary btn-sm">Edit</a>
-                    </td>
-                </tr>
-            {% endfor %}
-            </tbody>
-        </table>
-    </div>
+    {{ include('_grid.html.twig', {grid: viewModel.grid}) }}
 {% endblock %}

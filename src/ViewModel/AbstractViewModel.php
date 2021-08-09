@@ -3,6 +3,7 @@
 namespace App\ViewModel;
 
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\Validator\ConstraintViolationListInterface;
 
 class AbstractViewModel implements ViewModelInterface
 {
@@ -54,6 +55,16 @@ class AbstractViewModel implements ViewModelInterface
     public function addError(string $error): void
     {
         $this->errors[] = $error;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function addErrorsFromViolations(ConstraintViolationListInterface $violationList): void
+    {
+        foreach ($violationList as $violation) {
+            $this->errors[] = $violation->getMessage();
+        }
     }
 
     /**

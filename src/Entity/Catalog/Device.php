@@ -6,6 +6,7 @@ use App\Repository\Catalog\DeviceRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * @ORM\Entity(repositoryClass=DeviceRepository::class)
@@ -21,7 +22,8 @@ class Device
 
     /**
      * @ORM\OneToOne(targetEntity=Product::class, cascade={"persist", "remove"})
-     * @ORM\JoinColumn(nullable=false, unique=true)
+     * @ORM\JoinColumn(nullable=false, onDelete="CASCADE", unique=true)
+     * @Assert\Valid
      */
     private $product;
 

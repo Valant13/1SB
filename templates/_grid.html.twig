@@ -1,0 +1,44 @@
+<div class="table-responsive">
+    <table class="table table-bordered table-striped table-sm text-center small">
+        <thead class="thead-dark">
+        <tr>
+            {% for column in grid.columns %}
+                <th class="align-middle"{% if column.width %} style="width: {{ column.width }}%"{% endif %}>{{ column.name }}</th>
+            {% endfor %}
+        </tr>
+        </thead>
+        <tbody>
+        {% for row in grid.rows %}
+            <tr>
+                {% for value in row.values %}
+                    {% if value.type == "action" %}
+                        <td class="align-middle">
+                            <a href="{{ url(value.route, value.params) }}" class="btn btn-secondary btn-sm">{{ value.name }}</a>
+                        </td>
+                    {% elseif value.type == "checkbox" %}
+                    {% elseif value.type == "field" %}
+                    {% elseif value.type == "html" %}
+                        <td class="align-middle">{{ value.html|raw }}</td>
+                    {% elseif value.type == "image" %}
+                        <td class="align-middle">
+                            {% if value.href %}
+                                <img src="{{ value.href }}"{% if value.alt %} alt="{{ value.alt }}"{% endif %} class="img-fluid">
+                            {% endif %}
+                        </td>
+                    {% elseif value.type == "link" %}
+                        <td class="align-middle">
+                            {% if value.href %}
+                                <a href="{{ value.href }}">{{ value.text }}</a>
+                            {% else %}
+                                {{ value.text }}
+                            {% endif %}
+                        </td>
+                    {% elseif value.type == "text" %}
+                        <td class="align-middle">{{ value.text }}</td>
+                    {% endif %}
+                {% endfor %}
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+</div>

@@ -34,19 +34,17 @@
     {{ include('_errors.html.twig', {errors: viewModel.errors}) }}
     {{ include('_notices.html.twig', {notices: viewModel.notices}) }}
 
-    <form action="
-        {% if viewModel.id %}
-            {{ url('devices_edit', {id: viewModel.id}) }}
-        {% else %}
-            {{ url('devices_new') }}
-        {% endif %}
-    " method="post" id="form">
+    {% if viewModel.id %}
+        {% set form_url = url('devices_edit', {id: viewModel.id}) %}
+    {% else %}
+        {% set form_url = url('devices_new') %}
+    {% endif %}
 
+    <form action="{{ form_url }}" method="post" id="form">
         <div class="form-group">
             <label for="name">Name:</label>
             <input type="text" required="required" class="form-control" id="name" name="name" value="{{ viewModel.name }}">
         </div>
-
-        {{ include('_product.html.twig') }}
+        {{ include('_product_form.html.twig') }}
     </form>
 {% endblock %}

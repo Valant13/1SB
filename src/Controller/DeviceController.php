@@ -94,9 +94,8 @@ class DeviceController extends AbstractController
             $device->getProduct()->setModificationTime(new \DateTime());
 
             $errors = $this->validator->validate($device);
-            $errors->addAll($this->validator->validate($device->getProduct()));
             if (count($errors) > 0) {
-                $viewModel->addError($errors[0]->getMessage());
+                $viewModel->addErrorsFromViolations($errors);
             } else {
                 $this->getDoctrine()->getManager()->persist($device);
                 $this->getDoctrine()->getManager()->flush();
@@ -164,7 +163,7 @@ class DeviceController extends AbstractController
             $errors = $this->validator->validate($device);
             $errors->addAll($this->validator->validate($device->getProduct()));
             if (count($errors) > 0) {
-                $viewModel->addError($errors[0]->getMessage());
+                $viewModel->addErrorsFromViolations($errors);
             } else {
                 $this->getDoctrine()->getManager()->flush();
                 $viewModel->addNotice('Saved');

@@ -5,13 +5,34 @@ namespace App\ViewModel\Material;
 use App\Entity\Catalog\Material;
 use App\ViewModel\AbstractViewModel;
 use App\ViewModel\Formatter;
+use App\ViewModel\Grid\Column;
+use App\ViewModel\Grid\Grid;
+use App\ViewModel\Grid\Row;
+use App\ViewModel\Grid\Value\Action;
+use App\ViewModel\Grid\Value\Html;
+use App\ViewModel\Grid\Value\Image;
+use App\ViewModel\Grid\Value\Link;
+use App\ViewModel\Grid\Value\Text;
 
 class ListModel extends AbstractViewModel
 {
     /**
-     * @var ListItem[]
+     * @var Grid
      */
-    private $items = [];
+    private $grid;
+
+    /**
+     *
+     */
+    public function __construct()
+    {
+        $this->grid = new Grid();
+        $this->grid->addColumn((new Column())->setName('Image')->setWidth(15));
+        $this->grid->addColumn((new Column())->setName('Name'));
+        $this->grid->addColumn((new Column())->setName('Marketpl')->setWidth(15));
+        $this->grid->addColumn((new Column())->setName('Modified')->setWidth(15));
+        $this->grid->addColumn((new Column())->setName('Actions')->setWidth(15));
+    }
 
     /**
      * @param Material[] $materials
@@ -21,39 +42,48 @@ class ListModel extends AbstractViewModel
         foreach ($materials as $material) {
             $product = $material->getProduct();
 
-            $item = new ListItem();
+            $row = new Row();
 
-            $item->setId($material->getId());
-            $item->setImageUrl($product->getImageUrl());
-            $item->setWikiPageUrl($product->getWikiPageUrl());
-            $item->setName($product->getName());
+            $image = (new Image())
+                ->setHref($product->getImageUrl());
 
-            $item->setMarketplacePrice(Formatter::formatPrice(
-                $product->getMarketplacePrice()
-            ));
+            $name = (new Link())
+                ->setText($product->getName())
+                ->setHref($product->getWikiPageUrl());
 
-            $item->setModification(Formatter::formatModification(
-                $product->getModificationTime(),
-                $product->getModificationUser()
-            ));
+            $marketplace = (new Text())
+                ->setText(Formatter::formatPrice($product->getMarketplacePrice()));
 
-            $this->items[] = $item;
+            $modified = (new Html())
+                ->setHtml(Formatter::formatModification(
+                    $product->getModificationTime(),
+                    $product->getModificationUser()
+                ));
+
+            $actions = (new Action())
+                ->setName('Edit')
+                ->setRoute('materials_edit')
+                ->setParams(['id' => $material->getId()]);
+
+            $row->setValues([$image, $name, $marketplace, $modified, $actions]);
+
+            $this->grid->addRow($row);
         }
     }
 
     /**
-     * @return ListItem[]
+     * @return Grid
      */
-    public function getItems(): array
+    public function getGrid(): Grid
     {
-        return $this->items;
+        return $this->grid;
     }
 
     /**
-     * @param ListItem[] $items
+     * @param Grid $grid
      */
-    public function setItems(array $items): void
+    public function setGrid(Grid $grid): void
     {
-        $this->items = $items;
+        $this->grid = $grid;
     }
 }

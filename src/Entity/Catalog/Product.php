@@ -5,10 +5,12 @@ namespace App\Entity\Catalog;
 use App\Entity\User\User;
 use App\Repository\Catalog\ProductRepository;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * @ORM\Entity(repositoryClass=ProductRepository::class)
+ * @UniqueEntity("name", message="Name is already in use")
  */
 class Product
 {

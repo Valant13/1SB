@@ -176,7 +176,7 @@ class UserController extends AbstractController
 
             $errors = $this->validator->validate($user);
             if (count($errors) > 0) {
-                $viewModel->addError($errors[0]->getMessage());
+                $viewModel->addErrorsFromViolations($errors);
             } else {
                 $this->getDoctrine()->getManager()->flush();
                 $viewModel->addNotice('Saved');
