@@ -5,6 +5,7 @@ namespace App\Entity\Catalog;
 use App\Entity\User\User;
 use App\Repository\Catalog\ProductRepository;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * @ORM\Entity(repositoryClass=ProductRepository::class)
@@ -25,6 +26,7 @@ class Product
 
     /**
      * @ORM\Column(type="integer", nullable=true, options={"unsigned":true})
+     * @Assert\Positive(message="Marketplace price should be positive")
      */
     private $marketplacePrice;
 

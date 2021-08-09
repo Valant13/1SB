@@ -39,7 +39,7 @@ class Edit extends AbstractViewModel
      */
     public function fillFromRequest(Request $request): void
     {
-        $this->marketplacePrice = $request->request->getInt('marketplace-price');
+        $this->marketplacePrice = $request->request->getInt('marketplace-price') ?: null;
         $this->imageUrl = $request->request->get('image-url');
         $this->wikiPageUrl = $request->request->get('wiki-page-url');
     }

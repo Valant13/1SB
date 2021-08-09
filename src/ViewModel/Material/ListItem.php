@@ -17,6 +17,11 @@ class ListItem
     /**
      * @var string|null
      */
+    private $wikiPageUrl;
+
+    /**
+     * @var string|null
+     */
     private $name;
 
     /**
@@ -27,7 +32,7 @@ class ListItem
     /**
      * @var string|null
      */
-    private $modifiedString;
+    private $modifiedHtml;
 
     /**
      * @return int|null
@@ -59,6 +64,22 @@ class ListItem
     public function setImageUrl(?string $imageUrl): void
     {
         $this->imageUrl = $imageUrl;
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getWikiPageUrl(): ?string
+    {
+        return $this->wikiPageUrl;
+    }
+
+    /**
+     * @param string|null $wikiPageUrl
+     */
+    public function setWikiPageUrl(?string $wikiPageUrl): void
+    {
+        $this->wikiPageUrl = $wikiPageUrl;
     }
 
     /**
@@ -96,16 +117,16 @@ class ListItem
     /**
      * @return string|null
      */
-    public function getModifiedString(): ?string
+    public function getModifiedHtml(): ?string
     {
-        return $this->modifiedString;
+        return $this->modifiedHtml;
     }
 
     /**
-     * @param string|null $modifiedString
+     * @param string|null $modifiedHtml
      */
-    public function setModifiedString(?string $modifiedString): void
+    public function setModifiedHtml(?string $modifiedHtml): void
     {
-        $this->modifiedString = $modifiedString;
+        $this->modifiedHtml = $modifiedHtml;
     }
 }

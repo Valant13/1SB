@@ -100,6 +100,7 @@ class MaterialController extends AbstractController
             $material->getProduct()->setModificationTime(new \DateTime());
 
             $errors = $this->validator->validate($material);
+            $errors->addAll($this->validator->validate($material->getProduct()));
             if (count($errors) > 0) {
                 $viewModel->addError($errors[0]->getMessage());
             } else {
