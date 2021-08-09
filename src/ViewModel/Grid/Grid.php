@@ -7,7 +7,7 @@ class Grid
     /**
      * @var string|null
      */
-    private $name;
+    private $idForJs;
 
     /**
      * @var Column[]
@@ -22,18 +22,18 @@ class Grid
     /**
      * @return string|null
      */
-    public function getName(): ?string
+    public function getIdForJs(): ?string
     {
-        return $this->name;
+        return $this->idForJs;
     }
 
     /**
-     * @param string|null $name
+     * @param string|null $idForJs
      * @return Grid
      */
-    public function setName(?string $name): Grid
+    public function setIdForJs(?string $idForJs): Grid
     {
-        $this->name = $name;
+        $this->idForJs = $idForJs;
         return $this;
     }
 
@@ -80,6 +80,26 @@ class Grid
     public function setRows(array $rows): Grid
     {
         $this->rows = $rows;
+        return $this;
+    }
+
+    /**
+     * @param int $index
+     * @return Row
+     */
+    public function getRow(int $index): Row
+    {
+        return $this->rows[$index];
+    }
+
+    /**
+     * @param int $index
+     * @param Row $row
+     * @return Grid
+     */
+    public function setRow(int $index, Row $row): Grid
+    {
+        $this->rows[$index] = $row;
         return $this;
     }
 

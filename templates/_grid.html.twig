@@ -1,5 +1,12 @@
+{% set hasControls = false %}
+{% for column in grid.columns %}
+    {% if column.controlType != "none" %}
+        {% set hasControls = true %}
+    {% endif %}
+{% endfor %}
+
 <div class="table-responsive">
-    <table class="table table-bordered table-striped table-sm text-center small">
+    <table class="table table-bordered table-striped table-sm text-center small"{% if grid.idForJs %} id="{{ grid.idForJs }}"{% endif %}>
         <thead class="thead-dark">
         <tr>
             {% for column in grid.columns %}
@@ -8,6 +15,19 @@
         </tr>
         </thead>
         <tbody>
+        {% if hasControls %}
+            <tr class="bg-primary">
+                {% for column in grid.columns %}
+                <td class="align-middle">
+                    {% if column.controlType == "clear" %}
+                        <button class="btn btn-secondary btn-block text-nowrap control-button-{{ loop.index }}">Clear all</button>
+                    {% elseif column.controlType == "select_unselect" %}
+                        <button class="btn btn-secondary btn-block text-nowrap control-button-{{ loop.index }}">Unselect all</button>
+                    {% endif %}
+                </td>
+                {% endfor %}
+            </tr>
+        {% endif %}
         {% for row in grid.rows %}
             <tr>
                 {% for value in row.values %}
@@ -16,7 +36,13 @@
                             <a href="{{ url(value.route, value.params) }}" class="btn btn-secondary btn-sm">{{ value.name }}</a>
                         </td>
                     {% elseif value.type == "checkbox" %}
+                        <td class="align-middle">
+                            <input type="checkbox" class="custom-control-input checkbox-input-{{ loop.index }}" name="{{ value.name }}" checked="{% if value.isChecked %}checked{% endif %}">
+                        </td>
                     {% elseif value.type == "field" %}
+                        <td class="align-middle">
+                            <input type="{{ value.valueType }}" class="form-control field-input-{{ loop.index }}" name="{{ value.name }}" value="{{ value.value }}">
+                        </td>
                     {% elseif value.type == "html" %}
                         <td class="align-middle">{{ value.html|raw }}</td>
                     {% elseif value.type == "image" %}
@@ -42,3 +68,52 @@
         </tbody>
     </table>
 </div>
+
+{% if hasControls %}
+    {% for column in grid.columns %}
+        {% if column.controlType == "clear" %}
+            <script>
+                ;(function() {
+                    let tableId = '{{ grid.idForJs }}';
+                    let buttonClass = 'control-button-{{ loop.index }}';
+                    let inputClass = 'field-input-{{ loop.index }}';
+
+                    let table = document.getElementById(tableId);
+                    let button = table.getElementsByClassName(buttonClass)[0];
+
+                    button.onclick = function () {
+                        let inputs = table.getElementsByClassName(inputClass);
+
+                        for (let input of inputs) {
+                            input.value = '';
+                        }
+                    }.bind(this);
+                })();
+            </script>
+        {% elseif column.controlType == "select_unselect" %}
+            <script>
+                ;(function() {
+                    let tableId = '{{ grid.idForJs }}';
+                    let buttonClass = 'control-button-{{ loop.index }}';
+                    let inputClass = 'checkbox-input-{{ loop.index }}';
+
+                    let table = document.getElementById(tableId);
+                    let button = table.getElementsByClassName(buttonClass)[0];
+
+                    let isSelected = true;
+
+                    button.onclick = function () {
+                        let inputs = table.getElementsByClassName(inputClass);
+
+                        for (let input of inputs) {
+                            input.checked = isSelected ? '' : 'checked';
+                        }
+
+                        button.innerText = isSelected ? 'Select all' : 'Unselect all';
+                        isSelected = !isSelected;
+                    }.bind(this);
+                })();
+            </script>
+        {% endif %}
+    {% endfor %}
+{% endif %}

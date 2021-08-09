@@ -3,9 +3,14 @@
 namespace App\ViewModel\Device;
 
 use App\Entity\Catalog\Device;
-use App\Entity\Catalog\Product;
-use App\Entity\Catalog\ProductAuctionPrice;
+use App\Entity\Catalog\Material;
 use App\ViewModel\AbstractViewModel;
+use App\ViewModel\Grid\Column;
+use App\ViewModel\Grid\Grid;
+use App\ViewModel\Grid\Row;
+use App\ViewModel\Grid\Value\Field;
+use App\ViewModel\Grid\Value\Image;
+use App\ViewModel\Grid\Value\Text;
 use Symfony\Component\HttpFoundation\Request;
 
 class Edit extends AbstractViewModel
@@ -36,6 +41,44 @@ class Edit extends AbstractViewModel
     private $wikiPageUrl;
 
     /**
+     * @var Grid
+     */
+    private $craftingComponentGrid;
+
+    /**
+     * @param Material[] $materials
+     */
+    public function __construct(array $materials)
+    {
+        $this->craftingComponentGrid = new Grid();
+        $this->craftingComponentGrid->setIdForJs('crafting-component-form');
+        $this->craftingComponentGrid->addColumn((new Column())->setName('Image')->setWidth(15));
+        $this->craftingComponentGrid->addColumn((new Column())->setName('Name'));
+        $this->craftingComponentGrid->addColumn((new Column())->setName('Qty')->setWidth(20)
+            ->setControlType(Column::CONTROL_TYPE_CLEAR));
+
+        foreach ($materials as $material) {
+            $product = $material->getProduct();
+
+            $row = new Row();
+
+            $image = (new Image())
+                ->setHref($product->getImageUrl());
+
+            $name = (new Text())
+                ->setText($product->getName());
+
+            $qty = (new Field())
+                ->setValueType('number')
+                ->setName('crafting-components[' . $material->getId() . ']');
+
+            $row->setValues([$image, $name, $qty]);
+
+            $this->craftingComponentGrid->setRow($material->getId(), $row);
+        }
+    }
+
+    /**
      * @param Request $request
      */
     public function fillFromRequest(Request $request): void
@@ -55,6 +98,15 @@ class Edit extends AbstractViewModel
         $this->marketplacePrice = $device->getProduct()->getMarketplacePrice();
         $this->imageUrl = $device->getProduct()->getImageUrl();
         $this->wikiPageUrl = $device->getProduct()->getWikiPageUrl();
+
+        foreach ($device->getCraftingComponents() as $craftingComponent) {
+            $index = $craftingComponent->getMaterial()->getId();
+            $row = $this->craftingComponentGrid->getRow($index);
+
+            /** @var Field $qty */
+            $qty = $row->getValues()[2];
+            $qty->setValue($craftingComponent->getQty());
+        }
     }
 
     /**
@@ -62,14 +114,6 @@ class Edit extends AbstractViewModel
      */
     public function fillDevice(Device $device): void
     {
-        if ($device->getProduct() === null) {
-            $device->setProduct(new Product());
-        }
-
-        if ($device->getProduct()->getAuctionPrice() === null) {
-            $device->getProduct()->setAuctionPrice(new ProductAuctionPrice());
-        }
-
         $device->getProduct()->setName($this->name);
         $device->getProduct()->setMarketplacePrice($this->marketplacePrice);
         $device->getProduct()->setImageUrl($this->imageUrl);
@@ -154,5 +198,21 @@ class Edit extends AbstractViewModel
     public function setWikiPageUrl(?string $wikiPageUrl): void
     {
         $this->wikiPageUrl = $wikiPageUrl;
+    }
+
+    /**
+     * @return Grid
+     */
+    public function getCraftingComponentGrid(): Grid
+    {
+        return $this->craftingComponentGrid;
+    }
+
+    /**
+     * @param Grid $craftingComponentGrid
+     */
+    public function setCraftingComponentGrid(Grid $craftingComponentGrid): void
+    {
+        $this->craftingComponentGrid = $craftingComponentGrid;
     }
 }

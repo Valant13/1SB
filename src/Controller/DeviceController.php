@@ -5,7 +5,10 @@ namespace App\Controller;
 use App\Auth;
 use App\Config;
 use App\Entity\Catalog\Device;
+use App\Entity\Catalog\Product;
+use App\Entity\Catalog\ProductAuctionPrice;
 use App\Repository\Catalog\DeviceRepository;
+use App\Repository\Catalog\MaterialRepository;
 use App\ViewModel\Device\ListModel;
 use App\ViewModel\Device\Edit;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -38,14 +41,21 @@ class DeviceController extends AbstractController
     private $deviceRepository;
 
     /**
+     * @var MaterialRepository
+     */
+    private $materialRepository;
+
+    /**
      * @param Auth $auth
      * @param DeviceRepository $deviceRepository
+     * @param MaterialRepository $materialRepository
      * @param RequestStack $requestStack
      * @param ValidatorInterface $validator
      */
     public function __construct(
         Auth $auth,
         DeviceRepository $deviceRepository,
+        MaterialRepository $materialRepository,
         RequestStack $requestStack,
         ValidatorInterface $validator
     ) {
@@ -53,6 +63,7 @@ class DeviceController extends AbstractController
         $this->request = $requestStack->getCurrentRequest();
         $this->validator = $validator;
         $this->deviceRepository = $deviceRepository;
+        $this->materialRepository = $materialRepository;
     }
 
     /**
@@ -84,8 +95,11 @@ class DeviceController extends AbstractController
         }
 
         $device = new Device();
+        $device->setProduct(new Product());
+        $device->getProduct()->setAuctionPrice(new ProductAuctionPrice());
 
-        $viewModel = new Edit();
+        $materials = $this->materialRepository->findOrderedByName(Config::QUERY_SELECT_LIMIT);
+        $viewModel = new Edit($materials);
 
         if ($this->request->getMethod() === 'POST') {
             $viewModel->fillFromRequest($this->request);
@@ -149,7 +163,8 @@ class DeviceController extends AbstractController
             return new Response('', 404);
         }
 
-        $viewModel = new Edit();
+        $materials = $this->materialRepository->findOrderedByName(Config::QUERY_SELECT_LIMIT);
+        $viewModel = new Edit($materials);
         $viewModel->setId($device->getId());
 
         if ($this->request->getMethod() === 'GET') {

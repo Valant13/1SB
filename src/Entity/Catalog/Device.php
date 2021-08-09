@@ -10,6 +10,7 @@ use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * @ORM\Entity(repositoryClass=DeviceRepository::class)
+ * @ORM\HasLifecycleCallbacks()
  */
 class Device
 {
@@ -35,12 +36,12 @@ class Device
     /**
      * @ORM\OneToMany(targetEntity=DeviceCraftingComponent::class, mappedBy="device", orphanRemoval=true)
      */
-    private $deviceCraftingComponents;
+    private $craftingComponents;
 
     public function __construct()
     {
         $this->craftingExperience = new ArrayCollection();
-        $this->deviceCraftingComponents = new ArrayCollection();
+        $this->craftingComponents = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -93,30 +94,54 @@ class Device
     /**
      * @return Collection|DeviceCraftingComponent[]
      */
-    public function getDeviceCraftingComponents(): Collection
+    public function getCraftingComponents(): Collection
     {
-        return $this->deviceCraftingComponents;
+        return $this->craftingComponents;
     }
 
-    public function addDeviceCraftingComponent(DeviceCraftingComponent $deviceCraftingComponent): self
+    public function addCraftingComponent(DeviceCraftingComponent $craftingComponent): self
     {
-        if (!$this->deviceCraftingComponents->contains($deviceCraftingComponent)) {
-            $this->deviceCraftingComponents[] = $deviceCraftingComponent;
-            $deviceCraftingComponent->setDevice($this);
+        if (!$this->craftingComponents->contains($craftingComponent)) {
+            $this->craftingComponents[] = $craftingComponent;
+            $craftingComponent->setDevice($this);
         }
 
         return $this;
     }
 
-    public function removeDeviceCraftingComponent(DeviceCraftingComponent $deviceCraftingComponent): self
+    public function removeCraftingComponent(DeviceCraftingComponent $craftingComponent): self
     {
-        if ($this->deviceCraftingComponents->removeElement($deviceCraftingComponent)) {
+        if ($this->craftingComponents->removeElement($craftingComponent)) {
             // set the owning side to null (unless already changed)
-            if ($deviceCraftingComponent->getDevice() === $this) {
-                $deviceCraftingComponent->setDevice(null);
+            if ($craftingComponent->getDevice() === $this) {
+                $craftingComponent->setDevice(null);
             }
         }
 
         return $this;
+    }
+
+    /**
+     * @ORM\PreFlush()
+     */
+    public function removeEmptyCraftingExperience(): void
+    {
+        foreach ($this->getCraftingExperience() as $craftingExperience) {
+            if (!$craftingExperience->getQty()) {
+                $this->removeCraftingExperience($craftingExperience);
+            }
+        }
+    }
+
+    /**
+     * @ORM\PreFlush()
+     */
+    public function removeEmptyCraftingComponents(): void
+    {
+        foreach ($this->getCraftingComponents() as $craftingComponent) {
+            if (!$craftingComponent->getQty()) {
+                $this->removeCraftingComponent($craftingComponent);
+            }
+        }
     }
 }

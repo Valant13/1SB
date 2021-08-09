@@ -3,7 +3,6 @@
 namespace App\ViewModel\Material;
 
 use App\Entity\Catalog\Material;
-use App\Entity\Catalog\Product;
 use App\ViewModel\AbstractViewModel;
 use Symfony\Component\HttpFoundation\Request;
 
@@ -59,10 +58,6 @@ class Edit extends AbstractViewModel
      */
     public function fillMaterial(Material $material): void
     {
-        if ($material->getProduct() === null) {
-            $material->setProduct(new Product());
-        }
-
         $material->getProduct()->setMarketplacePrice($this->marketplacePrice);
         $material->getProduct()->setImageUrl($this->imageUrl);
         $material->getProduct()->setWikiPageUrl($this->wikiPageUrl);
