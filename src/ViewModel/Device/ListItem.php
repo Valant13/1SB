@@ -1,6 +1,6 @@
 <?php
 
-namespace App\ViewModel\Material;
+namespace App\ViewModel\Device;
 
 class ListItem
 {
@@ -25,7 +25,7 @@ class ListItem
     private $name;
 
     /**
-     * @var int|null
+     * @var string|null
      */
     private $marketplacePrice;
 

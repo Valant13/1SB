@@ -4,23 +4,27 @@ namespace App\ViewModel;
 
 use App\Entity\User\User;
 
-class ModificationFormatter
+class Formatter
 {
-    const SECOND = 1;
-    const MINUTE = self::SECOND * 60;
-    const HOUR = self::MINUTE * 60;
-    const DAY = self::HOUR * 24;
-    const WEEK = self::DAY * 7;
-    const MONTH = self::DAY * 30;
-    const YEAR = self::DAY * 365;
+    private const SECOND = 1;
+    private const MINUTE = self::SECOND * 60;
+    private const HOUR = self::MINUTE * 60;
+    private const DAY = self::HOUR * 24;
+    private const WEEK = self::DAY * 7;
+    private const MONTH = self::DAY * 30;
+    private const YEAR = self::DAY * 365;
 
     /**
-     * @param \DateTime $modificationTime
-     * @param User $modificationUser
-     * @return string
+     * @param \DateTime|null $modificationTime
+     * @param User|null $modificationUser
+     * @return string|null
      */
-    public static function getModifiedHtml(\DateTimeInterface $modificationTime, User $modificationUser): string
+    public static function formatModification(?\DateTimeInterface $modificationTime, ?User $modificationUser): ?string
     {
+        if ($modificationTime === null || $modificationUser === null) {
+            return null;
+        }
+
         $now = new \DateTime();
         $interval = $now->getTimestamp() - $modificationTime->getTimestamp();
 
@@ -54,5 +58,18 @@ class ModificationFormatter
         $nickname = $modificationUser->getNickname();
 
         return "$phrase<br>by $nickname";
+    }
+
+    /**
+     * @param int|null $price
+     * @return string|null
+     */
+    public static function formatPrice(?int $price): ?string
+    {
+        if ($price === null) {
+            return null;
+        }
+
+        return number_format($price, 0, ',', ' ') . ' C';
     }
 }

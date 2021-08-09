@@ -57,7 +57,7 @@ class UserController extends AbstractController
         $maximizationParam = $this->request->request->get('maximization-param');
 
         if (!in_array($maximizationParam, Config::ALLOWED_MAXIMIZATION_PARAMS)) {
-            return new Response(400);
+            return new Response('', 400);
         }
 
         return $this->render('user/index.html.twig', [
@@ -91,12 +91,12 @@ class UserController extends AbstractController
         }
 
         if (!is_numeric($this->request->request->get('qty'))) {
-            return new Response(400);
+            return new Response('', 400);
         }
 
         $qty = (int)$this->request->request->get('qty');
         if ($qty < 0) {
-            return new Response(400);
+            return new Response('', 400);
         }
 
         return $this->render('user/index.html.twig', [

@@ -10,13 +10,13 @@
                 <a class="nav-link small" href="#">Prices</a>
             </li>
             <li class="nav-item">
-                <a class="nav-link small" href="#">Materials</a>
+                <a class="nav-link small" href="{{ url('materials') }}">Materials</a>
             </li>
             <li class="nav-item">
-                <a class="nav-link small" href="#">Devices</a>
+                <a class="nav-link small" href="{{ url('devices') }}">Devices</a>
             </li>
             <li class="nav-item">
-                <a class="nav-link small" href="#">Account</a>
+                <a class="nav-link small" href="{{ url('user_account') }}">Account</a>
             </li>
         </ul>
         <ul class="navbar-nav d-none d-md-flex">
@@ -27,13 +27,13 @@
                 <a class="nav-link" href="#">Prices</a>
             </li>
             <li class="nav-item">
-                <a class="nav-link" href="#">Materials</a>
+                <a class="nav-link" href="{{ url('materials') }}">Materials</a>
             </li>
             <li class="nav-item">
-                <a class="nav-link" href="#">Devices</a>
+                <a class="nav-link" href="{{ url('devices') }}">Devices</a>
             </li>
             <li class="nav-item">
-                <a class="nav-link" href="#">Account</a>
+                <a class="nav-link" href="{{ url('user_account') }}">Account</a>
             </li>
         </ul>
     </nav>
@@ -42,7 +42,7 @@
 {% block body %}
     <div class="container-fluid">
         <div class="row bg-light min-vh-100">
-            <main class="col-md-6 bg-white offset-md-3 pt-4" style="margin-top: 56px">
+            <main class="col-md-6 bg-white offset-md-3 pt-3" style="margin-top: 56px">
                 {% block main %}{% endblock %}
             </main>
         </div>

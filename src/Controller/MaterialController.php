@@ -84,7 +84,7 @@ class MaterialController extends AbstractController
 
         $material = $this->materialRepository->find($id);
         if ($material === null) {
-            return new Response(404);
+            return new Response('', 404);
         }
 
         $viewModel = new Edit();

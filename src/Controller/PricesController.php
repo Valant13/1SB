@@ -65,7 +65,7 @@ class PricesController extends AbstractController
         }
 
         if (!is_numeric($this->request->request->get('auction-price'))) {
-            return new Response(400);
+            return new Response('', 400);
         }
 
         $auctionPrice = (int)$this->request->request->get('auction-price');

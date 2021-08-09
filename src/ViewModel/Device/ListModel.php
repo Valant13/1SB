@@ -1,8 +1,8 @@
 <?php
 
-namespace App\ViewModel\Material;
+namespace App\ViewModel\Device;
 
-use App\Entity\Catalog\Material;
+use App\Entity\Catalog\Device;
 use App\ViewModel\AbstractViewModel;
 use App\ViewModel\Formatter;
 
@@ -14,16 +14,16 @@ class ListModel extends AbstractViewModel
     private $items = [];
 
     /**
-     * @param Material[] $materials
+     * @param Device[] $devices
      */
-    public function fillFromMaterials(array $materials): void
+    public function fillFromDevices(array $devices): void
     {
-        foreach ($materials as $material) {
-            $product = $material->getProduct();
+        foreach ($devices as $device) {
+            $product = $device->getProduct();
 
             $item = new ListItem();
 
-            $item->setId($material->getId());
+            $item->setId($device->getId());
             $item->setImageUrl($product->getImageUrl());
             $item->setWikiPageUrl($product->getWikiPageUrl());
             $item->setName($product->getName());
