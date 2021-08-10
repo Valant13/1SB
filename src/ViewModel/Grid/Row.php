@@ -28,6 +28,26 @@ class Row
     }
 
     /**
+     * @param string $key
+     * @return ValueInterface
+     */
+    public function getValue(string $key): ValueInterface
+    {
+        return $this->values[$key];
+    }
+
+    /**
+     * @param string $key
+     * @param ValueInterface $value
+     * @return Row
+     */
+    public function setValue(string $key, ValueInterface $value): Row
+    {
+        $this->values[$key] = $value;
+        return $this;
+    }
+
+    /**
      * @param ValueInterface $value
      * @return Row
      */
@@ -35,5 +55,14 @@ class Row
     {
         $this->values[] = $value;
         return $this;
+    }
+
+    /**
+     * @param string $key
+     * @return bool
+     */
+    public function hasValue(string $key): bool
+    {
+        return array_key_exists($key, $this->values);
     }
 }

@@ -20,9 +20,9 @@
                 {% for column in grid.columns %}
                 <td class="align-middle">
                     {% if column.controlType == "clear" %}
-                        <button class="btn btn-secondary btn-block text-nowrap control-button-{{ loop.index }}">Clear all</button>
+                        <button type="button" class="btn btn-secondary btn-block text-nowrap control-button-{{ loop.index }}">Clear all</button>
                     {% elseif column.controlType == "select_unselect" %}
-                        <button class="btn btn-secondary btn-block text-nowrap control-button-{{ loop.index }}">Unselect all</button>
+                        <button type="button" class="btn btn-secondary btn-block text-nowrap control-button-{{ loop.index }}">Unselect all</button>
                     {% endif %}
                 </td>
                 {% endfor %}
@@ -41,7 +41,7 @@
                         </td>
                     {% elseif value.type == "field" %}
                         <td class="align-middle">
-                            <input type="{{ value.valueType }}" class="form-control field-input-{{ loop.index }}" name="{{ value.name }}" value="{{ value.value }}">
+                            <input type="{{ value.valueType }}" class="form-control text-center field-input-{{ loop.index }}" name="{{ value.name }}" value="{{ value.value }}">
                         </td>
                     {% elseif value.type == "html" %}
                         <td class="align-middle">{{ value.html|raw }}</td>

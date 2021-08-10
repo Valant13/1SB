@@ -4,6 +4,7 @@ namespace App\Entity\Catalog;
 
 use App\Repository\Catalog\DeviceCraftingExperienceRepository;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * @ORM\Entity(repositoryClass=DeviceCraftingExperienceRepository::class)
@@ -25,8 +26,15 @@ class DeviceCraftingExperience
 
     /**
      * @ORM\Column(type="integer", options={"unsigned":true})
+     * @Assert\PositiveOrZero(message="Crafting experience qty should be positive or zero")
      */
     private $qty;
+
+    /**
+     * @ORM\ManyToOne(targetEntity=ResearchPoint::class)
+     * @ORM\JoinColumn(nullable=false)
+     */
+    private $researchPoint;
 
     public function getId(): ?int
     {
@@ -53,6 +61,18 @@ class DeviceCraftingExperience
     public function setQty(int $qty): self
     {
         $this->qty = $qty;
+
+        return $this;
+    }
+
+    public function getResearchPoint(): ?ResearchPoint
+    {
+        return $this->researchPoint;
+    }
+
+    public function setResearchPoint(?ResearchPoint $researchPoint): self
+    {
+        $this->researchPoint = $researchPoint;
 
         return $this;
     }

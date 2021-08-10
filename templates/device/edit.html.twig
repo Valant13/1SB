@@ -48,6 +48,9 @@
 
         {{ include('_product_form.html.twig') }}
 
+        <h2 class="mt-5">Experience output</h2>
+        {{ include('_grid.html.twig', {grid: viewModel.craftingExperienceGrid}) }}
+
         <h2 class="mt-5">Crafting materials</h2>
         {{ include('_grid.html.twig', {grid: viewModel.craftingComponentGrid}) }}
     </form>

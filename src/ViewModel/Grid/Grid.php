@@ -112,4 +112,13 @@ class Grid
         $this->rows[] = $row;
         return $this;
     }
+
+    /**
+     * @param int $index
+     * @return bool
+     */
+    public function hasRow(int $index): bool
+    {
+        return array_key_exists($index, $this->rows);
+    }
 }

@@ -4,6 +4,7 @@ namespace App\Entity\Catalog;
 
 use App\Repository\Catalog\DeviceCraftingComponentRepository;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * @ORM\Entity(repositoryClass=DeviceCraftingComponentRepository::class)
@@ -18,7 +19,7 @@ class DeviceCraftingComponent
     private $id;
 
     /**
-     * @ORM\ManyToOne(targetEntity=Device::class, inversedBy="deviceCraftingComponents")
+     * @ORM\ManyToOne(targetEntity=Device::class, inversedBy="craftingComponents")
      * @ORM\JoinColumn(nullable=false)
      */
     private $device;
@@ -31,6 +32,7 @@ class DeviceCraftingComponent
 
     /**
      * @ORM\Column(type="integer", options={"unsigned":true})
+     * @Assert\PositiveOrZero(message="Crafting component qty should be positive or zero")
      */
     private $qty;
 

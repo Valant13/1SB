@@ -29,12 +29,24 @@ class Device
     private $product;
 
     /**
-     * @ORM\OneToMany(targetEntity=DeviceCraftingExperience::class, mappedBy="device", orphanRemoval=true)
+     * @ORM\OneToMany(
+     *     targetEntity=DeviceCraftingExperience::class,
+     *     mappedBy="device",
+     *     orphanRemoval=true,
+     *     cascade={"persist", "remove"}
+     *     )
+     * @Assert\Valid
      */
     private $craftingExperience;
 
     /**
-     * @ORM\OneToMany(targetEntity=DeviceCraftingComponent::class, mappedBy="device", orphanRemoval=true)
+     * @ORM\OneToMany(
+     *     targetEntity=DeviceCraftingComponent::class,
+     *     mappedBy="device",
+     *     orphanRemoval=true,
+     *     cascade={"persist", "remove"}
+     *     )
+     * @Assert\Valid
      */
     private $craftingComponents;
 
@@ -122,7 +134,7 @@ class Device
     }
 
     /**
-     * @ORM\PreFlush()
+     * @ORM\PreFlush
      */
     public function removeEmptyCraftingExperience(): void
     {
@@ -134,7 +146,7 @@ class Device
     }
 
     /**
-     * @ORM\PreFlush()
+     * @ORM\PreFlush
      */
     public function removeEmptyCraftingComponents(): void
     {

@@ -9,6 +9,7 @@ use App\Entity\Catalog\Product;
 use App\Entity\Catalog\ProductAuctionPrice;
 use App\Repository\Catalog\DeviceRepository;
 use App\Repository\Catalog\MaterialRepository;
+use App\Repository\Catalog\ResearchPointRepository;
 use App\ViewModel\Device\ListModel;
 use App\ViewModel\Device\Edit;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -46,9 +47,15 @@ class DeviceController extends AbstractController
     private $materialRepository;
 
     /**
+     * @var ResearchPointRepository
+     */
+    private $researchPointRepository;
+
+    /**
      * @param Auth $auth
      * @param DeviceRepository $deviceRepository
      * @param MaterialRepository $materialRepository
+     * @param ResearchPointRepository $researchPointRepository
      * @param RequestStack $requestStack
      * @param ValidatorInterface $validator
      */
@@ -56,6 +63,7 @@ class DeviceController extends AbstractController
         Auth $auth,
         DeviceRepository $deviceRepository,
         MaterialRepository $materialRepository,
+        ResearchPointRepository $researchPointRepository,
         RequestStack $requestStack,
         ValidatorInterface $validator
     ) {
@@ -64,6 +72,7 @@ class DeviceController extends AbstractController
         $this->validator = $validator;
         $this->deviceRepository = $deviceRepository;
         $this->materialRepository = $materialRepository;
+        $this->researchPointRepository = $researchPointRepository;
     }
 
     /**
@@ -98,8 +107,9 @@ class DeviceController extends AbstractController
         $device->setProduct(new Product());
         $device->getProduct()->setAuctionPrice(new ProductAuctionPrice());
 
+        $researchPoints = $this->researchPointRepository->findOrderedBySortOrder(Config::QUERY_SELECT_LIMIT);
         $materials = $this->materialRepository->findOrderedByName(Config::QUERY_SELECT_LIMIT);
-        $viewModel = new Edit($materials);
+        $viewModel = new Edit($researchPoints, $materials);
 
         if ($this->request->getMethod() === 'POST') {
             $viewModel->fillFromRequest($this->request);
@@ -163,8 +173,9 @@ class DeviceController extends AbstractController
             return new Response('', 404);
         }
 
+        $researchPoints = $this->researchPointRepository->findOrderedBySortOrder(Config::QUERY_SELECT_LIMIT);
         $materials = $this->materialRepository->findOrderedByName(Config::QUERY_SELECT_LIMIT);
-        $viewModel = new Edit($materials);
+        $viewModel = new Edit($researchPoints, $materials);
         $viewModel->setId($device->getId());
 
         if ($this->request->getMethod() === 'GET') {

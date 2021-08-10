@@ -19,32 +19,17 @@ class ResearchPointRepository extends ServiceEntityRepository
         parent::__construct($registry, ResearchPoint::class);
     }
 
-    // /**
-    //  * @return ResearchPoint[] Returns an array of ResearchPoint objects
-    //  */
-    /*
-    public function findByExampleField($value)
+    /**
+     * @param int $limit
+     * @return ResearchPoint[]
+     */
+    public function findOrderedBySortOrder(int $limit)
     {
         return $this->createQueryBuilder('r')
-            ->andWhere('r.exampleField = :val')
-            ->setParameter('val', $value)
-            ->orderBy('r.id', 'ASC')
-            ->setMaxResults(10)
+            ->orderBy('r.sort_order', 'ASC')
+            ->setMaxResults($limit)
             ->getQuery()
             ->getResult()
-        ;
+            ;
     }
-    */
-
-    /*
-    public function findOneBySomeField($value): ?ResearchPoint
-    {
-        return $this->createQueryBuilder('r')
-            ->andWhere('r.exampleField = :val')
-            ->setParameter('val', $value)
-            ->getQuery()
-            ->getOneOrNullResult()
-        ;
-    }
-    */
 }

@@ -53,7 +53,7 @@ class CalculatorController extends AbstractController
     public function getCalculatorInventory(): Response
     {
         if (!$this->auth->isAuthorized()) {
-            return $this->forward($this->auth->getRedirectToLogin());
+            return $this->auth->getRedirectToLogin();
         }
 
         return $this->render('calculator/index.html.twig', [
