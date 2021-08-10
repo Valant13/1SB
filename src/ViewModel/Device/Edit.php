@@ -371,25 +371,21 @@ class Edit extends AbstractViewModel
      */
     private function fillDeviceWithCraftingExperience(Device $device): void
     {
+        $indexedCraftingExperience = $this->getIndexedCraftingExperience($device->getCraftingExperience()->toArray());
+
         foreach ($this->craftingExperienceGrid->getRows() as $index => $row) {
             $qty = (int)$row->getValue('qty')->getValue();
 
-            $researchPointExists = false;
-            foreach ($device->getCraftingExperience() as $researchPoint) {
-                if ($researchPoint->getResearchPoint()->getId() === $index) {
-                    $researchPoint->setQty($qty);
-                    $researchPointExists= true;
-                    break;
-                }
-            }
+            if (array_key_exists($index, $indexedCraftingExperience)) {
+                $indexedCraftingExperience[$index]->setQty($qty);
+            } elseif ($qty) {
+                $craftingExperience = new DeviceCraftingExperience();
 
-            if (!$researchPointExists && $qty) {
-                $researchPoint = new DeviceCraftingExperience();
-                $researchPoint->setResearchPoint($this->researchPoints[$index]);
-                $researchPoint->setDevice($device);
-                $researchPoint->setQty($qty);
+                $craftingExperience->setResearchPoint($this->researchPoints[$index]);
+                $craftingExperience->setDevice($device);
+                $craftingExperience->setQty($qty);
 
-                $device->addCraftingExperience($researchPoint);
+                $device->addCraftingExperience($craftingExperience);
             }
         }
     }
@@ -399,20 +395,16 @@ class Edit extends AbstractViewModel
      */
     private function fillDeviceWithCraftingComponents(Device $device): void
     {
+        $indexedCraftingComponents = $this->getIndexedCraftingComponents($device->getCraftingComponents()->toArray());
+
         foreach ($this->craftingComponentGrid->getRows() as $index => $row) {
             $qty = (int)$row->getValue('qty')->getValue();
 
-            $componentExists = false;
-            foreach ($device->getCraftingComponents() as $craftingComponent) {
-                if ($craftingComponent->getMaterial()->getId() === $index) {
-                    $craftingComponent->setQty($qty);
-                    $componentExists= true;
-                    break;
-                }
-            }
-
-            if (!$componentExists && $qty) {
+            if (array_key_exists($index, $indexedCraftingComponents)) {
+                $indexedCraftingComponents[$index]->setQty($qty);
+            } elseif ($qty) {
                 $craftingComponent = new DeviceCraftingComponent();
+
                 $craftingComponent->setMaterial($this->materials[$index]);
                 $craftingComponent->setDevice($device);
                 $craftingComponent->setQty($qty);
@@ -420,5 +412,35 @@ class Edit extends AbstractViewModel
                 $device->addCraftingComponent($craftingComponent);
             }
         }
+    }
+
+    /**
+     * @param DeviceCraftingExperience[] $craftingExperience
+     * @return DeviceCraftingExperience[]
+     */
+    private function getIndexedCraftingExperience(array $craftingExperience): array
+    {
+        $indexedCraftingExperience = [];
+        foreach ($craftingExperience as $researchPoint) {
+            $researchPointId = $researchPoint->getResearchPoint()->getId();
+            $indexedCraftingExperience[$researchPointId] = $researchPoint;
+        }
+
+        return $indexedCraftingExperience;
+    }
+
+    /**
+     * @param DeviceCraftingComponent[] $craftingComponents
+     * @return DeviceCraftingComponent[]
+     */
+    private function getIndexedCraftingComponents(array $craftingComponents): array
+    {
+        $indexedCraftingComponents = [];
+        foreach ($craftingComponents as $component) {
+            $materialId = $component->getMaterial()->getId();
+            $indexedCraftingComponents[$materialId] = $component;
+        }
+
+        return $indexedCraftingComponents;
     }
 }
