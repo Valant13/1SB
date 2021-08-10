@@ -7,6 +7,11 @@ use App\ViewModel\Grid\ValueInterface;
 class Checkbox implements ValueInterface
 {
     /**
+     * @var string|null
+     */
+    private $name;
+
+    /**
      * @var bool
      */
     private $isChecked = false;
@@ -17,6 +22,24 @@ class Checkbox implements ValueInterface
     public function getType(): string
     {
         return 'checkbox';
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getName(): ?string
+    {
+        return $this->name;
+    }
+
+    /**
+     * @param string|null $name
+     * @return Checkbox
+     */
+    public function setName(?string $name): Checkbox
+    {
+        $this->name = $name;
+        return $this;
     }
 
     /**

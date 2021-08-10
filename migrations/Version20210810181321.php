@@ -4,9 +4,7 @@ declare(strict_types=1);
 
 namespace DoctrineMigrations;
 
-use App\Entity\Catalog\Material;
-use App\Entity\Catalog\Product;
-use App\Entity\Catalog\ProductAuctionPrice;
+use App\Entity\Catalog\ResearchPoint;
 use Doctrine\DBAL\Schema\Schema;
 use Doctrine\Migrations\AbstractMigration;
 use Doctrine\ORM\EntityManagerInterface;
@@ -16,7 +14,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 /**
  * Auto-generated Migration: Please modify to your needs!
  */
-final class Version20210808205352 extends AbstractMigration implements ContainerAwareInterface
+final class Version20210810181321 extends AbstractMigration implements ContainerAwareInterface
 {
     /** @var ContainerInterface */
     private $container;
@@ -29,34 +27,11 @@ final class Version20210808205352 extends AbstractMigration implements Container
         $this->container = $container;
     }
 
-    const MATERIAL_NAMES = [
-        'Valkite',
-        'Ajatite',
-        'Talkite',
-        'Bastium',
-        'Aegisium',
-        'Oninum',
-        'Charodium',
-        'Merkerium',
-        'Lukium',
-        'Targium',
-        'Tengium',
-        'Ilmatrium',
-        'Ukonium',
-        'Vokarium',
-        'Exorium',
-        'Ymrium',
-        'Naflite',
-        'Kutonium',
-        'Arkanium',
-        'Corazium',
-        'Xhalium',
-        'Daltium',
-        'Ice',
-        'Surtrite',
-        'Nhurgite',
-        'Haderite',
-        'Karnite'
+    const RESEARCH_POINT_NAMES = [
+        'Box',
+        'Lightning',
+        'Shield',
+        'Gear'
     ];
 
     public function getDescription(): string
@@ -75,13 +50,16 @@ final class Version20210808205352 extends AbstractMigration implements Container
         /** @var EntityManagerInterface $entityManager */
         $entityManager = $this->container->get('doctrine.orm.entity_manager');
 
-        foreach (self::MATERIAL_NAMES as $materialName) {
-            $material = new Material();
-            $material->setProduct(new Product());
-            $material->getProduct()->setAuctionPrice((new ProductAuctionPrice()));
-            $material->getProduct()->setName($materialName);
+        $sortOrder = 0;
+        foreach (self::RESEARCH_POINT_NAMES as $researchPointName) {
+            $sortOrder += 10;
 
-            $entityManager->persist($material);
+            $researchPoint = new ResearchPoint();
+            $researchPoint->setCode(strtolower($researchPointName));
+            $researchPoint->setName($researchPointName);
+            $researchPoint->setSortOrder($sortOrder);
+
+            $entityManager->persist($researchPoint);
             $entityManager->flush();
         }
     }
@@ -97,13 +75,12 @@ final class Version20210808205352 extends AbstractMigration implements Container
         /** @var EntityManagerInterface $entityManager */
         $entityManager = $this->container->get('doctrine.orm.entity_manager');
 
-        foreach (self::MATERIAL_NAMES as $materialName) {
-            /** @var Product $product */
-            $product = $entityManager->getRepository(Product::class)->findOneBy(['name' => $materialName]);
-            $auctionPrice = $product->getAuctionPrice();
+        foreach (self::RESEARCH_POINT_NAMES as $researchPointName) {
+            /** @var ResearchPoint $researchPoint */
+            $researchPoint = $entityManager->getRepository(ResearchPoint::class)
+                ->findOneBy(['name' => $researchPointName]);
 
-            $entityManager->remove($product);
-            $entityManager->remove($auctionPrice);
+            $entityManager->remove($researchPoint);
             $entityManager->flush();
         }
     }

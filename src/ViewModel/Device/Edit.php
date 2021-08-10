@@ -207,6 +207,22 @@ class Edit extends AbstractViewModel
     /**
      * @return Grid
      */
+    public function getCraftingExperienceGrid(): Grid
+    {
+        return $this->craftingExperienceGrid;
+    }
+
+    /**
+     * @param Grid $craftingExperienceGrid
+     */
+    public function setCraftingExperienceGrid(Grid $craftingExperienceGrid): void
+    {
+        $this->craftingExperienceGrid = $craftingExperienceGrid;
+    }
+
+    /**
+     * @return Grid
+     */
     public function getCraftingComponentGrid(): Grid
     {
         return $this->craftingComponentGrid;
