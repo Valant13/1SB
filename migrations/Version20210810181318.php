@@ -77,8 +77,6 @@ final class Version20210810181318 extends AbstractMigration implements Container
 
         foreach (self::MATERIAL_NAMES as $materialName) {
             $material = new Material();
-            $material->setProduct(new Product());
-            $material->getProduct()->setAuctionPrice((new ProductAuctionPrice()));
             $material->getProduct()->setName($materialName);
 
             $entityManager->persist($material);

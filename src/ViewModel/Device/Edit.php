@@ -57,12 +57,12 @@ class Edit extends AbstractViewModel
     /**
      * @var ResearchPoint[]
      */
-    private $researchPoints = [];
+    private $indexedResearchPoints = [];
 
     /**
      * @var Material[]
      */
-    private $materials = [];
+    private $indexedMaterials = [];
 
     /**
      * @param ResearchPoint[] $researchPoints
@@ -71,15 +71,15 @@ class Edit extends AbstractViewModel
     public function __construct(array $researchPoints, array $materials)
     {
         foreach ($researchPoints as $researchPoint) {
-            $this->researchPoints[$researchPoint->getId()] = $researchPoint;
+            $this->indexedResearchPoints[$researchPoint->getId()] = $researchPoint;
         }
 
         foreach ($materials as $material) {
-            $this->materials[$material->getId()] = $material;
+            $this->indexedMaterials[$material->getId()] = $material;
         }
 
-        $this->craftingExperienceGrid = $this->buildCraftingExperienceGrid($this->researchPoints);
-        $this->craftingComponentGrid = $this->buildCraftingComponentGrid($this->materials);
+        $this->craftingExperienceGrid = $this->buildCraftingExperienceGrid($researchPoints);
+        $this->craftingComponentGrid = $this->buildCraftingComponentGrid($materials);
     }
 
     /**
@@ -304,9 +304,9 @@ class Edit extends AbstractViewModel
         /** @var array $craftingExperience */
         $craftingExperience = $request->request->get('crafting-experience');
         if (is_array($craftingExperience)) {
-            foreach ($craftingExperience as $index => $value) {
-                if ($this->craftingExperienceGrid->hasRow($index)) {
-                    $row = $this->craftingExperienceGrid->getRow($index);
+            foreach ($craftingExperience as $researchPointId => $value) {
+                if ($this->craftingExperienceGrid->hasRow($researchPointId)) {
+                    $row = $this->craftingExperienceGrid->getRow($researchPointId);
 
                     /** @var Field $qty */
                     $qty = $row->getValue('qty');
@@ -324,9 +324,9 @@ class Edit extends AbstractViewModel
         /** @var array $craftingComponents */
         $craftingComponents = $request->request->get('crafting-components');
         if (is_array($craftingComponents)) {
-            foreach ($craftingComponents as $index => $value) {
-                if ($this->craftingComponentGrid->hasRow($index)) {
-                    $row = $this->craftingComponentGrid->getRow($index);
+            foreach ($craftingComponents as $materialId => $value) {
+                if ($this->craftingComponentGrid->hasRow($materialId)) {
+                    $row = $this->craftingComponentGrid->getRow($materialId);
 
                     /** @var Field $qty */
                     $qty = $row->getValue('qty');
@@ -342,8 +342,8 @@ class Edit extends AbstractViewModel
     private function fillCraftingExperienceFromDevice(Device $device): void
     {
         foreach ($device->getCraftingExperience() as $researchPoint) {
-            $index = $researchPoint->getResearchPoint()->getId();
-            $row = $this->craftingExperienceGrid->getRow($index);
+            $researchPointId = $researchPoint->getResearchPoint()->getId();
+            $row = $this->craftingExperienceGrid->getRow($researchPointId);
 
             /** @var Field $qty */
             $qty = $row->getValue('qty');
@@ -357,8 +357,8 @@ class Edit extends AbstractViewModel
     private function fillCraftingComponentsFromDevice(Device $device): void
     {
         foreach ($device->getCraftingComponents() as $craftingComponent) {
-            $index = $craftingComponent->getMaterial()->getId();
-            $row = $this->craftingComponentGrid->getRow($index);
+            $materialId = $craftingComponent->getMaterial()->getId();
+            $row = $this->craftingComponentGrid->getRow($materialId);
 
             /** @var Field $qty */
             $qty = $row->getValue('qty');
@@ -373,15 +373,15 @@ class Edit extends AbstractViewModel
     {
         $indexedCraftingExperience = $this->getIndexedCraftingExperience($device->getCraftingExperience()->toArray());
 
-        foreach ($this->craftingExperienceGrid->getRows() as $index => $row) {
+        foreach ($this->craftingExperienceGrid->getRows() as $researchPointId => $row) {
             $qty = (int)$row->getValue('qty')->getValue();
 
-            if (array_key_exists($index, $indexedCraftingExperience)) {
-                $indexedCraftingExperience[$index]->setQty($qty);
+            if (array_key_exists($researchPointId, $indexedCraftingExperience)) {
+                $indexedCraftingExperience[$researchPointId]->setQty($qty);
             } elseif ($qty) {
                 $craftingExperience = new DeviceCraftingExperience();
 
-                $craftingExperience->setResearchPoint($this->researchPoints[$index]);
+                $craftingExperience->setResearchPoint($this->indexedResearchPoints[$researchPointId]);
                 $craftingExperience->setDevice($device);
                 $craftingExperience->setQty($qty);
 
@@ -397,15 +397,15 @@ class Edit extends AbstractViewModel
     {
         $indexedCraftingComponents = $this->getIndexedCraftingComponents($device->getCraftingComponents()->toArray());
 
-        foreach ($this->craftingComponentGrid->getRows() as $index => $row) {
+        foreach ($this->craftingComponentGrid->getRows() as $materialId => $row) {
             $qty = (int)$row->getValue('qty')->getValue();
 
-            if (array_key_exists($index, $indexedCraftingComponents)) {
-                $indexedCraftingComponents[$index]->setQty($qty);
+            if (array_key_exists($materialId, $indexedCraftingComponents)) {
+                $indexedCraftingComponents[$materialId]->setQty($qty);
             } elseif ($qty) {
                 $craftingComponent = new DeviceCraftingComponent();
 
-                $craftingComponent->setMaterial($this->materials[$index]);
+                $craftingComponent->setMaterial($this->indexedMaterials[$materialId]);
                 $craftingComponent->setDevice($device);
                 $craftingComponent->setQty($qty);
 

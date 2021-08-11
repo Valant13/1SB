@@ -1,9 +1,10 @@
 <?php
 
-namespace App\Entity\Catalog;
+namespace App\Entity\Calculator;
 
+use App\Entity\Catalog\Material;
 use App\Entity\User\User;
-use App\Repository\Catalog\UserMiningMaterialRepository;
+use App\Repository\Calculator\UserMiningMaterialRepository;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
@@ -19,10 +20,10 @@ class UserMiningMaterial
     private $id;
 
     /**
-     * @ORM\ManyToOne(targetEntity=User::class)
+     * @ORM\ManyToOne(targetEntity=UserMining::class, inversedBy="materials")
      * @ORM\JoinColumn(nullable=false)
      */
-    private $user;
+    private $userMining;
 
     /**
      * @ORM\ManyToOne(targetEntity=Material::class)
@@ -40,14 +41,14 @@ class UserMiningMaterial
         return $this->id;
     }
 
-    public function getUser(): ?User
+    public function getUserMining(): ?UserMining
     {
-        return $this->user;
+        return $this->userMining;
     }
 
-    public function setUser(?User $user): self
+    public function setUserMining(?UserMining $userMining): self
     {
-        $this->user = $user;
+        $this->userMining = $userMining;
 
         return $this;
     }

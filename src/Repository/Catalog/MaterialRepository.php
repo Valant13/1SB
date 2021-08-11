@@ -20,15 +20,13 @@ class MaterialRepository extends ServiceEntityRepository
     }
 
     /**
-     * @param int $limit
      * @return Material[]
      */
-    public function findOrderedByName(int $limit)
+    public function findOrderedByName(): array
     {
         return $this->createQueryBuilder('m')
             ->join('m.product', 'p')
             ->orderBy('p.name', 'ASC')
-            ->setMaxResults($limit)
             ->getQuery()
             ->getResult()
         ;

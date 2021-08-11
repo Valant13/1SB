@@ -84,7 +84,7 @@ class DeviceController extends AbstractController
             return $this->auth->getRedirectToLogin();
         }
 
-        $devices = $this->deviceRepository->findOrderedByName(Config::QUERY_SELECT_LIMIT);
+        $devices = $this->deviceRepository->findOrderedByName();
 
         $viewModel = new ListModel();
         $viewModel->fillFromDevices($devices);
@@ -103,12 +103,14 @@ class DeviceController extends AbstractController
             return $this->auth->getRedirectToLogin();
         }
 
-        $device = new Device();
-        $device->setProduct(new Product());
-        $device->getProduct()->setAuctionPrice(new ProductAuctionPrice());
+        if ($this->deviceRepository->count([]) >= Config::DEVICE_LIMIT) {
+            return new Response('Device limit reached', 507);
+        }
 
-        $researchPoints = $this->researchPointRepository->findOrderedBySortOrder(Config::QUERY_SELECT_LIMIT);
-        $materials = $this->materialRepository->findOrderedByName(Config::QUERY_SELECT_LIMIT);
+        $device = new Device();
+
+        $researchPoints = $this->researchPointRepository->findOrderedBySortOrder();
+        $materials = $this->materialRepository->findOrderedByName();
         $viewModel = new Edit($researchPoints, $materials);
 
         if ($this->request->getMethod() === 'POST') {
@@ -173,8 +175,8 @@ class DeviceController extends AbstractController
             return new Response('', 404);
         }
 
-        $researchPoints = $this->researchPointRepository->findOrderedBySortOrder(Config::QUERY_SELECT_LIMIT);
-        $materials = $this->materialRepository->findOrderedByName(Config::QUERY_SELECT_LIMIT);
+        $researchPoints = $this->researchPointRepository->findOrderedBySortOrder();
+        $materials = $this->materialRepository->findOrderedByName();
         $viewModel = new Edit($researchPoints, $materials);
         $viewModel->setId($device->getId());
 

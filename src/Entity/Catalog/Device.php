@@ -52,6 +52,7 @@ class Device
 
     public function __construct()
     {
+        $this->product = new Product();
         $this->craftingExperience = new ArrayCollection();
         $this->craftingComponents = new ArrayCollection();
     }

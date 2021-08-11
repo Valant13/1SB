@@ -3,14 +3,24 @@
 {% block title %}Account{% endblock %}
 
 {% block main %}
+    <div class="text-right mb-3">
+        <a href="{{ url('homepage') }}" class="btn btn-link btn-lg">Back</a>
+        <button type="submit" class="btn btn-primary btn-lg" form="form">Save</button>
+    </div>
+
     {{ include('_errors.html.twig', {errors: viewModel.errors}) }}
     {{ include('_notices.html.twig', {notices: viewModel.notices}) }}
 
-    <form action="{{ url('user_account') }}" method="post">
+    <form action="{{ url('user_account') }}" method="post" id="form">
         <div class="form-group">
             <label for="nickname">Nickname:</label>
             <input type="text" class="form-control" id="nickname" name="nickname" value="{{ viewModel.nickname }}">
         </div>
-        <button type="submit" class="btn btn-primary">Save</button>
+
+        <h2 class="mt-5">Materials of interest</h2>
+        {{ include('_grid.html.twig', {grid: viewModel.interestMaterialGrid}) }}
+
+        <h2 class="mt-5">Devices of interest</h2>
+        {{ include('_grid.html.twig', {grid: viewModel.interestDeviceGrid}) }}
     </form>
 {% endblock %}

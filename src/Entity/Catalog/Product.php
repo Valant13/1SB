@@ -58,6 +58,11 @@ class Product
      */
     private $modificationTime;
 
+    public function __construct()
+    {
+        $this->auctionPrice = new ProductAuctionPrice();
+    }
+
     public function getId(): ?int
     {
         return $this->id;

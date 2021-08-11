@@ -1,8 +1,8 @@
 <?php
 
-namespace App\Repository\Catalog;
+namespace App\Repository\Calculator;
 
-use App\Entity\Catalog\UserInventoryMaterial;
+use App\Entity\Calculator\UserInventoryMaterial;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 

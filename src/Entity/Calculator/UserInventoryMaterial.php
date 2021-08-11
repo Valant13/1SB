@@ -1,9 +1,9 @@
 <?php
 
-namespace App\Entity\Catalog;
+namespace App\Entity\Calculator;
 
-use App\Entity\User\User;
-use App\Repository\Catalog\UserInventoryMaterialRepository;
+use App\Entity\Catalog\Material;
+use App\Repository\Calculator\UserInventoryMaterialRepository;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
@@ -19,10 +19,10 @@ class UserInventoryMaterial
     private $id;
 
     /**
-     * @ORM\ManyToOne(targetEntity=User::class)
+     * @ORM\ManyToOne(targetEntity=UserInventory::class, inversedBy="materials")
      * @ORM\JoinColumn(nullable=false)
      */
-    private $user;
+    private $userInventory;
 
     /**
      * @ORM\ManyToOne(targetEntity=Material::class)
@@ -40,14 +40,14 @@ class UserInventoryMaterial
         return $this->id;
     }
 
-    public function getUser(): ?User
+    public function getUserInventory(): ?UserInventory
     {
-        return $this->user;
+        return $this->userInventory;
     }
 
-    public function setUser(?User $user): self
+    public function setUserInventory(?UserInventory $userInventory): self
     {
-        $this->user = $user;
+        $this->userInventory = $userInventory;
 
         return $this;
     }

@@ -20,17 +20,15 @@ class DeviceRepository extends ServiceEntityRepository
     }
 
     /**
-     * @param int $limit
      * @return Device[]
      */
-    public function findOrderedByName(int $limit)
+    public function findOrderedByName(): array
     {
         return $this->createQueryBuilder('d')
             ->join('d.product', 'p')
             ->orderBy('p.name', 'ASC')
-            ->setMaxResults($limit)
             ->getQuery()
             ->getResult()
-            ;
+        ;
     }
 }

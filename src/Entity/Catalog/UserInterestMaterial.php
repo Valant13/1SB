@@ -2,7 +2,6 @@
 
 namespace App\Entity\Catalog;
 
-use App\Entity\User\User;
 use App\Repository\Catalog\UserInterestMaterialRepository;
 use Doctrine\ORM\Mapping as ORM;
 
@@ -19,10 +18,10 @@ class UserInterestMaterial
     private $id;
 
     /**
-     * @ORM\ManyToOne(targetEntity=User::class)
+     * @ORM\ManyToOne(targetEntity=UserInterest::class, inversedBy="materials")
      * @ORM\JoinColumn(nullable=false)
      */
-    private $user;
+    private $userInterest;
 
     /**
      * @ORM\ManyToOne(targetEntity=Material::class)
@@ -40,14 +39,14 @@ class UserInterestMaterial
         return $this->id;
     }
 
-    public function getUser(): ?User
+    public function getUserInterest(): ?UserInterest
     {
-        return $this->user;
+        return $this->userInterest;
     }
 
-    public function setUser(?User $user): self
+    public function setUserInterest(?UserInterest $userInterest): self
     {
-        $this->user = $user;
+        $this->userInterest = $userInterest;
 
         return $this;
     }

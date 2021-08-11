@@ -3,7 +3,6 @@
 namespace App\Controller;
 
 use App\Auth;
-use App\Config;
 use App\Repository\Catalog\MaterialRepository;
 use App\ViewModel\Material\Edit;
 use App\ViewModel\Material\ListModel;
@@ -63,7 +62,7 @@ class MaterialController extends AbstractController
             return $this->auth->getRedirectToLogin();
         }
 
-        $materials = $this->materialRepository->findOrderedByName(Config::QUERY_SELECT_LIMIT);
+        $materials = $this->materialRepository->findOrderedByName();
 
         $viewModel = new ListModel();
         $viewModel->fillFromMaterials($materials);

@@ -20,16 +20,14 @@ class ResearchPointRepository extends ServiceEntityRepository
     }
 
     /**
-     * @param int $limit
      * @return ResearchPoint[]
      */
-    public function findOrderedBySortOrder(int $limit)
+    public function findOrderedBySortOrder(): array
     {
         return $this->createQueryBuilder('rp')
             ->orderBy('rp.sortOrder', 'ASC')
-            ->setMaxResults($limit)
             ->getQuery()
             ->getResult()
-            ;
+        ;
     }
 }

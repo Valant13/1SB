@@ -4,6 +4,7 @@ namespace App\ViewModel\User;
 
 use App\Entity\Catalog\Device;
 use App\Entity\Catalog\Material;
+use App\Entity\Catalog\UserInterest;
 use App\Entity\Catalog\UserInterestDevice;
 use App\Entity\Catalog\UserInterestMaterial;
 use App\Entity\User\User;
@@ -34,14 +35,14 @@ class Account extends AbstractViewModel
     private $interestDeviceGrid;
 
     /**
-     * @var Material[]
+     * @param Material[] $materials
+     * @param Device[] $devices
      */
-    private $materials = [];
-
-    /**
-     * @var Device[]
-     */
-    private $devices = [];
+    public function __construct(array $materials, array $devices)
+    {
+        $this->interestMaterialGrid = $this->buildInterestMaterialGrid($materials);
+        $this->interestDeviceGrid = $this->buildInterestDeviceGrid($devices);
+    }
 
     /**
      * @param Request $request
@@ -49,22 +50,33 @@ class Account extends AbstractViewModel
     public function fillFromRequest(Request $request): void
     {
         $this->nickname = $request->request->get('nickname');
+
+        $this->fillInterestMaterialsFromRequest($request);
+        $this->fillInterestDevicesFromRequest($request);
     }
 
     /**
      * @param User $user
+     * @param UserInterest $userInterest
      */
-    public function fillFromUser(User $user): void
+    public function fillFromUser(User $user, UserInterest $userInterest): void
     {
         $this->nickname = $user->getNickname();
+
+        $this->fillFromInterestMaterials($userInterest->getMaterials()->toArray());
+        $this->fillFromInterestDevices($userInterest->getDevices()->toArray());
     }
 
     /**
      * @param User $user
+     * @param UserInterest $userInterest
      */
-    public function fillUser(User $user): void
+    public function fillUser(User $user, UserInterest $userInterest): void
     {
         $user->setNickname($this->nickname);
+
+        $this->fillInterestMaterials($userInterest->getMaterials()->toArray());
+        $this->fillInterestDevices($userInterest->getDevices()->toArray());
     }
 
     /**
@@ -185,13 +197,13 @@ class Account extends AbstractViewModel
         /** @var array $interestMaterials */
         $interestMaterials = $request->request->get('interest-materials');
         if (is_array($interestMaterials)) {
-            foreach ($interestMaterials as $index => $isChecked) {
-                if ($this->interestMaterialGrid->hasRow($index)) {
-                    $row = $this->interestMaterialGrid->getRow($index);
+            foreach ($interestMaterials as $materialId => $isChecked) {
+                if ($this->interestMaterialGrid->hasRow($materialId)) {
+                    $row = $this->interestMaterialGrid->getRow($materialId);
 
                     /** @var Checkbox $included */
                     $included = $row->getValue('included');
-                    $included->setIsChecked(((int)$isChecked) ?: null);
+                    $included->setIsChecked((bool)$isChecked);
                 }
             }
         }
@@ -205,13 +217,13 @@ class Account extends AbstractViewModel
         /** @var array $interestDevices */
         $interestDevices = $request->request->get('interest-devices');
         if (is_array($interestDevices)) {
-            foreach ($interestDevices as $index => $isChecked) {
-                if ($this->interestDeviceGrid->hasRow($index)) {
-                    $row = $this->interestDeviceGrid->getRow($index);
+            foreach ($interestDevices as $deviceId => $isChecked) {
+                if ($this->interestDeviceGrid->hasRow($deviceId)) {
+                    $row = $this->interestDeviceGrid->getRow($deviceId);
 
                     /** @var Checkbox $included */
                     $included = $row->getValue('included');
-                    $included->setIsChecked(((int)$isChecked) ?: null);
+                    $included->setIsChecked((bool)$isChecked);
                 }
             }
         }
@@ -224,8 +236,8 @@ class Account extends AbstractViewModel
     {
         $indexedInterestMaterials = $this->getIndexedInterestMaterials($interestMaterials);
 
-        foreach ($indexedInterestMaterials as $index => $interestMaterial) {
-            $row = $this->interestMaterialGrid->getRow($index);
+        foreach ($indexedInterestMaterials as $materialId => $interestMaterial) {
+            $row = $this->interestMaterialGrid->getRow($materialId);
 
             /** @var Checkbox $included */
             $included = $row->getValue('included');
@@ -240,8 +252,8 @@ class Account extends AbstractViewModel
     {
         $indexedInterestDevices = $this->getIndexedInterestDevices($interestDevices);
 
-        foreach ($indexedInterestDevices as $index => $interestDevice) {
-            $row = $this->interestDeviceGrid->getRow($index);
+        foreach ($indexedInterestDevices as $deviceId => $interestDevice) {
+            $row = $this->interestDeviceGrid->getRow($deviceId);
 
             /** @var Checkbox $included */
             $included = $row->getValue('included');
@@ -256,10 +268,10 @@ class Account extends AbstractViewModel
     {
         $indexedInterestMaterials = $this->getIndexedInterestMaterials($interestMaterials);
 
-        foreach ($this->interestMaterialGrid->getRows() as $index => $row) {
+        foreach ($this->interestMaterialGrid->getRows() as $materialId => $row) {
             $isExcluded = !$row->getValue('included')->isChecked();
 
-            $indexedInterestMaterials[$index]->setIsExcluded($isExcluded);
+            $indexedInterestMaterials[$materialId]->setIsExcluded($isExcluded);
         }
     }
 
@@ -270,10 +282,10 @@ class Account extends AbstractViewModel
     {
         $indexedInterestDevices = $this->getIndexedInterestDevices($interestDevices);
 
-        foreach ($this->interestDeviceGrid->getRows() as $index => $row) {
+        foreach ($this->interestDeviceGrid->getRows() as $deviceId => $row) {
             $isExcluded = !$row->getValue('included')->isChecked();
 
-            $indexedInterestDevices[$index]->setIsExcluded($isExcluded);
+            $indexedInterestDevices[$deviceId]->setIsExcluded($isExcluded);
         }
     }
 

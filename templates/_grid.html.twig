@@ -22,7 +22,7 @@
                     {% if column.controlType == "clear" %}
                         <button type="button" class="btn btn-secondary btn-block text-nowrap control-button-{{ loop.index }}">Clear all</button>
                     {% elseif column.controlType == "select_unselect" %}
-                        <button type="button" class="btn btn-secondary btn-block text-nowrap control-button-{{ loop.index }}">Unselect all</button>
+                        <button type="button" class="btn btn-secondary btn-block text-nowrap control-button-{{ loop.index }}" style="width: 120px">Unselect all</button>
                     {% endif %}
                 </td>
                 {% endfor %}
@@ -37,7 +37,7 @@
                         </td>
                     {% elseif value.type == "checkbox" %}
                         <td class="align-middle">
-                            <input type="checkbox" class="custom-control-input checkbox-input-{{ loop.index }}" name="{{ value.name }}" checked="{% if value.isChecked %}checked{% endif %}">
+                            <input type="checkbox" class="checkbox-input-{{ loop.index }}" style="transform: scale(1.25)" name="{{ value.name }}" {% if value.isChecked %}checked{% endif %}>
                         </td>
                     {% elseif value.type == "field" %}
                         <td class="align-middle">

@@ -1,8 +1,8 @@
 <?php
 
-namespace App\Repository\Catalog;
+namespace App\Repository\Calculator;
 
-use App\Entity\Catalog\UserMiningMaterial;
+use App\Entity\Calculator\UserMiningMaterial;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 

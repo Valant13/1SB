@@ -12,5 +12,6 @@ class Config
         'gear'
     ];
 
-    const QUERY_SELECT_LIMIT = 10000;
+    const DEVICE_LIMIT = 10000;
+    const USER_LIMIT = 10000;
 }

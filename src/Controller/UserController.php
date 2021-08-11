@@ -4,6 +4,10 @@ namespace App\Controller;
 
 use App\Auth;
 use App\Config;
+use App\Repository\Catalog\DeviceRepository;
+use App\Repository\Catalog\MaterialRepository;
+use App\Repository\Catalog\UserInterestRepository;
+use App\Repository\User\UserRepository;
 use App\ViewModel\User\Account;
 use App\ViewModel\User\Login;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -31,18 +35,50 @@ class UserController extends AbstractController
     private $validator;
 
     /**
+     * @var DeviceRepository
+     */
+    private $deviceRepository;
+
+    /**
+     * @var MaterialRepository
+     */
+    private $materialRepository;
+
+    /**
+     * @var UserRepository
+     */
+    private $userRepository;
+
+    /**
+     * @var UserInterestRepository
+     */
+    private $userInterestRepository;
+
+    /**
      * @param Auth $auth
      * @param RequestStack $requestStack
+     * @param DeviceRepository $deviceRepository
+     * @param MaterialRepository $materialRepository
+     * @param UserRepository $userRepository
+     * @param UserInterestRepository $userInterestRepository
      * @param ValidatorInterface $validator
      */
     public function __construct(
         Auth $auth,
         RequestStack $requestStack,
+        DeviceRepository $deviceRepository,
+        MaterialRepository $materialRepository,
+        UserRepository $userRepository,
+        UserInterestRepository $userInterestRepository,
         ValidatorInterface $validator
     ) {
         $this->auth = $auth;
         $this->request = $requestStack->getCurrentRequest();
         $this->validator = $validator;
+        $this->deviceRepository = $deviceRepository;
+        $this->materialRepository = $materialRepository;
+        $this->userRepository = $userRepository;
+        $this->userInterestRepository = $userInterestRepository;
     }
 
     /**
@@ -127,6 +163,10 @@ class UserController extends AbstractController
             try {
                 $this->auth->login($nickname);
             } catch (\InvalidArgumentException $exception) {
+                if ($this->userRepository->count([]) >= Config::USER_LIMIT) {
+                    return new Response('User limit reached', 507);
+                }
+
                 try {
                     $this->auth->register($nickname);
                 } catch (\InvalidArgumentException $exception) {
@@ -166,13 +206,18 @@ class UserController extends AbstractController
         }
 
         $user = $this->auth->getUser();
-        $viewModel = new Account();
+        $userInterest = $this->userInterestRepository->findOneByUser($user);
+
+        $materials = $this->materialRepository->findOrderedByName();
+        $device = $this->deviceRepository->findOrderedByName();
+
+        $viewModel = new Account($materials, $device);
 
         if ($this->request->getMethod() === 'GET') {
-            $viewModel->fillFromUser($user);
+            $viewModel->fillFromUser($user, $userInterest);
         } else {
             $viewModel->fillFromRequest($this->request);
-            $viewModel->fillUser($user);
+            $viewModel->fillUser($user, $userInterest);
 
             $errors = $this->validator->validate($user);
             if (count($errors) > 0) {
