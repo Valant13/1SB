@@ -1,10 +1,10 @@
 <?php
 
-namespace App\ViewModel\Grid\Value;
+namespace App\ViewModel\Grid\Cell;
 
-use App\ViewModel\Grid\ValueInterface;
+use App\ViewModel\Grid\CellInterface;
 
-class Field implements ValueInterface
+class Field implements CellInterface
 {
     /**
      * @var string|null

@@ -5,7 +5,7 @@ namespace App\Controller;
 use App\Auth;
 use App\Repository\Catalog\MaterialRepository;
 use App\ViewModel\Material\Edit;
-use App\ViewModel\Material\ListModel;
+use App\ViewModel\Material\ListViewModel;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
@@ -64,7 +64,7 @@ class MaterialController extends AbstractController
 
         $materials = $this->materialRepository->findOrderedByName();
 
-        $viewModel = new ListModel();
+        $viewModel = new ListViewModel();
         $viewModel->fillFromMaterials($materials);
 
         return $this->render('material/list.html.twig', [

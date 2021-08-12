@@ -10,7 +10,7 @@ use App\Entity\Catalog\ProductAuctionPrice;
 use App\Repository\Catalog\DeviceRepository;
 use App\Repository\Catalog\MaterialRepository;
 use App\Repository\Catalog\ResearchPointRepository;
-use App\ViewModel\Device\ListModel;
+use App\ViewModel\Device\ListModelModel;
 use App\ViewModel\Device\Edit;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\RequestStack;
@@ -86,7 +86,7 @@ class DeviceController extends AbstractController
 
         $devices = $this->deviceRepository->findOrderedByName();
 
-        $viewModel = new ListModel();
+        $viewModel = new ListModelModel();
         $viewModel->fillFromDevices($devices);
 
         return $this->render('device/list.html.twig', [

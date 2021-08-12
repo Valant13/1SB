@@ -30,37 +30,37 @@
         {% endif %}
         {% for row in grid.rows %}
             <tr>
-                {% for value in row.values %}
-                    {% if value.type == "action" %}
+                {% for cell in row.cells %}
+                    {% if cell.type == "action" %}
                         <td class="align-middle">
-                            <a href="{{ url(value.route, value.params) }}" class="btn btn-secondary btn-sm">{{ value.name }}</a>
+                            <a href="{{ url(cell.route, cell.params) }}" class="btn btn-secondary btn-sm">{{ cell.name }}</a>
                         </td>
-                    {% elseif value.type == "checkbox" %}
+                    {% elseif cell.type == "checkbox" %}
                         <td class="align-middle">
-                            <input type="checkbox" class="checkbox-input-{{ loop.index }}" style="transform: scale(1.25)" name="{{ value.name }}" {% if value.isChecked %}checked{% endif %}>
+                            <input type="checkbox" class="checkbox-input-{{ loop.index }}" style="transform: scale(1.25)" name="{{ cell.name }}" {% if cell.isChecked %}checked{% endif %}>
                         </td>
-                    {% elseif value.type == "field" %}
+                    {% elseif cell.type == "field" %}
                         <td class="align-middle">
-                            <input type="{{ value.valueType }}" class="form-control field-input-{{ loop.index }}" name="{{ value.name }}" value="{{ value.value }}">
+                            <input type="{{ cell.valueType }}" class="form-control field-input-{{ loop.index }}" name="{{ cell.name }}" value="{{ cell.value }}">
                         </td>
-                    {% elseif value.type == "html" %}
-                        <td class="align-middle">{{ value.html|raw }}</td>
-                    {% elseif value.type == "image" %}
+                    {% elseif cell.type == "html" %}
+                        <td class="align-middle">{{ cell.html|raw }}</td>
+                    {% elseif cell.type == "image" %}
                         <td class="align-middle">
-                            {% if value.href %}
-                                <img src="{{ value.href }}"{% if value.alt %} alt="{{ value.alt }}"{% endif %} class="img-fluid">
+                            {% if cell.href %}
+                                <img src="{{ cell.href }}"{% if cell.alt %} alt="{{ cell.alt }}"{% endif %} class="img-fluid">
                             {% endif %}
                         </td>
-                    {% elseif value.type == "link" %}
+                    {% elseif cell.type == "link" %}
                         <td class="align-middle">
-                            {% if value.href %}
-                                <a href="{{ value.href }}">{{ value.text }}</a>
+                            {% if cell.href %}
+                                <a href="{{ cell.href }}">{{ cell.text }}</a>
                             {% else %}
-                                {{ value.text }}
+                                {{ cell.text }}
                             {% endif %}
                         </td>
-                    {% elseif value.type == "text" %}
-                        <td class="align-middle">{{ value.text }}</td>
+                    {% elseif cell.type == "text" %}
+                        <td class="align-middle">{{ cell.text }}</td>
                     {% endif %}
                 {% endfor %}
             </tr>

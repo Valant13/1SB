@@ -5,64 +5,50 @@ namespace App\ViewModel\Grid;
 class Row
 {
     /**
-     * @var ValueInterface[]
+     * @var CellInterface[]
      */
-    private $values = [];
+    private $cells = [];
 
     /**
-     * @return ValueInterface[]
+     * @return CellInterface[]
      */
-    public function getValues(): array
+    public function getCells(): array
     {
-        return $this->values;
+        return $this->cells;
     }
 
     /**
-     * @param ValueInterface[] $values
-     * @return Row
+     * @param CellInterface[] $cells
      */
-    public function setValues(array $values): Row
+    public function setCells(array $cells): void
     {
-        $this->values = $values;
-        return $this;
-    }
-
-    /**
-     * @param string $key
-     * @return ValueInterface
-     */
-    public function getValue(string $key): ValueInterface
-    {
-        return $this->values[$key];
+        $this->cells = $cells;
     }
 
     /**
      * @param string $key
-     * @param ValueInterface $value
-     * @return Row
+     * @return CellInterface
      */
-    public function setValue(string $key, ValueInterface $value): Row
+    public function getCell(string $key): CellInterface
     {
-        $this->values[$key] = $value;
-        return $this;
+        return $this->cells[$key];
     }
 
     /**
-     * @param ValueInterface $value
-     * @return Row
+     * @param string $key
+     * @param CellInterface $cell
      */
-    public function addValue(ValueInterface $value): Row
+    public function setCell(string $key, CellInterface $cell): void
     {
-        $this->values[] = $value;
-        return $this;
+        $this->cells[$key] = $cell;
     }
 
     /**
      * @param string $key
      * @return bool
      */
-    public function hasValue(string $key): bool
+    public function hasCell(string $key): bool
     {
-        return array_key_exists($key, $this->values);
+        return array_key_exists($key, $this->cells);
     }
 }

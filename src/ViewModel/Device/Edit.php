@@ -3,18 +3,12 @@
 namespace App\ViewModel\Device;
 
 use App\Entity\Catalog\Device;
-use App\Entity\Catalog\DeviceCraftingComponent;
-use App\Entity\Catalog\DeviceCraftingExperience;
 use App\Entity\Catalog\Material;
 use App\Entity\Catalog\ResearchPoint;
 use App\ViewModel\AbstractViewModel;
-use App\ViewModel\Grid\Column;
+use App\ViewModel\Device\Edit\CraftingComponentGrid;
+use App\ViewModel\Device\Edit\CraftingExperienceGrid;
 use App\ViewModel\Grid\Grid;
-use App\ViewModel\Grid\Row;
-use App\ViewModel\Grid\Value\Field;
-use App\ViewModel\Grid\Value\Html;
-use App\ViewModel\Grid\Value\Image;
-use App\ViewModel\Grid\Value\Text;
 use Symfony\Component\HttpFoundation\Request;
 
 class Edit extends AbstractViewModel
@@ -55,31 +49,22 @@ class Edit extends AbstractViewModel
     private $craftingComponentGrid;
 
     /**
-     * @var ResearchPoint[]
-     */
-    private $indexedResearchPoints = [];
-
-    /**
-     * @var Material[]
-     */
-    private $indexedMaterials = [];
-
-    /**
      * @param ResearchPoint[] $researchPoints
      * @param Material[] $materials
      */
     public function __construct(array $researchPoints, array $materials)
     {
-        foreach ($researchPoints as $researchPoint) {
-            $this->indexedResearchPoints[$researchPoint->getId()] = $researchPoint;
-        }
+        $this->craftingExperienceGrid = new Grid(
+            'crafting-experience-grid',
+            new CraftingExperienceGrid(),
+            $researchPoints
+        );
 
-        foreach ($materials as $material) {
-            $this->indexedMaterials[$material->getId()] = $material;
-        }
-
-        $this->craftingExperienceGrid = $this->buildCraftingExperienceGrid($researchPoints);
-        $this->craftingComponentGrid = $this->buildCraftingComponentGrid($materials);
+        $this->craftingComponentGrid = new Grid(
+            'crafting-component-grid',
+            new CraftingComponentGrid(),
+            $materials
+        );
     }
 
     /**
@@ -92,8 +77,8 @@ class Edit extends AbstractViewModel
         $this->imageUrl = $request->request->get('image-url');
         $this->wikiPageUrl = $request->request->get('wiki-page-url');
 
-        $this->fillCraftingExperienceFromRequest($request);
-        $this->fillCraftingComponentsFromRequest($request);
+        $this->craftingExperienceGrid->fillFromRequest($request);
+        $this->craftingComponentGrid->fillFromRequest($request);
     }
 
     /**
@@ -106,8 +91,8 @@ class Edit extends AbstractViewModel
         $this->imageUrl = $device->getProduct()->getImageUrl();
         $this->wikiPageUrl = $device->getProduct()->getWikiPageUrl();
 
-        $this->fillCraftingExperienceFromDevice($device);
-        $this->fillCraftingComponentsFromDevice($device);
+        $this->craftingExperienceGrid->fillFromModels($device->getCraftingExperience()->toArray());
+        $this->craftingComponentGrid->fillFromModels($device->getCraftingComponents()->toArray());
     }
 
     /**
@@ -120,8 +105,8 @@ class Edit extends AbstractViewModel
         $device->getProduct()->setImageUrl($this->imageUrl);
         $device->getProduct()->setWikiPageUrl($this->wikiPageUrl);
 
-        $this->fillDeviceWithCraftingExperience($device);
-        $this->fillDeviceWithCraftingComponents($device);
+        $this->craftingExperienceGrid->fillModels($device->getCraftingExperience()->toArray(), $device);
+        $this->craftingComponentGrid->fillModels($device->getCraftingComponents()->toArray(), $device);
     }
 
     /**
@@ -234,213 +219,5 @@ class Edit extends AbstractViewModel
     public function setCraftingComponentGrid(Grid $craftingComponentGrid): void
     {
         $this->craftingComponentGrid = $craftingComponentGrid;
-    }
-
-    /**
-     * @param ResearchPoint[] $researchPoints
-     * @return Grid
-     */
-    private function buildCraftingExperienceGrid(array $researchPoints): Grid
-    {
-        $grid = new Grid();
-        $grid->setIdForJs('crafting-experience-form');
-
-        $grid->addColumn((new Column())->setName('Name'));
-        $grid->addColumn((new Column())->setName('Qty')->setWidth(20)
-            ->setControlType(Column::CONTROL_TYPE_CLEAR));
-
-        foreach ($researchPoints as $researchPoint) {
-            $row = new Row();
-
-            $name = (new Html())->setHtml($researchPoint->getName());
-            $qty = (new Field())->setValueType('number')
-                ->setName('crafting-experience[' . $researchPoint->getId() . ']');
-
-            $row->setValues(['name' => $name, 'qty' => $qty]);
-
-            $grid->setRow($researchPoint->getId(), $row);
-        }
-
-        return $grid;
-    }
-
-    /**
-     * @param Material[] $materials
-     * @return Grid
-     */
-    private function buildCraftingComponentGrid(array $materials): Grid
-    {
-        $grid = new Grid();
-        $grid->setIdForJs('crafting-component-form');
-
-        $grid->addColumn((new Column())->setName('Image')->setWidth(15));
-        $grid->addColumn((new Column())->setName('Name'));
-        $grid->addColumn((new Column())->setName('Qty')->setWidth(20)
-            ->setControlType(Column::CONTROL_TYPE_CLEAR));
-
-        foreach ($materials as $material) {
-            $product = $material->getProduct();
-
-            $row = new Row();
-
-            $image = (new Image())->setHref($product->getImageUrl());
-            $name = (new Text())->setText($product->getName());
-            $qty = (new Field())->setValueType('number')
-                ->setName('crafting-components[' . $material->getId() . ']');
-
-            $row->setValues(['image' => $image, 'name' => $name, 'qty' => $qty]);
-
-            $grid->setRow($material->getId(), $row);
-        }
-
-        return $grid;
-    }
-
-    /**
-     * @param Request $request
-     */
-    private function fillCraftingExperienceFromRequest(Request $request): void
-    {
-        /** @var array $craftingExperience */
-        $craftingExperience = $request->request->get('crafting-experience');
-        if (is_array($craftingExperience)) {
-            foreach ($craftingExperience as $researchPointId => $value) {
-                if ($this->craftingExperienceGrid->hasRow($researchPointId)) {
-                    $row = $this->craftingExperienceGrid->getRow($researchPointId);
-
-                    /** @var Field $qty */
-                    $qty = $row->getValue('qty');
-                    $qty->setValue(((int)$value) ?: null);
-                }
-            }
-        }
-    }
-
-    /**
-     * @param Request $request
-     */
-    private function fillCraftingComponentsFromRequest(Request $request): void
-    {
-        /** @var array $craftingComponents */
-        $craftingComponents = $request->request->get('crafting-components');
-        if (is_array($craftingComponents)) {
-            foreach ($craftingComponents as $materialId => $value) {
-                if ($this->craftingComponentGrid->hasRow($materialId)) {
-                    $row = $this->craftingComponentGrid->getRow($materialId);
-
-                    /** @var Field $qty */
-                    $qty = $row->getValue('qty');
-                    $qty->setValue(((int)$value) ?: null);
-                }
-            }
-        }
-    }
-
-    /**
-     * @param Device $device
-     */
-    private function fillCraftingExperienceFromDevice(Device $device): void
-    {
-        foreach ($device->getCraftingExperience() as $researchPoint) {
-            $researchPointId = $researchPoint->getResearchPoint()->getId();
-            $row = $this->craftingExperienceGrid->getRow($researchPointId);
-
-            /** @var Field $qty */
-            $qty = $row->getValue('qty');
-            $qty->setValue($researchPoint->getQty());
-        }
-    }
-
-    /**
-     * @param Device $device
-     */
-    private function fillCraftingComponentsFromDevice(Device $device): void
-    {
-        foreach ($device->getCraftingComponents() as $craftingComponent) {
-            $materialId = $craftingComponent->getMaterial()->getId();
-            $row = $this->craftingComponentGrid->getRow($materialId);
-
-            /** @var Field $qty */
-            $qty = $row->getValue('qty');
-            $qty->setValue($craftingComponent->getQty());
-        }
-    }
-
-    /**
-     * @param Device $device
-     */
-    private function fillDeviceWithCraftingExperience(Device $device): void
-    {
-        $indexedCraftingExperience = $this->getIndexedCraftingExperience($device->getCraftingExperience()->toArray());
-
-        foreach ($this->craftingExperienceGrid->getRows() as $researchPointId => $row) {
-            $qty = (int)$row->getValue('qty')->getValue();
-
-            if (array_key_exists($researchPointId, $indexedCraftingExperience)) {
-                $indexedCraftingExperience[$researchPointId]->setQty($qty);
-            } elseif ($qty) {
-                $craftingExperience = new DeviceCraftingExperience();
-
-                $craftingExperience->setResearchPoint($this->indexedResearchPoints[$researchPointId]);
-                $craftingExperience->setDevice($device);
-                $craftingExperience->setQty($qty);
-
-                $device->addCraftingExperience($craftingExperience);
-            }
-        }
-    }
-
-    /**
-     * @param Device $device
-     */
-    private function fillDeviceWithCraftingComponents(Device $device): void
-    {
-        $indexedCraftingComponents = $this->getIndexedCraftingComponents($device->getCraftingComponents()->toArray());
-
-        foreach ($this->craftingComponentGrid->getRows() as $materialId => $row) {
-            $qty = (int)$row->getValue('qty')->getValue();
-
-            if (array_key_exists($materialId, $indexedCraftingComponents)) {
-                $indexedCraftingComponents[$materialId]->setQty($qty);
-            } elseif ($qty) {
-                $craftingComponent = new DeviceCraftingComponent();
-
-                $craftingComponent->setMaterial($this->indexedMaterials[$materialId]);
-                $craftingComponent->setDevice($device);
-                $craftingComponent->setQty($qty);
-
-                $device->addCraftingComponent($craftingComponent);
-            }
-        }
-    }
-
-    /**
-     * @param DeviceCraftingExperience[] $craftingExperience
-     * @return DeviceCraftingExperience[]
-     */
-    private function getIndexedCraftingExperience(array $craftingExperience): array
-    {
-        $indexedCraftingExperience = [];
-        foreach ($craftingExperience as $researchPoint) {
-            $researchPointId = $researchPoint->getResearchPoint()->getId();
-            $indexedCraftingExperience[$researchPointId] = $researchPoint;
-        }
-
-        return $indexedCraftingExperience;
-    }
-
-    /**
-     * @param DeviceCraftingComponent[] $craftingComponents
-     * @return DeviceCraftingComponent[]
-     */
-    private function getIndexedCraftingComponents(array $craftingComponents): array
-    {
-        $indexedCraftingComponents = [];
-        foreach ($craftingComponents as $component) {
-            $materialId = $component->getMaterial()->getId();
-            $indexedCraftingComponents[$materialId] = $component;
-        }
-
-        return $indexedCraftingComponents;
     }
 }

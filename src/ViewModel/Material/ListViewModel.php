@@ -8,13 +8,13 @@ use App\ViewModel\Formatter;
 use App\ViewModel\Grid\Column;
 use App\ViewModel\Grid\Grid;
 use App\ViewModel\Grid\Row;
-use App\ViewModel\Grid\Value\Action;
-use App\ViewModel\Grid\Value\Html;
-use App\ViewModel\Grid\Value\Image;
-use App\ViewModel\Grid\Value\Link;
-use App\ViewModel\Grid\Value\Text;
+use App\ViewModel\Grid\Cell\Action;
+use App\ViewModel\Grid\Cell\Html;
+use App\ViewModel\Grid\Cell\Image;
+use App\ViewModel\Grid\Cell\Link;
+use App\ViewModel\Grid\Cell\Text;
 
-class ListModel extends AbstractViewModel
+class ListViewModel extends AbstractViewModel
 {
     /**
      * @var Grid
@@ -26,12 +26,15 @@ class ListModel extends AbstractViewModel
      */
     public function __construct()
     {
-        $this->grid = new Grid();
-        $this->grid->addColumn((new Column())->setName('Image')->setWidth(15));
-        $this->grid->addColumn((new Column())->setName('Name'));
-        $this->grid->addColumn((new Column())->setName('Marketpl')->setWidth(15));
-        $this->grid->addColumn((new Column())->setName('Modified')->setWidth(15));
-        $this->grid->addColumn((new Column())->setName('Actions')->setWidth(15));
+        $this->grid = new Grid('material-grid');
+
+        $this->grid->setColumns([
+            (new Column())->setName('Image')->setWidth(15),
+            (new Column())->setName('Name'),
+            (new Column())->setName('Marketpl')->setWidth(15),
+            (new Column())->setName('Modified')->setWidth(15),
+            (new Column())->setName('Actions')->setWidth(15)
+        ]);
     }
 
     /**
@@ -40,32 +43,32 @@ class ListModel extends AbstractViewModel
     public function fillFromMaterials(array $materials): void
     {
         foreach ($materials as $material) {
-            $product = $material->getProduct();
-
             $row = new Row();
 
-            $image = (new Image())
+            $product = $material->getProduct();
+
+            $imageCell = (new Image())
                 ->setHref($product->getImageUrl());
 
-            $name = (new Link())
+            $nameCell = (new Link())
                 ->setText($product->getName())
                 ->setHref($product->getWikiPageUrl());
 
-            $marketplace = (new Text())
+            $marketplaceCell = (new Text())
                 ->setText(Formatter::formatPrice($product->getMarketplacePrice()));
 
-            $modified = (new Html())
+            $modifiedCell = (new Html())
                 ->setHtml(Formatter::formatModification(
                     $product->getModificationTime(),
                     $product->getModificationUser()
                 ));
 
-            $actions = (new Action())
+            $actionsCell = (new Action())
                 ->setName('Edit')
                 ->setRoute('materials_edit')
                 ->setParams(['id' => $material->getId()]);
 
-            $row->setValues([$image, $name, $marketplace, $modified, $actions]);
+            $row->setCells([$imageCell, $nameCell, $marketplaceCell, $modifiedCell, $actionsCell]);
 
             $this->grid->addRow($row);
         }

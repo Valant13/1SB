@@ -2,7 +2,7 @@
 
 namespace App\ViewModel\Grid;
 
-interface ValueInterface
+interface CellInterface
 {
     /**
      * @return string

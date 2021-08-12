@@ -5,7 +5,7 @@ namespace App\ViewModel;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Validator\ConstraintViolationListInterface;
 
-class AbstractViewModel implements ViewModelInterface
+abstract class AbstractViewModel implements ViewModelInterface
 {
     /**
      * @var string[]

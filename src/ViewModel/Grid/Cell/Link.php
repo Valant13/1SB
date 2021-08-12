@@ -1,10 +1,10 @@
 <?php
 
-namespace App\ViewModel\Grid\Value;
+namespace App\ViewModel\Grid\Cell;
 
-use App\ViewModel\Grid\ValueInterface;
+use App\ViewModel\Grid\CellInterface;
 
-class Image implements ValueInterface
+class Link implements CellInterface
 {
     /**
      * @var string|null
@@ -14,14 +14,14 @@ class Image implements ValueInterface
     /**
      * @var string|null
      */
-    private $alt;
+    private $text;
 
     /**
      * @inheritDoc
      */
     public function getType(): string
     {
-        return 'image';
+        return 'link';
     }
 
     /**
@@ -34,9 +34,9 @@ class Image implements ValueInterface
 
     /**
      * @param string|null $href
-     * @return Image
+     * @return Link
      */
-    public function setHref(?string $href): Image
+    public function setHref(?string $href): Link
     {
         $this->href = $href;
         return $this;
@@ -45,18 +45,18 @@ class Image implements ValueInterface
     /**
      * @return string|null
      */
-    public function getAlt(): ?string
+    public function getText(): ?string
     {
-        return $this->alt;
+        return $this->text;
     }
 
     /**
-     * @param string|null $alt
-     * @return Image
+     * @param string|null $text
+     * @return Link
      */
-    public function setAlt(?string $alt): Image
+    public function setText(?string $text): Link
     {
-        $this->alt = $alt;
+        $this->text = $text;
         return $this;
     }
 }

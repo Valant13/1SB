@@ -7,7 +7,7 @@ use Symfony\Component\HttpFoundation\Request;
 class Grid
 {
     /**
-     * @var string|null
+     * @var string
      */
     private $idForJs;
 
@@ -15,6 +15,11 @@ class Grid
      * @var GridBindingInterface
      */
     private $binding;
+
+    /**
+     * @var array
+     */
+    private $prototypes = [];
 
     /**
      * @var Column[]
@@ -28,31 +33,41 @@ class Grid
 
     /**
      * @param string $idForJs
-     * @param GridBindingInterface $binding
+     * @param GridBindingInterface|null $binding
      * @param array $prototypes
      */
-    public function __construct(string $idForJs, GridBindingInterface $binding, $prototypes)
+    public function __construct(string $idForJs, GridBindingInterface $binding = null, $prototypes = [])
     {
         $this->idForJs = $idForJs;
         $this->binding = $binding;
 
-        foreach ($prototypes as $prototype) {
-            $index = $this->binding->getPrototypeIndex($prototype);
+        if ($this->binding !== null) {
+            $this->columns = $this->binding->buildColumns();
 
-            $this->rows[$index] = $this->binding->buildRow($index, $prototype);
+            foreach ($prototypes as $prototype) {
+                $index = $this->binding->getPrototypeIndex($prototype);
+
+                $this->prototypes[$index] = $prototype;
+                $this->rows[$index] = $this->binding->buildRow($index, $prototype);
+            }
         }
     }
 
     /**
      * @param Request $request
+     * @throws \BadMethodCallException
      */
     public function fillFromRequest(Request $request): void
     {
+        if ($this->binding === null) {
+            throw new \BadMethodCallException('Binding is not set');
+        }
+
         foreach ($this->rows as $index => $row) {
             $requestValues = [];
 
-            foreach ($this->binding->getRequestValueMapping() as $columnKey => $requestKey) {
-                $requestValues[$columnKey] = $this->getRequestValue($index, $requestKey, $request);
+            foreach ($this->binding->getRequestValueKeys() as $requestKey) {
+                $requestValues[$requestKey] = $this->getRowRequestValue($index, $requestKey, $request);
             }
 
             $this->binding->fillRowFromRequest($index, $row, $requestValues);
@@ -61,45 +76,57 @@ class Grid
 
     /**
      * @param array $models
+     * @throws \BadMethodCallException
      */
     public function fillFromModels(array $models): void
     {
+        if ($this->binding === null) {
+            throw new \BadMethodCallException('Binding is not set');
+        }
+
         $indexedModels = $this->getIndexedModels($models);
 
         foreach ($this->rows as $index => $row) {
-            $this->binding->fillRowFromModel($index, $row, $indexedModels[$index]);
+            $model = null;
+            if (array_key_exists($index, $indexedModels)) {
+                $model = $indexedModels[$index];
+            }
+
+            $this->binding->fillRowFromModel($index, $row, $model);
         }
     }
 
     /**
      * @param array $models
      * @param $parentModel
+     * @throws \Exception
      */
     public function fillModels(array $models, $parentModel): void
     {
+        if ($this->binding === null) {
+            throw new \Exception('Binding is not set');
+        }
+
         $indexedModels = $this->getIndexedModels($models);
 
         foreach ($this->rows as $index => $row) {
-            $this->binding->fillModelFromRow($index, $row, $indexedModels[$index], $parentModel);
+            $model = null;
+            if (array_key_exists($index, $indexedModels)) {
+                $model = $indexedModels[$index];
+            }
+
+            $prototype = $this->prototypes[$index];
+
+            $this->binding->fillModelFromRow($index, $row, $prototype, $model, $parentModel);
         }
     }
 
     /**
-     * @return string|null
+     * @return string
      */
-    public function getIdForJs(): ?string
+    public function getIdForJs(): string
     {
         return $this->idForJs;
-    }
-
-    /**
-     * @param string|null $idForJs
-     * @return Grid
-     */
-    public function setIdForJs(?string $idForJs): Grid
-    {
-        $this->idForJs = $idForJs;
-        return $this;
     }
 
     /**
@@ -112,22 +139,10 @@ class Grid
 
     /**
      * @param Column[] $columns
-     * @return Grid
      */
-    public function setColumns(array $columns): Grid
+    public function setColumns(array $columns): void
     {
         $this->columns = $columns;
-        return $this;
-    }
-
-    /**
-     * @param Column $column
-     * @return Grid
-     */
-    public function addColumn(Column $column): Grid
-    {
-        $this->columns[] = $column;
-        return $this;
     }
 
     /**
@@ -140,12 +155,10 @@ class Grid
 
     /**
      * @param Row[] $rows
-     * @return Grid
      */
-    public function setRows(array $rows): Grid
+    public function setRows(array $rows): void
     {
         $this->rows = $rows;
-        return $this;
     }
 
     /**
@@ -160,22 +173,18 @@ class Grid
     /**
      * @param int $index
      * @param Row $row
-     * @return Grid
      */
-    public function setRow(int $index, Row $row): Grid
+    public function setRow(int $index, Row $row): void
     {
         $this->rows[$index] = $row;
-        return $this;
     }
 
     /**
      * @param Row $row
-     * @return Grid
      */
-    public function addRow(Row $row): Grid
+    public function addRow(Row $row): void
     {
         $this->rows[] = $row;
-        return $this;
     }
 
     /**
@@ -193,7 +202,7 @@ class Grid
      * @param Request $request
      * @return string|null
      */
-    private function getRequestValue(int $rowIndex, string $requestKey, Request $request): ?string
+    private function getRowRequestValue(int $rowIndex, string $requestKey, Request $request): ?string
     {
         $param = $request->request->get($requestKey);
 

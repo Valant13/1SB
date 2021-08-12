@@ -19,7 +19,12 @@ interface GridBindingInterface
     /**
      * @return string[]
      */
-    function getRequestValueMapping(): array;
+    function getRequestValueKeys(): array;
+
+    /**
+     * @return Column[]
+     */
+    function buildColumns(): array;
 
     /**
      * @param int $index
@@ -45,8 +50,9 @@ interface GridBindingInterface
     /**
      * @param int $index
      * @param Row $row
+     * @param $prototype
      * @param $model
      * @param $parentModel
      */
-    function fillModelFromRow(int $index, Row $row, $model, $parentModel): void;
+    function fillModelFromRow(int $index, Row $row, $prototype, $model, $parentModel): void;
 }
