@@ -89,9 +89,9 @@ class CraftingComponentGrid implements GridBindingInterface
      */
     function fillRowFromRequest(int $index, Row $row, array $requestValues): void
     {
-        $value = (int)$requestValues['crafting-components'];
+        $value = (int)$requestValues['crafting-components'] ?: null;
 
-        $row->getCell('qty')->setValue($value ?: null);
+        $row->getCell('qty')->setValue($value);
     }
 
     /**

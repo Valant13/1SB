@@ -70,6 +70,6 @@ class Formatter
             return null;
         }
 
-        return number_format($price, 0, ',', ' ') . ' C';
+        return number_format($price, 0, ',', ' ')/* . ' C'*/;
     }
 }

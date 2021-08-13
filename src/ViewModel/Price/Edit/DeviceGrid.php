@@ -48,7 +48,7 @@ class DeviceGrid implements GridBindingInterface
     {
         $imageColumn = (new Column())->setName('Image')->setWidth(15);
         $nameColumn = (new Column())->setName('Name');
-        $modifiedColumn = (new Column())->setName('Modified')->setWidth(15);
+        $modifiedColumn = (new Column())->setName('Price modified')->setWidth(20);
         $auctionPriceColumn = (new Column())->setName('Auction price')->setWidth(20)
             ->setControlType(Column::CONTROL_TYPE_CLEAR);
 
@@ -93,9 +93,9 @@ class DeviceGrid implements GridBindingInterface
      */
     function fillRowFromRequest(int $index, Row $row, array $requestValues): void
     {
-        if ($requestValues['devices'] !== null) {
-            $value = (int)$requestValues['devices'] ?: null;
+        $value = $requestValues['devices'];
 
+        if ($value !== null) {
             $row->getCell('auction_price')->setValue($value);
         }
     }
@@ -126,15 +126,19 @@ class DeviceGrid implements GridBindingInterface
      */
     function fillModelFromRow(int $index, Row $row, $prototype, $model, $parentModel): void
     {
-        $newAuctionPrice = (int)$row->getCell('auction_price')->getValue() ?: null;
+        $value = $row->getCell('auction_price')->getValue();
 
-        $product = $model->getProduct();
+        if ($value !== null) {
+            $product = $model->getProduct();
 
-        $oldAuctionPrice = $product->getAuctionPrice()->getValue();
-        if ($newAuctionPrice !== $oldAuctionPrice) {
-            $product->getAuctionPrice()->setValue($newAuctionPrice);
-            $product->getAuctionPrice()->setModificationTime(new \DateTime());
-            $product->getAuctionPrice()->setModificationUser($parentModel);
+            $newAuctionPrice = (int)$value ?: null;
+            $oldAuctionPrice = $product->getAuctionPrice()->getValue();
+
+            if ($newAuctionPrice !== $oldAuctionPrice) {
+                $product->getAuctionPrice()->setValue($newAuctionPrice);
+                $product->getAuctionPrice()->setModificationTime(new \DateTime());
+                $product->getAuctionPrice()->setModificationUser($parentModel);
+            }
         }
     }
 }

@@ -82,9 +82,9 @@ class CraftingExperienceGrid implements GridBindingInterface
      */
     function fillRowFromRequest(int $index, Row $row, array $requestValues): void
     {
-        $value = (int)$requestValues['crafting-experience'];
+        $value = (int)$requestValues['crafting-experience'] ?: null;
 
-        $row->getCell('qty')->setValue($value ?: null);
+        $row->getCell('qty')->setValue($value);
     }
 
     /**

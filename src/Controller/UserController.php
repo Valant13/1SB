@@ -82,65 +82,6 @@ class UserController extends AbstractController
     }
 
     /**
-     * @Route("/user/calculator", methods="PUT", name="put_user_calculator")
-     */
-    public function putUserCalculator(): Response
-    {
-        if (!$this->auth->isAuthorized()) {
-            return $this->forward($this->auth->getRedirectToLogin());
-        }
-
-        $maximizationParam = $this->request->request->get('maximization-param');
-
-        if (!in_array($maximizationParam, Config::ALLOWED_MAXIMIZATION_PARAMS)) {
-            return new Response('', 400);
-        }
-
-        return $this->render('user/index.html.twig', [
-            'controller_name' => 'UserController',
-        ]);
-    }
-
-    /**
-     * @Route("/user/mining/materials/{id}", methods="PUT", name="put_user_mining_materials")
-     */
-    public function putUserMiningMaterials(int $id): Response
-    {
-        if (!$this->auth->isAuthorized()) {
-            return $this->forward($this->auth->getRedirectToLogin());
-        }
-
-        $isAcceptable = (bool)$this->request->request->get('is-acceptable');
-
-        return $this->render('user/index.html.twig', [
-            'controller_name' => 'UserController',
-        ]);
-    }
-
-    /**
-     * @Route("/user/inventory/materials/{id}", methods="PUT", name="put_user_inventory_materials")
-     */
-    public function putUserInventoryMaterials(int $id): Response
-    {
-        if (!$this->auth->isAuthorized()) {
-            return $this->forward($this->auth->getRedirectToLogin());
-        }
-
-        if (!is_numeric($this->request->request->get('qty'))) {
-            return new Response('', 400);
-        }
-
-        $qty = (int)$this->request->request->get('qty');
-        if ($qty < 0) {
-            return new Response('', 400);
-        }
-
-        return $this->render('user/index.html.twig', [
-            'controller_name' => 'UserController',
-        ]);
-    }
-
-    /**
      * @Route("/user/login", methods="GET|POST", name="user_login")
      */
     public function login(): Response
@@ -231,16 +172,5 @@ class UserController extends AbstractController
         return $this->render('user/account.html.twig', [
             'viewModel' => $viewModel,
         ]);
-
-//        if (!is_array($this->request->request->get('interest-materials'))) {
-//            return new Response(400);
-//        }
-//
-//        if (!is_array($this->request->request->get('interest-devices'))) {
-//            return new Response(400);
-//        }
-//
-//        $interestMaterials = (array)$this->request->request->get('interest-materials');
-//        $interestDevices = (array)$this->request->request->get('interest-devices');
     }
 }

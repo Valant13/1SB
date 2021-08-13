@@ -35,6 +35,7 @@ class Product
     /**
      * @ORM\OneToOne(targetEntity=ProductAuctionPrice::class, cascade={"persist", "remove"})
      * @ORM\JoinColumn(nullable=false, unique=true)
+     * @Assert\Valid
      */
     private $auctionPrice;
 

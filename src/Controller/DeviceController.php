@@ -133,32 +133,6 @@ class DeviceController extends AbstractController
         return $this->render('device/edit.html.twig', [
             'viewModel' => $viewModel,
         ]);
-
-//        if (!$this->auth->isAuthorized()) {
-//            return $this->forward($this->auth->getRedirectToLogin());
-//        }
-//
-//        // TODO: use form
-//        // TODO: validate name
-//        $name = (string)$this->request->request->get('name');
-//        $marketplacePrice = (int)$this->request->request->get('marketplace-price');
-//        $imageUrl = (string)$this->request->request->get('image-url');
-//        $wikiPageUrl = (string)$this->request->request->get('wiki-page-url');
-//
-//        if (!is_array($this->request->request->get('crafting-experience'))) {
-//            return new Response('', 400);
-//        }
-//
-//        if (!is_array($this->request->request->get('crafting-components'))) {
-//            return new Response('', 400);
-//        }
-//
-//        $craftingExperience = (array)$this->request->request->get('crafting-experience');
-//        $craftingComponents = (array)$this->request->request->get('crafting-components');
-//
-//        return $this->render('devices/index.html.twig', [
-//            'controller_name' => 'DevicesController',
-//        ]);
     }
 
     /**
@@ -201,30 +175,6 @@ class DeviceController extends AbstractController
         return $this->render('device/edit.html.twig', [
             'viewModel' => $viewModel,
         ]);
-
-//        if (!$this->auth->isAuthorized()) {
-//            return $this->forward($this->auth->getRedirectToLogin());
-//        }
-//
-//        // TODO: use form
-//        $marketplacePrice = (int)$this->request->request->get('marketplace-price');
-//        $imageUrl = (string)$this->request->request->get('image-url');
-//        $wikiPageUrl = (string)$this->request->request->get('wiki-page-url');
-//
-//        if (!is_array($this->request->request->get('crafting-experience'))) {
-//            return new Response('', 400);
-//        }
-//
-//        if (!is_array($this->request->request->get('crafting-components'))) {
-//            return new Response('', 400);
-//        }
-//
-//        $craftingExperience = (array)$this->request->request->get('crafting-experience');
-//        $craftingComponents = (array)$this->request->request->get('crafting-components');
-//
-//        return $this->render('devices/index.html.twig', [
-//            'controller_name' => 'DevicesController',
-//        ]);
     }
 
     /**

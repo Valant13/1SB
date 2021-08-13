@@ -97,18 +97,11 @@ class PriceController extends AbstractController
             $viewModel->fillFromMaterials($materials);
             $viewModel->fillFromDevices($devices);
         } else {
-            // Set old prices
-            $viewModel->fillFromMaterials($materials);
-            $viewModel->fillFromDevices($devices);
-
-            // Merge with new prices
             $viewModel->fillFromRequest($this->request);
 
-            // Save only difference
             $viewModel->fillMaterials($materials, $user);
             $viewModel->fillDevices($devices, $user);
 
-            // Set new modification
             $viewModel->fillFromMaterials($materials);
             $viewModel->fillFromDevices($devices);
 
