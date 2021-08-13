@@ -4,17 +4,92 @@
 
 {% block main %}
     <div class="text-right mb-3">
-        <button type="submit" class="btn btn-primary btn-lg" form="form">Save</button>
+        <button type="button" class="btn btn-primary btn-lg" id="save-button">Save</button>
     </div>
 
     {{ include('_errors.html.twig', {errors: viewModel.errors}) }}
     {{ include('_notices.html.twig', {notices: viewModel.notices}) }}
 
-    <form action="{{ url('prices') }}" method="post" id="form">
-        <h2>Materials</h2>
-        {{ include('_grid.html.twig', {grid: viewModel.materialGrid}) }}
+    <h2>Materials</h2>
+    {{ include('_grid.html.twig', {grid: viewModel.materialGrid}) }}
 
-        <h2 class="mt-5">Devices</h2>
-        {{ include('_grid.html.twig', {grid: viewModel.deviceGrid}) }}
-    </form>
+    <h2 class="mt-5">Devices</h2>
+    {{ include('_grid.html.twig', {grid: viewModel.deviceGrid}) }}
+
+    <form action="{{ url('prices') }}" method="post" id="form"></form>
+
+    <script>
+        ;(function() {
+            let oldMaterialValues = getInputValues('materials');
+            let oldDeviceValues = getInputValues('devices');
+
+            let button = document.getElementById('save-button');
+
+            button.onclick = function () {
+                let newMaterialValues = getInputValues('materials');
+                let newDeviceValues = getInputValues('devices');
+
+                let materialDifference = getValueDifference(newMaterialValues, oldMaterialValues);
+                let deviceDifference = getValueDifference(newDeviceValues, oldDeviceValues);
+
+                let materialInputs = createInputsWithValues(materialDifference, 'materials');
+                let deviceInputs = createInputsWithValues(deviceDifference, 'devices');
+
+                let inputs = materialInputs.concat(deviceInputs);
+
+                let form = document.getElementById('form');
+
+                for (let input of inputs) {
+                    form.appendChild(input);
+                }
+
+                form.submit();
+            }.bind(this);
+
+            function getInputValues(inputName) {
+                let inputs = document.querySelectorAll('input[name^=' + inputName + ']');
+
+                let values = {};
+
+                for (let input of inputs) {
+                    let id = +input.name.slice(inputName.length + 1, -1);
+                    values[id] = input.value;
+                }
+
+                return values;
+            }
+
+            function getValueDifference(valuesA, valuesB) {
+                let difference = {};
+
+                for (let id in valuesA) {
+                    if (valuesA.hasOwnProperty(id)) {
+                        if (valuesA[id] !== valuesB[id]) {
+                            difference[id] = valuesA[id];
+                        }
+                    }
+                }
+
+                return difference;
+            }
+
+            function createInputsWithValues(values, inputName) {
+                let inputs = [];
+
+                for (let id in values) {
+                    if (values.hasOwnProperty(id)) {
+                        let input = document.createElement('INPUT');
+
+                        input.type = 'text';
+                        input.name = inputName + '[' + id.toString() + ']';
+                        input.value = values[id];
+
+                        inputs.push(input);
+                    }
+                }
+
+                return inputs;
+            }
+        })();
+    </script>
 {% endblock %}

@@ -100,8 +100,8 @@ class UserInterestService
                 if (in_array($device->getId(), $excludedDeviceIds)) {
                     $filteredDevices[] = $device;
                 } else {
-                    foreach ($device->getCraftingComponents() as $material) {
-                        if (in_array($material->getId(), $excludedMaterialIds)) {
+                    foreach ($device->getCraftingComponents() as $componentRecord) {
+                        if (in_array($componentRecord->getMaterial()->getId(), $excludedMaterialIds)) {
                             $filteredDevices[] = $device;
                             break;
                         }
@@ -111,13 +111,18 @@ class UserInterestService
 
             // Searching for included devices
             if (!$isExcluded && !in_array($device->getId(), $excludedDeviceIds)) {
-                foreach ($device->getCraftingComponents() as $material) {
-                    if (in_array($material->getId(), $excludedMaterialIds)) {
+                $hasExcludedComponents = false;
+
+                foreach ($device->getCraftingComponents() as $componentRecord) {
+                    if (in_array($componentRecord->getMaterial()->getId(), $excludedMaterialIds)) {
+                        $hasExcludedComponents = true;
                         break;
                     }
                 }
 
-                $filteredDevices[] = $device;
+                if (!$hasExcludedComponents) {
+                    $filteredDevices[] = $device;
+                }
             }
         }
 

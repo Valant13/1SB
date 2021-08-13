@@ -65,6 +65,13 @@
                 {% endfor %}
             </tr>
         {% endfor %}
+        {% if grid.rows|length == 0 %}
+            <tr>
+                <td colspan="{{ grid.columns|length }}" class="align-middle" style="height: 50px">
+                    Empty
+                </td>
+            </tr>
+        {% endif %}
         </tbody>
     </table>
 </div>
