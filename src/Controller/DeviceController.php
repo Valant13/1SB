@@ -7,6 +7,7 @@ use App\Config;
 use App\Entity\Catalog\Device;
 use App\Entity\Catalog\Product;
 use App\Entity\Catalog\ProductAuctionPrice;
+use App\Logger;
 use App\Repository\Catalog\DeviceRepository;
 use App\Repository\Catalog\MaterialRepository;
 use App\Repository\Catalog\ResearchPointRepository;
@@ -52,7 +53,13 @@ class DeviceController extends AbstractController
     private $researchPointRepository;
 
     /**
+     * @var Logger
+     */
+    private $logger;
+
+    /**
      * @param Auth $auth
+     * @param Logger $logger
      * @param DeviceRepository $deviceRepository
      * @param MaterialRepository $materialRepository
      * @param ResearchPointRepository $researchPointRepository
@@ -61,6 +68,7 @@ class DeviceController extends AbstractController
      */
     public function __construct(
         Auth $auth,
+        Logger $logger,
         DeviceRepository $deviceRepository,
         MaterialRepository $materialRepository,
         ResearchPointRepository $researchPointRepository,
@@ -73,6 +81,7 @@ class DeviceController extends AbstractController
         $this->deviceRepository = $deviceRepository;
         $this->materialRepository = $materialRepository;
         $this->researchPointRepository = $researchPointRepository;
+        $this->logger = $logger;
     }
 
     /**
@@ -83,6 +92,7 @@ class DeviceController extends AbstractController
         if (!$this->auth->isAuthorized()) {
             return $this->auth->getRedirectToLogin();
         }
+        $this->logger->logUserRequest();
 
         $devices = $this->deviceRepository->findOrderedByName();
 
@@ -102,6 +112,7 @@ class DeviceController extends AbstractController
         if (!$this->auth->isAuthorized()) {
             return $this->auth->getRedirectToLogin();
         }
+        $this->logger->logUserRequest();
 
         if ($this->deviceRepository->count([]) >= Config::DEVICE_LIMIT) {
             return new Response('Device limit reached', 507);
@@ -143,6 +154,7 @@ class DeviceController extends AbstractController
         if (!$this->auth->isAuthorized()) {
             return $this->auth->getRedirectToLogin();
         }
+        $this->logger->logUserRequest();
 
         $device = $this->deviceRepository->find($id);
         if ($device === null) {
@@ -185,6 +197,7 @@ class DeviceController extends AbstractController
         if (!$this->auth->isAuthorized()) {
             return $this->auth->getRedirectToLogin();
         }
+        $this->logger->logUserRequest();
 
         $device = $this->deviceRepository->find($id);
         if ($device === null) {

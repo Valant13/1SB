@@ -2,14 +2,14 @@
 
 namespace App\Entity\User;
 
-use App\Repository\User\UserLogRecordRepository;
+use App\Repository\User\UserLogRepository;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
- * @ORM\Entity(repositoryClass=UserLogRecordRepository::class)
+ * @ORM\Entity(repositoryClass=UserLogRepository::class)
  * @ORM\Table(name="user_log")
  */
-class UserLogRecord
+class UserLog
 {
     /**
      * @ORM\Id

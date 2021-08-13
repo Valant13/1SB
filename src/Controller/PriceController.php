@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Auth;
+use App\Logger;
 use App\Repository\Catalog\DeviceRepository;
 use App\Repository\Catalog\MaterialRepository;
 use App\Service\Catalog\UserInterestService;
@@ -47,7 +48,13 @@ class PriceController extends AbstractController
     private $interestService;
 
     /**
+     * @var Logger
+     */
+    private $logger;
+
+    /**
      * @param Auth $auth
+     * @param Logger $logger
      * @param MaterialRepository $materialRepository
      * @param DeviceRepository $deviceRepository
      * @param UserInterestService $interestService
@@ -56,6 +63,7 @@ class PriceController extends AbstractController
      */
     public function __construct(
         Auth $auth,
+        Logger $logger,
         MaterialRepository $materialRepository,
         DeviceRepository $deviceRepository,
         UserInterestService $interestService,
@@ -68,6 +76,7 @@ class PriceController extends AbstractController
         $this->materialRepository = $materialRepository;
         $this->deviceRepository = $deviceRepository;
         $this->interestService = $interestService;
+        $this->logger = $logger;
     }
 
     /**
@@ -78,6 +87,7 @@ class PriceController extends AbstractController
         if (!$this->auth->isAuthorized()) {
             return $this->auth->getRedirectToLogin();
         }
+        $this->logger->logUserRequest();
 
         $user = $this->auth->getUser();
 

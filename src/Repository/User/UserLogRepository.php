@@ -2,25 +2,25 @@
 
 namespace App\Repository\User;
 
-use App\Entity\User\UserLogRecord;
+use App\Entity\User\UserLog;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
- * @method UserLogRecord|null find($id, $lockMode = null, $lockVersion = null)
- * @method UserLogRecord|null findOneBy(array $criteria, array $orderBy = null)
- * @method UserLogRecord[]    findAll()
- * @method UserLogRecord[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
+ * @method UserLog|null find($id, $lockMode = null, $lockVersion = null)
+ * @method UserLog|null findOneBy(array $criteria, array $orderBy = null)
+ * @method UserLog[]    findAll()
+ * @method UserLog[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
  */
-class UserLogRecordRepository extends ServiceEntityRepository
+class UserLogRepository extends ServiceEntityRepository
 {
     public function __construct(ManagerRegistry $registry)
     {
-        parent::__construct($registry, UserLogRecord::class);
+        parent::__construct($registry, UserLog::class);
     }
 
     // /**
-    //  * @return UserLogRecord[] Returns an array of UserLogRecord objects
+    //  * @return UserLog[] Returns an array of UserLog objects
     //  */
     /*
     public function findByExampleField($value)

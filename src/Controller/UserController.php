@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use App\Auth;
 use App\Config;
+use App\Logger;
 use App\Repository\Catalog\DeviceRepository;
 use App\Repository\Catalog\MaterialRepository;
 use App\Repository\Catalog\UserInterestRepository;
@@ -55,6 +56,11 @@ class UserController extends AbstractController
     private $userInterestRepository;
 
     /**
+     * @var Logger
+     */
+    private $logger;
+
+    /**
      * @param Auth $auth
      * @param RequestStack $requestStack
      * @param DeviceRepository $deviceRepository
@@ -65,6 +71,7 @@ class UserController extends AbstractController
      */
     public function __construct(
         Auth $auth,
+        Logger $logger,
         RequestStack $requestStack,
         DeviceRepository $deviceRepository,
         MaterialRepository $materialRepository,
@@ -79,6 +86,7 @@ class UserController extends AbstractController
         $this->materialRepository = $materialRepository;
         $this->userRepository = $userRepository;
         $this->userInterestRepository = $userInterestRepository;
+        $this->logger = $logger;
     }
 
     /**
@@ -119,6 +127,8 @@ class UserController extends AbstractController
                 }
             }
 
+            $this->logger->logUserRequest();
+
             return $this->redirectToRoute('homepage');
         }
     }
@@ -131,6 +141,7 @@ class UserController extends AbstractController
         if (!$this->auth->isAuthorized()) {
             return $this->auth->getRedirectToLogin();
         }
+        $this->logger->logUserRequest();
 
         $this->auth->logout();
 
@@ -145,6 +156,7 @@ class UserController extends AbstractController
         if (!$this->auth->isAuthorized()) {
             return $this->auth->getRedirectToLogin();
         }
+        $this->logger->logUserRequest();
 
         $user = $this->auth->getUser();
         $userInterest = $this->userInterestRepository->findOneByUser($user);

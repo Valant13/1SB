@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Auth;
+use App\Logger;
 use App\Repository\Calculator\UserInventoryRepository;
 use App\Repository\Calculator\UserMiningRepository;
 use App\Repository\Catalog\MaterialRepository;
@@ -54,7 +55,13 @@ class CalculatorController extends AbstractController
     private $inventoryRepository;
 
     /**
+     * @var Logger
+     */
+    private $logger;
+
+    /**
      * @param Auth $auth
+     * @param Logger $logger
      * @param RequestStack $requestStack
      * @param MaterialRepository $materialRepository
      * @param UserMiningRepository $miningRepository
@@ -64,6 +71,7 @@ class CalculatorController extends AbstractController
      */
     public function __construct(
         Auth $auth,
+        Logger $logger,
         RequestStack $requestStack,
         MaterialRepository $materialRepository,
         UserMiningRepository $miningRepository,
@@ -78,6 +86,7 @@ class CalculatorController extends AbstractController
         $this->miningRepository = $miningRepository;
         $this->interestService = $interestService;
         $this->inventoryRepository = $inventoryRepository;
+        $this->logger = $logger;
     }
 
     /**
@@ -88,6 +97,7 @@ class CalculatorController extends AbstractController
         if (!$this->auth->isAuthorized()) {
             return $this->auth->getRedirectToLogin();
         }
+        $this->logger->logUserRequest();
 
         $user = $this->auth->getUser();
         $userMining = $this->miningRepository->findOneByUser($user);
@@ -127,6 +137,7 @@ class CalculatorController extends AbstractController
         if (!$this->auth->isAuthorized()) {
             return $this->auth->getRedirectToLogin();
         }
+        $this->logger->logUserRequest();
 
         $user = $this->auth->getUser();
         $userInventory = $this->inventoryRepository->findOneByUser($user);

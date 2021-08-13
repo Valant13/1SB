@@ -3,6 +3,13 @@
 {% block title %}Calculator{% endblock %}
 
 {% block main %}
+    <div class="clearfix mb-3">
+        <div class="btn-group btn-group-lg float-right">
+            <button type="button" class="btn btn-primary active">Mining</button>
+            <a href="{{ url('calculator_inventory') }}" class="btn btn-primary">Inventory</a>
+        </div>
+    </div>
+
     <div class="text-right mb-3">
         <button type="submit" class="btn btn-primary btn-lg" form="form">Save</button>
     </div>
