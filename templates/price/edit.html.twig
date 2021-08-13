@@ -1,0 +1,21 @@
+{% extends 'layout.html.twig' %}
+
+{% block title %}Prices{% endblock %}
+
+{% block main %}
+    <div class="text-right mb-3">
+        <a href="{{ url('devices') }}" class="btn btn-link btn-lg">Back</a>
+        <button type="submit" class="btn btn-primary btn-lg" form="form">Save</button>
+    </div>
+
+    {{ include('_errors.html.twig', {errors: viewModel.errors}) }}
+    {{ include('_notices.html.twig', {notices: viewModel.notices}) }}
+
+    <form action="{{ url('prices') }}" method="post" id="form">
+        <h2 class="mt-5">Experience output</h2>
+        {{ include('_grid.html.twig', {grid: viewModel.materialGrid}) }}
+
+        <h2 class="mt-5">Crafting materials</h2>
+        {{ include('_grid.html.twig', {grid: viewModel.deviceGrid}) }}
+    </form>
+{% endblock %}
