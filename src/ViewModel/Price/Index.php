@@ -7,11 +7,11 @@ use App\Entity\Catalog\Material;
 use App\Entity\User\User;
 use App\ViewModel\AbstractViewModel;
 use App\ViewModel\Grid\Grid;
-use App\ViewModel\Price\Edit\DeviceGrid;
-use App\ViewModel\Price\Edit\MaterialGrid;
+use App\ViewModel\Price\Index\DeviceGrid;
+use App\ViewModel\Price\Index\MaterialGrid;
 use Symfony\Component\HttpFoundation\Request;
 
-class Edit extends AbstractViewModel
+class Index extends AbstractViewModel
 {
     /**
      * @var Grid

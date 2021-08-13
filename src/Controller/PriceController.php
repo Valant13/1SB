@@ -6,7 +6,7 @@ use App\Auth;
 use App\Repository\Catalog\DeviceRepository;
 use App\Repository\Catalog\MaterialRepository;
 use App\Service\Catalog\UserInterestService;
-use App\ViewModel\Price\Edit;
+use App\ViewModel\Price\Index;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
@@ -73,7 +73,7 @@ class PriceController extends AbstractController
     /**
      * @Route("/prices", methods="GET|POST", name="prices")
      */
-    public function edit(): Response
+    public function index(): Response
     {
         if (!$this->auth->isAuthorized()) {
             return $this->auth->getRedirectToLogin();
@@ -91,7 +91,7 @@ class PriceController extends AbstractController
             $user
         );
 
-        $viewModel = new Edit($materials, $devices);
+        $viewModel = new Index($materials, $devices);
 
         if ($this->request->getMethod() === 'GET') {
             $viewModel->fillFromMaterials($materials);
@@ -115,7 +115,7 @@ class PriceController extends AbstractController
             }
         }
 
-        return $this->render('price/edit.html.twig', [
+        return $this->render('price/index.html.twig', [
             'viewModel' => $viewModel,
         ]);
     }

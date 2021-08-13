@@ -3,89 +3,158 @@
 namespace App\Controller;
 
 use App\Auth;
+use App\Repository\Calculator\UserInventoryRepository;
+use App\Repository\Calculator\UserMiningRepository;
+use App\Repository\Catalog\MaterialRepository;
+use App\Service\Catalog\UserInterestService;
+use App\ViewModel\Calculator\Inventory;
+use App\ViewModel\Calculator\Mining;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 class CalculatorController extends AbstractController
 {
-    /**
-     * @var Request
-     */
-    private $request;
-
     /**
      * @var Auth
      */
     private $auth;
 
     /**
-     * @param RequestStack $requestStack
+     * @var Request
+     */
+    private $request;
+
+    /**
+     * @var ValidatorInterface
+     */
+    private $validator;
+
+    /**
+     * @var MaterialRepository
+     */
+    private $materialRepository;
+
+    /**
+     * @var UserMiningRepository
+     */
+    private $miningRepository;
+
+    /**
+     * @var UserInterestService
+     */
+    private $interestService;
+
+    /**
+     * @var UserInventoryRepository
+     */
+    private $inventoryRepository;
+
+    /**
      * @param Auth $auth
+     * @param RequestStack $requestStack
+     * @param MaterialRepository $materialRepository
+     * @param UserMiningRepository $miningRepository
+     * @param UserInventoryRepository $inventoryRepository
+     * @param UserInterestService $interestService
+     * @param ValidatorInterface $validator
      */
     public function __construct(
+        Auth $auth,
         RequestStack $requestStack,
-        Auth $auth
+        MaterialRepository $materialRepository,
+        UserMiningRepository $miningRepository,
+        UserInventoryRepository $inventoryRepository,
+        UserInterestService $interestService,
+        ValidatorInterface $validator
     ) {
-        $this->request = $requestStack->getCurrentRequest();
         $this->auth = $auth;
+        $this->request = $requestStack->getCurrentRequest();
+        $this->validator = $validator;
+        $this->materialRepository = $materialRepository;
+        $this->miningRepository = $miningRepository;
+        $this->interestService = $interestService;
+        $this->inventoryRepository = $inventoryRepository;
     }
 
     /**
-     * @Route("/calculator/mining", methods="GET", name="get_calculator_mining")
+     * @Route("/calculator/mining", methods="GET|POST", name="calculator_mining")
      */
-    public function getCalculatorMining(): Response
-    {
-        if (!$this->auth->isAuthorized()) {
-            return $this->forward($this->auth->getRedirectToLogin());
-        }
-
-        return $this->render('calculator/index.html.twig', [
-            'controller_name' => 'CalculatorController',
-        ]);
-    }
-
-    /**
-     * @Route("/calculator/inventory", methods="GET", name="get_calculator_inventory")
-     */
-    public function getCalculatorInventory(): Response
+    public function mining(): Response
     {
         if (!$this->auth->isAuthorized()) {
             return $this->auth->getRedirectToLogin();
         }
 
-        return $this->render('calculator/index.html.twig', [
-            'controller_name' => 'CalculatorController',
+        $user = $this->auth->getUser();
+        $userMining = $this->miningRepository->findOneByUser($user);
+
+        $materials = $this->interestService->filterMaterialsByExclusion(
+            $this->materialRepository->findOrderedByName(),
+            $user
+        );
+
+        $viewModel = new Mining($materials);
+
+        if ($this->request->getMethod() === 'GET') {
+            $viewModel->fillFromUser($userMining);
+        } else {
+            $viewModel->fillFromRequest($this->request);
+            $viewModel->fillUser($userMining);
+
+            $errors = $this->validator->validate($user);
+            if (count($errors) > 0) {
+                $viewModel->addErrorsFromViolations($errors);
+            } else {
+                $this->getDoctrine()->getManager()->flush();
+                $viewModel->addNotice('Saved');
+            }
+        }
+
+        return $this->render('calculator/mining.html.twig', [
+            'viewModel' => $viewModel,
         ]);
     }
 
     /**
-     * @Route("/calculator/mining/calculate", methods="POST", name="post_calculator_mining_calculate")
+     * @Route("/calculator/inventory", methods="GET|POST", name="calculator_inventory")
      */
-    public function postCalculatorMiningCalculate(): Response
+    public function inventory(): Response
     {
         if (!$this->auth->isAuthorized()) {
-            return $this->forward($this->auth->getRedirectToLogin());
+            return $this->auth->getRedirectToLogin();
         }
 
-        return $this->render('calculator/index.html.twig', [
-            'controller_name' => 'CalculatorController',
-        ]);
-    }
+        $user = $this->auth->getUser();
+        $userInventory = $this->inventoryRepository->findOneByUser($user);
 
-    /**
-     * @Route("/calculator/inventory/calculate", methods="POST", name="post_calculator_inventory_calculate")
-     */
-    public function postCalculatorInventoryCalculate(): Response
-    {
-        if (!$this->auth->isAuthorized()) {
-            return $this->forward($this->auth->getRedirectToLogin());
+        $materials = $this->interestService->filterMaterialsByExclusion(
+            $this->materialRepository->findOrderedByName(),
+            $user
+        );
+
+        $viewModel = new Inventory($materials);
+
+        if ($this->request->getMethod() === 'GET') {
+            $viewModel->fillFromUser($userInventory);
+        } else {
+            $viewModel->fillFromRequest($this->request);
+            $viewModel->fillUser($userInventory);
+
+            $errors = $this->validator->validate($user);
+            if (count($errors) > 0) {
+                $viewModel->addErrorsFromViolations($errors);
+            } else {
+                $this->getDoctrine()->getManager()->flush();
+                $viewModel->addNotice('Saved');
+            }
         }
 
-        return $this->render('calculator/index.html.twig', [
-            'controller_name' => 'CalculatorController',
+        return $this->render('calculator/inventory.html.twig', [
+            'viewModel' => $viewModel,
         ]);
     }
 }

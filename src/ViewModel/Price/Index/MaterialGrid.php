@@ -1,6 +1,6 @@
 <?php
 
-namespace App\ViewModel\Price\Edit;
+namespace App\ViewModel\Price\Index;
 
 use App\Entity\Catalog\Material;
 use App\Entity\User\User;

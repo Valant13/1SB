@@ -1,0 +1,17 @@
+{% extends 'layout.html.twig' %}
+
+{% block title %}Calculator{% endblock %}
+
+{% block main %}
+    <div class="text-right mb-3">
+        <button type="submit" class="btn btn-primary btn-lg" form="form">Save</button>
+    </div>
+
+    {{ include('_errors.html.twig', {errors: viewModel.errors}) }}
+    {{ include('_notices.html.twig', {notices: viewModel.notices}) }}
+
+    <form action="{{ url('calculator_mining') }}" method="post" id="form">
+        <h2 class="mt-5">Materials acceptable for mining</h2>
+        {{ include('_grid.html.twig', {grid: viewModel.miningMaterialGrid}) }}
+    </form>
+{% endblock %}
