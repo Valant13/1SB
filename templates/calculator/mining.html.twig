@@ -5,14 +5,14 @@
 {% block main %}
     <div class="clearfix mb-3">
         <div class="btn-group btn-group-lg float-right">
-            <button type="button" class="btn btn-primary active">Mining</button>
             <a href="{{ url('calculator_inventory') }}" class="btn btn-primary">Inventory</a>
+            <button type="button" class="btn btn-primary active">Mining</button>
         </div>
     </div>
+    <hr class="mt-4 mb-4">
 
     <form action="{{ url('calculator_mining') }}" method="post" id="form">
-        <hr class="mt-4 mb-4">
-        <div class="clearfix">
+        <div class="clearfix mb-4">
             <div class="float-left">
                 <label>Maximize by:</label>
                 {{ include('calculator/_maximization_param_list.html.twig', {list: viewModel.maximizationParamList}) }}

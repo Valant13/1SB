@@ -5,6 +5,7 @@ namespace App\Entity\Calculator;
 use App\Entity\Catalog\Material;
 use App\Repository\Calculator\UserInventoryMaterialRepository;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * @ORM\Entity(repositoryClass=UserInventoryMaterialRepository::class)
@@ -32,6 +33,7 @@ class UserInventoryMaterial
 
     /**
      * @ORM\Column(type="integer", options={"unsigned":true})
+     * @Assert\PositiveOrZero (message="Inventory qty should be positive or zero")
      */
     private $qty;
 

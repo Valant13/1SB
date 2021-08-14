@@ -3,7 +3,6 @@
 namespace App\Entity\Calculator;
 
 use App\Entity\Catalog\Material;
-use App\Entity\User\User;
 use App\Repository\Calculator\UserMiningMaterialRepository;
 use Doctrine\ORM\Mapping as ORM;
 

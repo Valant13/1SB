@@ -48,7 +48,7 @@ class DeviceGrid implements GridBindingInterface
     {
         $imageColumn = (new Column())->setName('Image')->setWidth(15);
         $nameColumn = (new Column())->setName('Name');
-        $modifiedColumn = (new Column())->setName('Price modified')->setWidth(20);
+        $modifiedColumn = (new Column())->setName('Price modified')->setWidth(17);
         $auctionPriceColumn = (new Column())->setName('Auction price')->setWidth(20)
             ->setControlType(Column::CONTROL_TYPE_CLEAR);
 

@@ -33,7 +33,7 @@
                 {% for cell in row.cells %}
                     {% if cell.type == "action" %}
                         <td class="align-middle">
-                            <a href="{{ url(cell.route, cell.params) }}" class="btn btn-secondary btn-sm">{{ cell.name }}</a>
+                            <a href="{{ url(cell.route, cell.params) }}" class="btn btn-link btn-sm">{{ cell.name }}</a>
                         </td>
                     {% elseif cell.type == "checkbox" %}
                         <td class="align-middle">

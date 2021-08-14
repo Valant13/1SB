@@ -16,7 +16,8 @@
             <input type="text" class="form-control" id="nickname" name="nickname" value="{{ viewModel.nickname }}">
         </div>
 
-        <h2 class="mt-5">Materials of interest</h2>
+        <h2 class="mt-5 mb-0">Materials of interest</h2>
+        <p class="mt-0 mb-0 small text-muted">Items excluded from the interest will be hidden on the calculator and price pages</p>
         {{ include('_grid.html.twig', {grid: viewModel.interestMaterialGrid}) }}
 
         <h2 class="mt-5">Devices of interest</h2>

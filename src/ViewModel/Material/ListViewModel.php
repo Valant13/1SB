@@ -32,8 +32,8 @@ class ListViewModel extends AbstractViewModel
             (new Column())->setName('Image')->setWidth(15),
             (new Column())->setName('Name'),
             (new Column())->setName('Marketp.')->setWidth(15),
-            (new Column())->setName('Modified')->setWidth(15),
-            (new Column())->setName('Actions')->setWidth(15)
+            (new Column())->setName('Modified')->setWidth(17),
+            (new Column())->setName('Actions')->setWidth(10)
         ]);
     }
 

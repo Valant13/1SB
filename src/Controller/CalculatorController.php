@@ -139,7 +139,6 @@ class CalculatorController extends AbstractController
             $viewModel->addErrorsFromViolations($this->validator->validate($userMining));
             if (!$viewModel->hasErrors()) {
                 $this->getDoctrine()->getManager()->flush();
-                $viewModel->addNotice('Saved');
             }
         }
 
@@ -180,7 +179,6 @@ class CalculatorController extends AbstractController
             $viewModel->addErrorsFromViolations($this->validator->validate($userInventory));
             if (!$viewModel->hasErrors()) {
                 $this->getDoctrine()->getManager()->flush();
-                $viewModel->addNotice('Saved');
             }
         }
 
