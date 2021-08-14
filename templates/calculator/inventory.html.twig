@@ -10,15 +10,23 @@
         </div>
     </div>
 
-    <div class="text-right mb-3">
-        <button type="submit" class="btn btn-primary btn-lg" form="form">Save</button>
-    </div>
-
-    {{ include('_errors.html.twig', {errors: viewModel.errors}) }}
-    {{ include('_notices.html.twig', {notices: viewModel.notices}) }}
-
     <form action="{{ url('calculator_inventory') }}" method="post" id="form">
-        <h2 class="mt-5">Materials stored in inventory</h2>
+        <hr class="mt-4 mb-4">
+        <div class="clearfix">
+            <div class="float-left">
+                <label>Maximize by:</label>
+                {{ include('calculator/_maximization_param_list.html.twig', {list: viewModel.maximizationParamList}) }}
+            </div>
+
+            <div class="float-right text-right mb-3">
+                <button type="submit" class="btn btn-primary btn-lg" form="form">Calculate</button>
+            </div>
+        </div>
+
+        {{ include('_errors.html.twig', {errors: viewModel.errors}) }}
+        {{ include('_notices.html.twig', {notices: viewModel.notices}) }}
+
+        <h2 class="mt-5">Materials in inventory</h2>
         {{ include('_grid.html.twig', {grid: viewModel.inventoryMaterialGrid}) }}
     </form>
 {% endblock %}

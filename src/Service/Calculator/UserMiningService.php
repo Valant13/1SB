@@ -56,7 +56,6 @@ class UserMiningService
 
             $miningMaterial->setUserMining($mining);
             $miningMaterial->setMaterial($material);
-            $miningMaterial->setIsAcceptable(true);
         }
     }
 
@@ -76,7 +75,6 @@ class UserMiningService
 
             $miningMaterial->setMaterial($material);
             $miningMaterial->setUserMining($mining);
-            $miningMaterial->setIsAcceptable(true);
 
             $mining->addMaterial($miningMaterial);
         }

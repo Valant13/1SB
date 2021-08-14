@@ -3,6 +3,7 @@
 namespace App\Repository\Calculator;
 
 use App\Entity\Calculator\UserCalculation;
+use App\Entity\User\User;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
@@ -19,32 +20,17 @@ class UserCalculationRepository extends ServiceEntityRepository
         parent::__construct($registry, UserCalculation::class);
     }
 
-    // /**
-    //  * @return UserCalculation[] Returns an array of UserCalculation objects
-    //  */
-    /*
-    public function findByExampleField($value)
+    /**
+     * @param User $user
+     * @return UserCalculation|null
+     */
+    public function findOneByUser(User $user): ?UserCalculation
     {
-        return $this->createQueryBuilder('u')
-            ->andWhere('u.exampleField = :val')
-            ->setParameter('val', $value)
-            ->orderBy('u.id', 'ASC')
-            ->setMaxResults(10)
-            ->getQuery()
-            ->getResult()
-        ;
-    }
-    */
-
-    /*
-    public function findOneBySomeField($value): ?UserCalculation
-    {
-        return $this->createQueryBuilder('u')
-            ->andWhere('u.exampleField = :val')
-            ->setParameter('val', $value)
+        return $this->createQueryBuilder('uc')
+            ->andWhere('uc.user = :user')
+            ->setParameter('user', $user)
             ->getQuery()
             ->getOneOrNullResult()
         ;
     }
-    */
 }

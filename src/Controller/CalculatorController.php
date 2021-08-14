@@ -4,9 +4,11 @@ namespace App\Controller;
 
 use App\Auth;
 use App\Logger;
+use App\Repository\Calculator\UserCalculationRepository;
 use App\Repository\Calculator\UserInventoryRepository;
 use App\Repository\Calculator\UserMiningRepository;
 use App\Repository\Catalog\MaterialRepository;
+use App\Repository\Catalog\ResearchPointRepository;
 use App\Service\Catalog\UserInterestService;
 use App\ViewModel\Calculator\Inventory;
 use App\ViewModel\Calculator\Mining;
@@ -60,11 +62,23 @@ class CalculatorController extends AbstractController
     private $logger;
 
     /**
+     * @var ResearchPointRepository
+     */
+    private $researchPointRepository;
+
+    /**
+     * @var UserCalculationRepository
+     */
+    private $calculationRepository;
+
+    /**
      * @param Auth $auth
      * @param Logger $logger
      * @param RequestStack $requestStack
      * @param MaterialRepository $materialRepository
+     * @param ResearchPointRepository $researchPointRepository
      * @param UserMiningRepository $miningRepository
+     * @param UserCalculationRepository $calculationRepository
      * @param UserInventoryRepository $inventoryRepository
      * @param UserInterestService $interestService
      * @param ValidatorInterface $validator
@@ -74,7 +88,9 @@ class CalculatorController extends AbstractController
         Logger $logger,
         RequestStack $requestStack,
         MaterialRepository $materialRepository,
+        ResearchPointRepository $researchPointRepository,
         UserMiningRepository $miningRepository,
+        UserCalculationRepository $calculationRepository,
         UserInventoryRepository $inventoryRepository,
         UserInterestService $interestService,
         ValidatorInterface $validator
@@ -87,6 +103,8 @@ class CalculatorController extends AbstractController
         $this->interestService = $interestService;
         $this->inventoryRepository = $inventoryRepository;
         $this->logger = $logger;
+        $this->researchPointRepository = $researchPointRepository;
+        $this->calculationRepository = $calculationRepository;
     }
 
     /**
@@ -101,24 +119,25 @@ class CalculatorController extends AbstractController
 
         $user = $this->auth->getUser();
         $userMining = $this->miningRepository->findOneByUser($user);
+        $userCalculation = $this->calculationRepository->findOneByUser($user);
 
+        $researchPoints = $this->researchPointRepository->findOrderedBySortOrder();
         $materials = $this->interestService->filterMaterialsByExclusion(
             $this->materialRepository->findOrderedByName(),
             $user
         );
 
-        $viewModel = new Mining($materials);
+        $viewModel = new Mining($researchPoints, $materials);
 
         if ($this->request->getMethod() === 'GET') {
-            $viewModel->fillFromUser($userMining);
+            $viewModel->fillFromUser($userCalculation, $userMining);
         } else {
             $viewModel->fillFromRequest($this->request);
-            $viewModel->fillUser($userMining);
+            $viewModel->fillUser($userCalculation, $userMining);
 
-            $errors = $this->validator->validate($user);
-            if (count($errors) > 0) {
-                $viewModel->addErrorsFromViolations($errors);
-            } else {
+            $viewModel->addErrorsFromViolations($this->validator->validate($userCalculation));
+            $viewModel->addErrorsFromViolations($this->validator->validate($userMining));
+            if (!$viewModel->hasErrors()) {
                 $this->getDoctrine()->getManager()->flush();
                 $viewModel->addNotice('Saved');
             }
@@ -141,24 +160,25 @@ class CalculatorController extends AbstractController
 
         $user = $this->auth->getUser();
         $userInventory = $this->inventoryRepository->findOneByUser($user);
+        $userCalculation = $this->calculationRepository->findOneByUser($user);
 
+        $researchPoints = $this->researchPointRepository->findOrderedBySortOrder();
         $materials = $this->interestService->filterMaterialsByExclusion(
             $this->materialRepository->findOrderedByName(),
             $user
         );
 
-        $viewModel = new Inventory($materials);
+        $viewModel = new Inventory($researchPoints, $materials);
 
         if ($this->request->getMethod() === 'GET') {
-            $viewModel->fillFromUser($userInventory);
+            $viewModel->fillFromUser($userCalculation, $userInventory);
         } else {
             $viewModel->fillFromRequest($this->request);
-            $viewModel->fillUser($userInventory);
+            $viewModel->fillUser($userCalculation, $userInventory);
 
-            $errors = $this->validator->validate($user);
-            if (count($errors) > 0) {
-                $viewModel->addErrorsFromViolations($errors);
-            } else {
+            $viewModel->addErrorsFromViolations($this->validator->validate($userCalculation));
+            $viewModel->addErrorsFromViolations($this->validator->validate($userInventory));
+            if (!$viewModel->hasErrors()) {
                 $this->getDoctrine()->getManager()->flush();
                 $viewModel->addNotice('Saved');
             }

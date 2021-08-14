@@ -36,6 +36,11 @@ class UserMiningMaterial
      */
     private $isAcceptable;
 
+    public function __construct()
+    {
+        $this->isAcceptable = true;
+    }
+
     public function getId(): ?int
     {
         return $this->id;

@@ -11,6 +11,8 @@ use Doctrine\ORM\Mapping as ORM;
  */
 class UserCalculation
 {
+    const CREDIT_CODE = 'credit';
+
     /**
      * @ORM\Id
      * @ORM\GeneratedValue
@@ -20,14 +22,19 @@ class UserCalculation
 
     /**
      * @ORM\OneToOne(targetEntity=User::class, cascade={"persist", "remove"})
-     * @ORM\JoinColumn(nullable=false, unique=true)
+     * @ORM\JoinColumn(nullable=false, onDelete="CASCADE", unique=true)
      */
     private $user;
 
     /**
-     * @ORM\Column(type="string", length=255, nullable=true)
+     * @ORM\Column(name="maximization_param", type="string", length=255, nullable=true)
      */
-    private $maximizationParam;
+    private $maximizationParamCode;
+
+    public function __construct()
+    {
+        $this->maximizationParamCode = UserCalculation::CREDIT_CODE;
+    }
 
     public function getId(): ?int
     {
@@ -46,14 +53,14 @@ class UserCalculation
         return $this;
     }
 
-    public function getMaximizationParam(): ?string
+    public function getMaximizationParamCode(): ?string
     {
-        return $this->maximizationParam;
+        return $this->maximizationParamCode;
     }
 
-    public function setMaximizationParam(?string $maximizationParam): self
+    public function setMaximizationParamCode(?string $maximizationParamCode): self
     {
-        $this->maximizationParam = $maximizationParam;
+        $this->maximizationParamCode = $maximizationParamCode;
 
         return $this;
     }

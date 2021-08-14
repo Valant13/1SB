@@ -142,7 +142,6 @@ class UserInterestService
 
             $interestMaterial->setUserInterest($interest);
             $interestMaterial->setMaterial($material);
-            $interestMaterial->setIsExcluded(false);
         }
     }
 
@@ -159,7 +158,6 @@ class UserInterestService
 
             $interestDevice->setUserInterest($interest);
             $interestDevice->setDevice($device);
-            $interestDevice->setIsExcluded(false);
 
             $interest->addDevice($interestDevice);
         }
@@ -181,7 +179,6 @@ class UserInterestService
 
             $interestMaterial->setMaterial($material);
             $interestMaterial->setUserInterest($interest);
-            $interestMaterial->setIsExcluded(false);
 
             $interest->addMaterial($interestMaterial);
         }
@@ -192,7 +189,6 @@ class UserInterestService
 
             $interestDevice->setDevice($device);
             $interestDevice->setUserInterest($interest);
-            $interestDevice->setIsExcluded(false);
 
             $interest->addDevice($interestDevice);
         }

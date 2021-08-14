@@ -35,6 +35,11 @@ class UserInventoryMaterial
      */
     private $qty;
 
+    public function __construct()
+    {
+        $this->qty = 0;
+    }
+
     public function getId(): ?int
     {
         return $this->id;

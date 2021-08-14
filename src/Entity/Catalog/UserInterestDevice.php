@@ -34,6 +34,11 @@ class UserInterestDevice
      */
     private $isExcluded;
 
+    public function __construct()
+    {
+        $this->isExcluded = false;
+    }
+
     public function getId(): ?int
     {
         return $this->id;

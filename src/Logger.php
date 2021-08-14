@@ -40,24 +40,24 @@ class Logger
         $this->requestStack = $requestStack;
     }
 
-    public function logUserRequest(): void
+    /**
+     * @param User|null $user
+     * @param Request|null $request
+     */
+    public function logUserRequest(User $user = null, Request $request = null): void
     {
-        if (!$this->auth->isAuthorized()) {
-            throw new \BadMethodCallException('User is not authorized');
+        if ($user === null) {
+            if (!$this->auth->isAuthorized()) {
+                throw new \BadMethodCallException('User is not authorized');
+            }
+
+            $user = $this->auth->getUser();
         }
 
-        $user = $this->auth->getUser();
-        $request = $this->requestStack->getCurrentRequest();
+        if ($request === null) {
+            $request = $this->requestStack->getCurrentRequest();
+        }
 
-        $this->logUserRequestImpl($user, $request);
-    }
-
-    /**
-     * @param User $user
-     * @param Request $request
-     */
-    private function logUserRequestImpl(User $user, Request $request): void
-    {
         $record = new UserLog();
 
         $record->setUser($user);

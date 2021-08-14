@@ -29,11 +29,14 @@ final class Version20210810181240 extends AbstractMigration
         $this->addSql('CREATE TABLE research_point (id INT AUTO_INCREMENT NOT NULL, code VARCHAR(255) NOT NULL, name VARCHAR(255) NOT NULL, icon_url LONGTEXT DEFAULT NULL, sort_order INT NOT NULL, UNIQUE INDEX UNIQ_312391C077153098 (code), UNIQUE INDEX UNIQ_312391C05E237E06 (name), PRIMARY KEY(id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB');
         $this->addSql('CREATE TABLE user_calculation (id INT AUTO_INCREMENT NOT NULL, user_id INT NOT NULL, maximization_param VARCHAR(255) DEFAULT NULL, UNIQUE INDEX UNIQ_5FBCA0E5A76ED395 (user_id), PRIMARY KEY(id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB');
         $this->addSql('CREATE TABLE user_entity (id INT AUTO_INCREMENT NOT NULL, nickname VARCHAR(255) NOT NULL, registration_ip VARCHAR(255) NOT NULL, registration_time DATETIME NOT NULL, UNIQUE INDEX UNIQ_6B7A5F55A188FE64 (nickname), PRIMARY KEY(id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB');
-        $this->addSql('CREATE TABLE user_interest_device (id INT AUTO_INCREMENT NOT NULL, user_id INT NOT NULL, device_id INT NOT NULL, is_excluded TINYINT(1) NOT NULL, INDEX IDX_617D2048A76ED395 (user_id), INDEX IDX_617D204894A4C7D4 (device_id), PRIMARY KEY(id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB');
-        $this->addSql('CREATE TABLE user_interest_material (id INT AUTO_INCREMENT NOT NULL, user_id INT NOT NULL, material_id INT NOT NULL, is_excluded TINYINT(1) NOT NULL, INDEX IDX_F8725B7EA76ED395 (user_id), INDEX IDX_F8725B7EE308AC6F (material_id), PRIMARY KEY(id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB');
-        $this->addSql('CREATE TABLE user_inventory_material (id INT AUTO_INCREMENT NOT NULL, user_id INT NOT NULL, material_id INT NOT NULL, qty INT UNSIGNED NOT NULL, INDEX IDX_64B029FFA76ED395 (user_id), INDEX IDX_64B029FFE308AC6F (material_id), PRIMARY KEY(id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB');
+        $this->addSql('CREATE TABLE user_interest (id INT AUTO_INCREMENT NOT NULL, user_id INT NOT NULL, UNIQUE INDEX UNIQ_8CB3FE67A76ED395 (user_id), PRIMARY KEY(id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB');
+        $this->addSql('CREATE TABLE user_interest_device (id INT AUTO_INCREMENT NOT NULL, user_interest_id INT NOT NULL, device_id INT NOT NULL, is_excluded TINYINT(1) NOT NULL, INDEX IDX_617D2048F38E361C (user_interest_id), INDEX IDX_617D204894A4C7D4 (device_id), PRIMARY KEY(id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB');
+        $this->addSql('CREATE TABLE user_interest_material (id INT AUTO_INCREMENT NOT NULL, user_interest_id INT NOT NULL, material_id INT NOT NULL, is_excluded TINYINT(1) NOT NULL, INDEX IDX_F8725B7EF38E361C (user_interest_id), INDEX IDX_F8725B7EE308AC6F (material_id), PRIMARY KEY(id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB');
+        $this->addSql('CREATE TABLE user_inventory (id INT AUTO_INCREMENT NOT NULL, user_id INT NOT NULL, UNIQUE INDEX UNIQ_B1CDC7D2A76ED395 (user_id), PRIMARY KEY(id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB');
+        $this->addSql('CREATE TABLE user_inventory_material (id INT AUTO_INCREMENT NOT NULL, user_inventory_id INT NOT NULL, material_id INT NOT NULL, qty INT UNSIGNED NOT NULL, INDEX IDX_64B029FF8922DB5B (user_inventory_id), INDEX IDX_64B029FFE308AC6F (material_id), PRIMARY KEY(id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB');
         $this->addSql('CREATE TABLE user_log (id INT AUTO_INCREMENT NOT NULL, user_id INT NOT NULL, user_nickname VARCHAR(255) NOT NULL, request_url LONGTEXT NOT NULL, request_ip VARCHAR(255) NOT NULL, request_time DATETIME NOT NULL, INDEX IDX_6429094EA76ED395 (user_id), PRIMARY KEY(id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB');
-        $this->addSql('CREATE TABLE user_mining_material (id INT AUTO_INCREMENT NOT NULL, user_id INT NOT NULL, material_id INT NOT NULL, is_acceptable TINYINT(1) NOT NULL, INDEX IDX_9DB42EF5A76ED395 (user_id), INDEX IDX_9DB42EF5E308AC6F (material_id), PRIMARY KEY(id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB');
+        $this->addSql('CREATE TABLE user_mining (id INT AUTO_INCREMENT NOT NULL, user_id INT NOT NULL, UNIQUE INDEX UNIQ_408F716BA76ED395 (user_id), PRIMARY KEY(id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB');
+        $this->addSql('CREATE TABLE user_mining_material (id INT AUTO_INCREMENT NOT NULL, user_mining_id INT NOT NULL, material_id INT NOT NULL, is_acceptable TINYINT(1) NOT NULL, INDEX IDX_9DB42EF569E037B7 (user_mining_id), INDEX IDX_9DB42EF5E308AC6F (material_id), PRIMARY KEY(id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB');
         $this->addSql('ALTER TABLE device ADD CONSTRAINT FK_92FB68E4584665A FOREIGN KEY (product_id) REFERENCES product (id) ON DELETE CASCADE');
         $this->addSql('ALTER TABLE device_crafting_component ADD CONSTRAINT FK_40F0896094A4C7D4 FOREIGN KEY (device_id) REFERENCES device (id)');
         $this->addSql('ALTER TABLE device_crafting_component ADD CONSTRAINT FK_40F08960E308AC6F FOREIGN KEY (material_id) REFERENCES material (id)');
@@ -43,15 +46,18 @@ final class Version20210810181240 extends AbstractMigration
         $this->addSql('ALTER TABLE product ADD CONSTRAINT FK_D34A04AD639C1909 FOREIGN KEY (auction_price_id) REFERENCES product_auction_price (id)');
         $this->addSql('ALTER TABLE product ADD CONSTRAINT FK_D34A04AD337A48F0 FOREIGN KEY (modification_user_id) REFERENCES user_entity (id)');
         $this->addSql('ALTER TABLE product_auction_price ADD CONSTRAINT FK_5F31A722337A48F0 FOREIGN KEY (modification_user_id) REFERENCES user_entity (id)');
-        $this->addSql('ALTER TABLE user_calculation ADD CONSTRAINT FK_5FBCA0E5A76ED395 FOREIGN KEY (user_id) REFERENCES user_entity (id)');
-        $this->addSql('ALTER TABLE user_interest_device ADD CONSTRAINT FK_617D2048A76ED395 FOREIGN KEY (user_id) REFERENCES user_entity (id)');
+        $this->addSql('ALTER TABLE user_calculation ADD CONSTRAINT FK_5FBCA0E5A76ED395 FOREIGN KEY (user_id) REFERENCES user_entity (id) ON DELETE CASCADE');
+        $this->addSql('ALTER TABLE user_interest ADD CONSTRAINT FK_8CB3FE67A76ED395 FOREIGN KEY (user_id) REFERENCES user_entity (id) ON DELETE CASCADE');
+        $this->addSql('ALTER TABLE user_interest_device ADD CONSTRAINT FK_617D2048F38E361C FOREIGN KEY (user_interest_id) REFERENCES user_interest (id)');
         $this->addSql('ALTER TABLE user_interest_device ADD CONSTRAINT FK_617D204894A4C7D4 FOREIGN KEY (device_id) REFERENCES device (id)');
-        $this->addSql('ALTER TABLE user_interest_material ADD CONSTRAINT FK_F8725B7EA76ED395 FOREIGN KEY (user_id) REFERENCES user_entity (id)');
+        $this->addSql('ALTER TABLE user_interest_material ADD CONSTRAINT FK_F8725B7EF38E361C FOREIGN KEY (user_interest_id) REFERENCES user_interest (id)');
         $this->addSql('ALTER TABLE user_interest_material ADD CONSTRAINT FK_F8725B7EE308AC6F FOREIGN KEY (material_id) REFERENCES material (id)');
-        $this->addSql('ALTER TABLE user_inventory_material ADD CONSTRAINT FK_64B029FFA76ED395 FOREIGN KEY (user_id) REFERENCES user_entity (id)');
+        $this->addSql('ALTER TABLE user_inventory ADD CONSTRAINT FK_B1CDC7D2A76ED395 FOREIGN KEY (user_id) REFERENCES user_entity (id) ON DELETE CASCADE');
+        $this->addSql('ALTER TABLE user_inventory_material ADD CONSTRAINT FK_64B029FF8922DB5B FOREIGN KEY (user_inventory_id) REFERENCES user_inventory (id)');
         $this->addSql('ALTER TABLE user_inventory_material ADD CONSTRAINT FK_64B029FFE308AC6F FOREIGN KEY (material_id) REFERENCES material (id)');
         $this->addSql('ALTER TABLE user_log ADD CONSTRAINT FK_6429094EA76ED395 FOREIGN KEY (user_id) REFERENCES user_entity (id)');
-        $this->addSql('ALTER TABLE user_mining_material ADD CONSTRAINT FK_9DB42EF5A76ED395 FOREIGN KEY (user_id) REFERENCES user_entity (id)');
+        $this->addSql('ALTER TABLE user_mining ADD CONSTRAINT FK_408F716BA76ED395 FOREIGN KEY (user_id) REFERENCES user_entity (id) ON DELETE CASCADE');
+        $this->addSql('ALTER TABLE user_mining_material ADD CONSTRAINT FK_9DB42EF569E037B7 FOREIGN KEY (user_mining_id) REFERENCES user_mining (id)');
         $this->addSql('ALTER TABLE user_mining_material ADD CONSTRAINT FK_9DB42EF5E308AC6F FOREIGN KEY (material_id) REFERENCES material (id)');
     }
 
@@ -72,11 +78,14 @@ final class Version20210810181240 extends AbstractMigration
         $this->addSql('ALTER TABLE product DROP FOREIGN KEY FK_D34A04AD337A48F0');
         $this->addSql('ALTER TABLE product_auction_price DROP FOREIGN KEY FK_5F31A722337A48F0');
         $this->addSql('ALTER TABLE user_calculation DROP FOREIGN KEY FK_5FBCA0E5A76ED395');
-        $this->addSql('ALTER TABLE user_interest_device DROP FOREIGN KEY FK_617D2048A76ED395');
-        $this->addSql('ALTER TABLE user_interest_material DROP FOREIGN KEY FK_F8725B7EA76ED395');
-        $this->addSql('ALTER TABLE user_inventory_material DROP FOREIGN KEY FK_64B029FFA76ED395');
+        $this->addSql('ALTER TABLE user_interest DROP FOREIGN KEY FK_8CB3FE67A76ED395');
+        $this->addSql('ALTER TABLE user_inventory DROP FOREIGN KEY FK_B1CDC7D2A76ED395');
         $this->addSql('ALTER TABLE user_log DROP FOREIGN KEY FK_6429094EA76ED395');
-        $this->addSql('ALTER TABLE user_mining_material DROP FOREIGN KEY FK_9DB42EF5A76ED395');
+        $this->addSql('ALTER TABLE user_mining DROP FOREIGN KEY FK_408F716BA76ED395');
+        $this->addSql('ALTER TABLE user_interest_device DROP FOREIGN KEY FK_617D2048F38E361C');
+        $this->addSql('ALTER TABLE user_interest_material DROP FOREIGN KEY FK_F8725B7EF38E361C');
+        $this->addSql('ALTER TABLE user_inventory_material DROP FOREIGN KEY FK_64B029FF8922DB5B');
+        $this->addSql('ALTER TABLE user_mining_material DROP FOREIGN KEY FK_9DB42EF569E037B7');
         $this->addSql('DROP TABLE device');
         $this->addSql('DROP TABLE device_crafting_component');
         $this->addSql('DROP TABLE device_crafting_experience');
@@ -86,10 +95,13 @@ final class Version20210810181240 extends AbstractMigration
         $this->addSql('DROP TABLE research_point');
         $this->addSql('DROP TABLE user_calculation');
         $this->addSql('DROP TABLE user_entity');
+        $this->addSql('DROP TABLE user_interest');
         $this->addSql('DROP TABLE user_interest_device');
         $this->addSql('DROP TABLE user_interest_material');
+        $this->addSql('DROP TABLE user_inventory');
         $this->addSql('DROP TABLE user_inventory_material');
         $this->addSql('DROP TABLE user_log');
+        $this->addSql('DROP TABLE user_mining');
         $this->addSql('DROP TABLE user_mining_material');
     }
 }

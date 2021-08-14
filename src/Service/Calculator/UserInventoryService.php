@@ -56,7 +56,6 @@ class UserInventoryService
 
             $inventoryMaterial->setUserInventory($inventory);
             $inventoryMaterial->setMaterial($material);
-            $inventoryMaterial->setQty(0);
         }
     }
 
@@ -76,7 +75,6 @@ class UserInventoryService
 
             $inventoryMaterial->setMaterial($material);
             $inventoryMaterial->setUserInventory($inventory);
-            $inventoryMaterial->setQty(0);
 
             $inventory->addMaterial($inventoryMaterial);
         }
