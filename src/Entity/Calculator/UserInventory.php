@@ -93,13 +93,13 @@ class UserInventory
     /**
      * @return int[]
      */
-    public function getMaterialQuantities(): array
+    public function getMaterialQtys(): array
     {
-        $materialQuantities = [];
+        $materialQtys = [];
         foreach ($this->getMaterials() as $materialRecord) {
-            $materialQuantities[$materialRecord->getMaterial()->getId()] = $materialRecord->getQty();
+            $materialQtys[$materialRecord->getMaterial()->getId()] = $materialRecord->getQty();
         }
 
-        return $materialQuantities;
+        return $materialQtys;
     }
 }

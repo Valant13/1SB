@@ -135,6 +135,35 @@ class Device
     }
 
     /**
+     * @return int[]
+     */
+    public function getCraftingExperienceQtys(): array
+    {
+        $experienceQtys = [];
+        foreach ($this->getCraftingExperience() as $experienceRecord) {
+            $experienceQtys[$experienceRecord->getResearchPoint()->getCode()] = $experienceRecord->getQty();
+        }
+
+        return $experienceQtys;
+    }
+
+    /**
+     * @return float[]
+     */
+    public function getCraftingComponentsQtys(): array
+    {
+        $componentQtys = [];
+        foreach ($this->getCraftingComponents() as $componentRecord) {
+            /** @var float $componentQty */
+            $componentQty = $componentRecord->getQty() / Material::STACK_SIZE;
+
+            $componentQtys[$componentRecord->getMaterial()->getId()] = $componentQty;
+        }
+
+        return $componentQtys;
+    }
+
+    /**
      * @ORM\PreFlush
      */
     public function removeEmptyCraftingExperience(): void

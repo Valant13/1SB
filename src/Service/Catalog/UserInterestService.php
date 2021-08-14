@@ -65,20 +65,19 @@ class UserInterestService
         $interest = $this->interestRepository->findOneByUser($user);
         $excludedMaterialIds = $interest->getExcludedMaterialIds();
 
-        $filteredMaterials = [];
+        $excludedMaterials = [];
+        $includedMaterials = [];
+
         foreach ($materials as $material) {
-            // Searching for excluded materials
-            if ($isExcluded && in_array($material->getId(), $excludedMaterialIds)) {
-                $filteredMaterials[] = $material;
+            if (in_array($material->getId(), $excludedMaterialIds)) {
+                $excludedMaterials[] = $material;
+                break;
             }
 
-            // Searching for included materials
-            if (!$isExcluded && !in_array($material->getId(), $excludedMaterialIds)) {
-                $filteredMaterials[] = $material;
-            }
+            $includedMaterials[] = $material;
         }
 
-        return $filteredMaterials;
+        return $isExcluded ? $excludedMaterials : $includedMaterials;
     }
 
     /**
@@ -93,40 +92,33 @@ class UserInterestService
         $excludedMaterialIds = $interest->getExcludedMaterialIds();
         $excludedDeviceIds = $interest->getExcludedDeviceIds();
 
-        $filteredDevices = [];
-        foreach ($devices as $device) {
-            // Searching for excluded devices
-            if ($isExcluded) {
-                if (in_array($device->getId(), $excludedDeviceIds)) {
-                    $filteredDevices[] = $device;
-                } else {
-                    foreach ($device->getCraftingComponents() as $componentRecord) {
-                        if (in_array($componentRecord->getMaterial()->getId(), $excludedMaterialIds)) {
-                            $filteredDevices[] = $device;
-                            break;
-                        }
-                    }
-                }
-            }
+        $excludedDevices = [];
+        $includedDevices = [];
 
-            // Searching for included devices
-            if (!$isExcluded && !in_array($device->getId(), $excludedDeviceIds)) {
-                $hasExcludedComponents = false;
+        foreach ($devices as $device) {
+            if (in_array($device->getId(), $excludedDeviceIds)) {
+                $excludedDevices[] = $device;
+                break;
+            } else {
+                $hasExcludedComponent = false;
 
                 foreach ($device->getCraftingComponents() as $componentRecord) {
                     if (in_array($componentRecord->getMaterial()->getId(), $excludedMaterialIds)) {
-                        $hasExcludedComponents = true;
+                        $hasExcludedComponent = true;
                         break;
                     }
                 }
 
-                if (!$hasExcludedComponents) {
-                    $filteredDevices[] = $device;
+                if ($hasExcludedComponent) {
+                    $excludedDevices[] = $device;
+                    break;
                 }
             }
+
+            $includedDevices[] = $device;
         }
 
-        return $filteredDevices;
+        return $isExcluded ? $excludedDevices : $includedDevices;
     }
 
     /**
