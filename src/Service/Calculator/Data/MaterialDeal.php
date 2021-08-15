@@ -42,4 +42,13 @@ class MaterialDeal extends AbstractDeal implements DealInterface
     {
         return $this->source;
     }
+
+    /**
+     * @param int|null $qty
+     */
+    public function setQty(?int $qty): void
+    {
+        parent::setQty($qty);
+        $this->source->setDealQty($qty);
+    }
 }

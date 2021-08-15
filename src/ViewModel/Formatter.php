@@ -87,6 +87,13 @@ class Formatter
             return null;
         }
 
-        return number_format($qty, 1);
+        // TODO: refactor
+        $formattedQty = number_format($qty, 1, '.', ' ');
+
+        if ($qty > 0 && substr($formattedQty, -1) === '0') {
+            return substr($formattedQty, 0, -2);
+        }
+
+        return $formattedQty;
     }
 }

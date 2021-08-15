@@ -52,6 +52,14 @@ abstract class AbstractDeal implements DealInterface
     }
 
     /**
+     * @return int
+     */
+    public function getTotalProfit(): int
+    {
+        return $this->qty === null ? $this->profit : $this->profit * $this->qty;
+    }
+
+    /**
      * @return int|null
      */
     public function getQty(): ?int
@@ -65,6 +73,7 @@ abstract class AbstractDeal implements DealInterface
     public function setQty(?int $qty): void
     {
         $this->qty = $qty;
+        $this->destination->setDealQty($qty);
     }
 
     /**

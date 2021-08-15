@@ -39,4 +39,12 @@ class CraftingDealComponent
     {
         return $this->source;
     }
+
+    /**
+     * @param int|null $dealQty
+     */
+    public function setDealQty(?int $dealQty): void
+    {
+        $this->source->setDealQty($dealQty);
+    }
 }

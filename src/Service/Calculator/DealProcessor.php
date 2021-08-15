@@ -54,7 +54,13 @@ class DealProcessor
             $orderingDeals = $deals;
 
             usort($deals, function ($a, $b) {
-                return $a->getProfit() - $b->getProfit();
+                $aCost = $a->getDestination()->getPrice() - $a->getProfit();
+                $bCost = $b->getDestination()->getPrice() - $b->getProfit();
+
+                $aProfitability = $aCost / $a->getProfit();
+                $bProfitability = $bCost / $b->getProfit();
+
+                return $aProfitability - $bProfitability;
             });
         } else {
             $orderingDeals = [];
@@ -76,9 +82,18 @@ class DealProcessor
                     $bParamValue = $b->getExperience()[$param];
                 }
 
-                $paramDifference = $aParamValue - $bParamValue;
+                $aCost = $a->getDestination()->getPrice() - $a->getProfit();
+                $bCost = $b->getDestination()->getPrice() - $b->getProfit();
 
-                return $paramDifference ?: $a->getProfit() - $b->getProfit();
+                $aProfitability = $aCost / $a->getProfit();
+                $bProfitability = $bCost / $b->getProfit();
+
+                $aParamCost = $aCost / $aParamValue;
+                $bParamCost = $bCost / $bParamValue;
+
+                $paramCostDifference = $aParamCost - $bParamCost;
+
+                return $paramCostDifference ?: $aProfitability - $bProfitability;
             });
         }
 

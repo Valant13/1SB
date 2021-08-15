@@ -51,10 +51,38 @@ class CraftingDeal extends AbstractDeal implements DealInterface
     }
 
     /**
+     * @return int[]
+     */
+    public function getTotalExperience(): array
+    {
+        if ($this->getQty() === null) {
+            return $this->experience;
+        } else {
+            $totalExperience = [];
+            foreach ($this->experience as $code => $qty) {
+                $totalExperience[$code] = $qty * $this->getQty();
+            }
+
+            return $totalExperience;
+        }
+    }
+
+    /**
      * @return CraftingDealComponent[]
      */
     public function getComponents(): array
     {
         return $this->components;
+    }
+
+    /**
+     * @param int|null $qty
+     */
+    public function setQty(?int $qty): void
+    {
+        parent::setQty($qty);
+        foreach ($this->components as $component) {
+            $component->setDealQty($qty);
+        }
     }
 }

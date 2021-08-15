@@ -147,7 +147,7 @@ class DealGrid extends Grid
             'craft' => $this->createCellForCrafting(),
             'device' => $this->createCellForDevice(),
             'sell' => $this->createCellForDestination($deal->getDestination()),
-            'profit' => $this->createCellForProfit($deal->getProfit())
+            'profit' => $this->createCellForProfit($deal->getTotalProfit())
         ]);
 
         return [$row];
@@ -169,7 +169,7 @@ class DealGrid extends Grid
             'craft' => $this->createCellForCrafting(),
             'device' => $this->createCellForDevice($deal->getDeviceId()),
             'sell' => $this->createCellForDestination($deal->getDestination()),
-            'profit' => $this->createCellForProfit($deal->getProfit())
+            'profit' => $this->createCellForProfit($deal->getTotalProfit())
         ]);
 
         return [$row];
@@ -207,8 +207,10 @@ class DealGrid extends Grid
                     ->setRowspan($componentsCount));
                 $row->setCell('sell', $this->createCellForDestination($deal->getDestination())
                     ->setRowspan($componentsCount));
-                $row->setCell('profit', $this->createCellForProfit($deal->getProfit(), $deal->getExperience())
-                    ->setRowspan($componentsCount));
+                $row->setCell('profit', $this->createCellForProfit(
+                    $deal->getTotalProfit(),
+                    $deal->getTotalExperience()
+                )->setRowspan($componentsCount));
             }
 
             $rows[] = $row;
@@ -247,10 +249,10 @@ class DealGrid extends Grid
             $typeName = self::SOURCE_TYPE_NAMES[$type];
             $html .= "<span>$typeName</span><br>";
 
-            $formattedQty = Formatter::formatQty($source->getQty());
+            $formattedQty = Formatter::formatQty($source->getTotalQty());
             $html .= "<span>Qty: $formattedQty</span><br>";
 
-            $price = $source->getPrice();
+            $price = $source->getTotalPrice();
             if ($price > 0) {
                 $formattedPrice = Formatter::formatPrice($price);
                 $html .= "<span>Price: $formattedPrice</span><br>";
@@ -277,10 +279,10 @@ class DealGrid extends Grid
             $typeName = self::DESTINATION_TYPE_NAMES[$type];
             $html .= "<span>$typeName</span><br>";
 
-            $formattedQty = Formatter::formatQty($destination->getQty());
+            $formattedQty = Formatter::formatQty($destination->getTotalQty());
             $html .= "<span>Qty: $formattedQty</span><br>";
 
-            $price = $destination->getPrice();
+            $price = $destination->getTotalPrice();
             if ($price > 0) {
                 $formattedPrice = Formatter::formatPrice($price);
                 $html .= "<span>Price: $formattedPrice</span><br>";

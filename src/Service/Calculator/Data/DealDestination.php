@@ -17,7 +17,12 @@ class DealDestination
     /**
      * @var float
      */
-    private $qty = 0;
+    private $qty = 0.0;
+
+    /**
+     * @var int|null
+     */
+    private $dealQty = null;
 
     /**
      * @param string $type
@@ -52,6 +57,14 @@ class DealDestination
     }
 
     /**
+     * @return int
+     */
+    public function getTotalPrice(): int
+    {
+        return $this->dealQty === null ? $this->price : $this->price * $this->dealQty;
+    }
+
+    /**
      * @return float
      */
     public function getQty(): float
@@ -65,5 +78,21 @@ class DealDestination
     public function setQty(float $qty): void
     {
         $this->qty = $qty;
+    }
+
+    /**
+     * @return float
+     */
+    public function getTotalQty(): float
+    {
+        return $this->dealQty === null ? $this->qty : $this->qty * $this->dealQty;
+    }
+
+    /**
+     * @param int|null $dealQty
+     */
+    public function setDealQty(?int $dealQty): void
+    {
+        $this->dealQty = $dealQty;
     }
 }
