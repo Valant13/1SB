@@ -66,35 +66,23 @@ class CalculatorParamsFactory
             $auctionPrice = $material->getProduct()->getAuctionPrice()->getValue();
 
             if (array_key_exists($materialId, $inventoryQtys) && $inventoryQtys[$materialId] > 0) {
-                $stockSource = new StockSource(StockSource::TYPE_INVENTORY);
-                $stockSource->setQty($inventoryQtys[$materialId]);
-                $materialItem->getSources()[] = $stockSource;
+                $materialItem->getSources()[] = $this->createInventorySource($inventoryQtys[$materialId]);
             }
 
             if ($auctionPrice !== null) {
-                $stockSource = new StockSource(StockSource::TYPE_AUCTION);
-                $stockSource->setPrice($auctionPrice);
-                $materialItem->getSources()[] = $stockSource;
+                $materialItem->getSources()[] = $this->createAuctionSource($auctionPrice);
             }
 
             if (in_array($materialId, $miningAcceptableIds)) {
-                $stockSource = new StockSource(StockSource::TYPE_MINING);
-                $materialItem->getSources()[] = $stockSource;
+                $materialItem->getSources()[] = $this->createMiningSource();
             }
 
             if ($marketplacePrice !== null) {
-                $stockDestination = new StockDestination(StockDestination::TYPE_MARKETPLACE);
-                $stockDestination->setPrice($marketplacePrice);
-                $materialItem->getDestinations()[] = $stockDestination;
+                $materialItem->getDestinations()[] = $this->createMarketplaceDestination($marketplacePrice);
             }
 
             if ($auctionPrice !== null) {
-                $stockDestination = new StockDestination(StockDestination::TYPE_AUCTION);
-                $stockDestination->setPrice($this->getPriceExcludingCommission(
-                    $auctionPrice,
-                    self::AUCTION_COMMISSION
-                ));
-                $materialItem->getDestinations()[] = $stockDestination;
+                $materialItem->getDestinations()[] = $this->createAuctionDestination($auctionPrice);
             }
 
             $materialItems[] = $materialItem;
@@ -125,30 +113,80 @@ class CalculatorParamsFactory
             $auctionPrice = $device->getProduct()->getAuctionPrice()->getValue();
 
             if ($auctionPrice !== null) {
-                $stockSource = new StockSource(StockSource::TYPE_AUCTION);
-                $stockSource->setPrice($auctionPrice);
-                $deviceItem->getSources()[] = $stockSource;
+                $deviceItem->getSources()[] = $this->createAuctionSource($auctionPrice);
             }
 
             if ($marketplacePrice !== null) {
-                $stockDestination = new StockDestination(StockDestination::TYPE_MARKETPLACE);
-                $stockDestination->setPrice($marketplacePrice);
-                $deviceItem->getDestinations()[] = $stockDestination;
+                $deviceItem->getDestinations()[] = $this->createMarketplaceDestination($marketplacePrice);
             }
 
             if ($auctionPrice !== null) {
-                $stockDestination = new StockDestination(StockDestination::TYPE_AUCTION);
-                $stockDestination->setPrice($this->getPriceExcludingCommission(
-                    $auctionPrice,
-                    self::AUCTION_COMMISSION
-                ));
-                $deviceItem->getDestinations()[] = $stockDestination;
+                $deviceItem->getDestinations()[] = $this->createAuctionDestination($auctionPrice);
             }
 
             $deviceItems[] = $deviceItem;
         }
 
         return $deviceItems;
+    }
+
+    /**
+     * @param float $qty
+     * @return StockSource
+     */
+    private function createInventorySource(float $qty): StockSource
+    {
+        $stockSource = new StockSource(StockSource::TYPE_INVENTORY);
+        $stockSource->setQty($qty);
+
+        return $stockSource;
+    }
+
+    /**
+     * @param int $price
+     * @return StockSource
+     */
+    private function createAuctionSource(int $price): StockSource
+    {
+        $stockSource = new StockSource(StockSource::TYPE_AUCTION);
+        $stockSource->setPrice($price);
+
+        return $stockSource;
+    }
+
+    /**
+     * @return StockSource
+     */
+    private function createMiningSource(): StockSource
+    {
+        return new StockSource(StockSource::TYPE_AUCTION);
+    }
+
+    /**
+     * @param int $price
+     * @return StockDestination
+     */
+    private function createMarketplaceDestination(int $price): StockDestination
+    {
+        $stockDestination = new StockDestination(StockDestination::TYPE_MARKETPLACE);
+        $stockDestination->setPrice($price);
+
+        return $stockDestination;
+    }
+
+    /**
+     * @param int $price
+     * @return StockDestination
+     */
+    private function createAuctionDestination(int $price): StockDestination
+    {
+        $stockDestination = new StockDestination(StockDestination::TYPE_AUCTION);
+        $stockDestination->setPrice($this->getPriceExcludingCommission(
+            $price,
+            self::AUCTION_COMMISSION
+        ));
+
+        return $stockDestination;
     }
 
     /**
