@@ -11,6 +11,7 @@
     {{ include('_errors.html.twig', {errors: viewModel.errors}) }}
     {{ include('_notices.html.twig', {notices: viewModel.notices}) }}
 
+    <h1>{{ viewModel.name }}</h1>
     <form action="{{ url('materials_edit', {id: viewModel.id}) }}" method="post" id="form">
         {{ include('_product_form.html.twig') }}
     </form>

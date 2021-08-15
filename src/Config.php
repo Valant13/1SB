@@ -6,4 +6,12 @@ class Config
 {
     const DEVICE_LIMIT = 10000;
     const USER_LIMIT = 10000;
+
+    const IMAGE_COLUMN_WIDTH = 85;
+    const NAME_COLUMN_WIDTH = 150;
+    const PRICE_COLUMN_WIDTH = 75;
+    const MODIFICATION_COLUMN_WIDTH = 95;
+    const EDIT_COLUMN_WIDTH = 62;
+    const FIELD_COLUMN_WIDTH = 80;
+    const CHECKBOX_COLUMN_WIDTH = 110;
 }

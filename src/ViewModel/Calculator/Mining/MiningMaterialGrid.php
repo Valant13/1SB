@@ -2,6 +2,7 @@
 
 namespace App\ViewModel\Calculator\Mining;
 
+use App\Config;
 use App\Entity\Calculator\UserMining;
 use App\Entity\Calculator\UserMiningMaterial;
 use App\Entity\Catalog\Material;
@@ -45,9 +46,9 @@ class MiningMaterialGrid implements GridBindingInterface
      */
     function buildColumns(): array
     {
-        $imageColumn = (new Column())->setName('Image')->setWidth(15);
+        $imageColumn = (new Column())->setName('Image')->setWidth(Config::IMAGE_COLUMN_WIDTH);
         $nameColumn = (new Column())->setName('Name');
-        $acceptableColumn = (new Column())->setName('Acceptable')->setWidth(20)
+        $acceptableColumn = (new Column())->setName('Acceptable')->setWidth(Config::CHECKBOX_COLUMN_WIDTH)
             ->setControlType(Column::CONTROL_TYPE_SELECT_UNSELECT);
 
         return [

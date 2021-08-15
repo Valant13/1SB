@@ -2,6 +2,7 @@
 
 namespace App\ViewModel\Material;
 
+use App\Config;
 use App\Entity\Catalog\Material;
 use App\ViewModel\AbstractViewModel;
 use App\ViewModel\Formatter;
@@ -29,11 +30,12 @@ class ListViewModel extends AbstractViewModel
         $this->grid = new Grid('material-grid');
 
         $this->grid->setColumns([
-            (new Column())->setName('Image')->setWidth(15),
+            (new Column())->setName('Image')->setWidth(Config::IMAGE_COLUMN_WIDTH),
             (new Column())->setName('Name'),
-            (new Column())->setName('Marketp.')->setWidth(15),
-            (new Column())->setName('Modified')->setWidth(17),
-            (new Column())->setName('Actions')->setWidth(10)
+            (new Column())->setName('Marketp.')->setWidth(Config::PRICE_COLUMN_WIDTH),
+            (new Column())->setName('Auction')->setWidth(Config::PRICE_COLUMN_WIDTH),
+            (new Column())->setName('Modified')->setWidth(Config::MODIFICATION_COLUMN_WIDTH),
+            (new Column())->setName('Actions')->setWidth(Config::EDIT_COLUMN_WIDTH)
         ]);
     }
 
@@ -57,6 +59,9 @@ class ListViewModel extends AbstractViewModel
             $marketplaceCell = (new Text())
                 ->setText(Formatter::formatPrice($product->getMarketplacePrice()));
 
+            $auctionCell = (new Text())
+                ->setText(Formatter::formatPrice($product->getAuctionPrice()->getValue()));
+
             $modifiedCell = (new Html())
                 ->setHtml(Formatter::formatModification(
                     $product->getModificationTime(),
@@ -68,7 +73,7 @@ class ListViewModel extends AbstractViewModel
                 ->setRoute('materials_edit')
                 ->setParams(['id' => $material->getId()]);
 
-            $row->setCells([$imageCell, $nameCell, $marketplaceCell, $modifiedCell, $actionsCell]);
+            $row->setCells([$imageCell, $nameCell, $marketplaceCell, $auctionCell, $modifiedCell, $actionsCell]);
 
             $this->grid->addRow($row);
         }

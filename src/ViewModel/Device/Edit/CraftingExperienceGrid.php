@@ -2,6 +2,7 @@
 
 namespace App\ViewModel\Device\Edit;
 
+use App\Config;
 use App\Entity\Catalog\Device;
 use App\Entity\Catalog\DeviceCraftingExperience;
 use App\Entity\Catalog\ResearchPoint;
@@ -45,7 +46,7 @@ class CraftingExperienceGrid implements GridBindingInterface
     function buildColumns(): array
     {
         $nameColumn = (new Column())->setName('Name');
-        $qtyColumn = (new Column())->setName('Qty')->setWidth(20)
+        $qtyColumn = (new Column())->setName('Qty')->setWidth(Config::FIELD_COLUMN_WIDTH)
             ->setControlType(Column::CONTROL_TYPE_CLEAR);
 
         return [

@@ -2,6 +2,7 @@
 
 namespace App\ViewModel\User\Account;
 
+use App\Config;
 use App\Entity\Catalog\Device;
 use App\Entity\Catalog\UserInterest;
 use App\Entity\Catalog\UserInterestDevice;
@@ -45,9 +46,9 @@ class InterestDeviceGrid implements GridBindingInterface
      */
     function buildColumns(): array
     {
-        $imageColumn = (new Column())->setName('Image')->setWidth(15);
+        $imageColumn = (new Column())->setName('Image')->setWidth(Config::IMAGE_COLUMN_WIDTH);
         $nameColumn = (new Column())->setName('Name');
-        $includedColumn = (new Column())->setName('Included')->setWidth(20)
+        $includedColumn = (new Column())->setName('Included')->setWidth(Config::CHECKBOX_COLUMN_WIDTH)
             ->setControlType(Column::CONTROL_TYPE_SELECT_UNSELECT);
 
         return [

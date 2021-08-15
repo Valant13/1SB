@@ -2,9 +2,10 @@
 
 namespace App\ViewModel\Grid\Cell;
 
+use App\ViewModel\Grid\AbstractCell;
 use App\ViewModel\Grid\CellInterface;
 
-class Text implements CellInterface
+class Text extends AbstractCell implements CellInterface
 {
     /**
      * @var string|null

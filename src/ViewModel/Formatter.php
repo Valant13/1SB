@@ -21,7 +21,7 @@ class Formatter
      */
     public static function formatModification(?\DateTimeInterface $modificationTime, ?User $modificationUser): ?string
     {
-        if ($modificationTime === null || $modificationUser === null) {
+        if ($modificationTime === null) {
             return null;
         }
 
@@ -55,9 +55,13 @@ class Formatter
             $phrase = "<span class=\"font-weight-bold\">$years year(s)</span><br> ago";
         }
 
-        $nickname = $modificationUser->getNickname();
+        if ($modificationUser !== null) {
+            $nickname = $modificationUser->getNickname();
 
-        return $phrase . ' by ' .  $nickname;
+            return $phrase . " by $nickname";
+        } else {
+            return $phrase;
+        }
     }
 
     /**

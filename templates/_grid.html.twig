@@ -5,12 +5,25 @@
     {% endif %}
 {% endfor %}
 
+<style>
+    input::-webkit-outer-spin-button,
+    input::-webkit-inner-spin-button {
+        -webkit-appearance: none;
+        margin: 0;
+    }
+
+    input[type=number] {
+        -moz-appearance: textfield;
+        text-align: right;
+    }
+</style>
+
 <div class="table-responsive">
     <table class="table table-bordered table-striped table-sm text-center small"{% if grid.idForJs %} id="{{ grid.idForJs }}"{% endif %}>
         <thead class="thead-dark">
         <tr>
             {% for column in grid.columns %}
-                <th class="align-middle"{% if column.width %} style="width: {{ column.width }}%"{% endif %}>{{ column.name }}</th>
+                <th class="align-middle"{% if column.width %} style="min-width: {{ column.width }}px; width: {{ column.width }}px"{% endif %}>{{ column.name }}</th>
             {% endfor %}
         </tr>
         </thead>
@@ -20,9 +33,9 @@
                 {% for column in grid.columns %}
                 <td class="align-middle">
                     {% if column.controlType == "clear" %}
-                        <button type="button" class="btn btn-secondary btn-block text-nowrap control-button-{{ loop.index }}">Clear all</button>
+                        <button type="button" class="btn btn-secondary btn-block text-nowrap control-button-{{ loop.index }}">Clear</button>
                     {% elseif column.controlType == "select_unselect" %}
-                        <button type="button" class="btn btn-secondary btn-block text-nowrap control-button-{{ loop.index }}" style="width: 120px">Unselect all</button>
+                        <button type="button" class="btn btn-secondary btn-block text-nowrap control-button-{{ loop.index }}">Unselect</button>
                     {% endif %}
                 </td>
                 {% endfor %}
@@ -31,37 +44,29 @@
         {% for row in grid.rows %}
             <tr>
                 {% for cell in row.cells %}
-                    {% if cell.type == "action" %}
-                        <td class="align-middle">
+                    <td class="align-middle" colspan="{{ cell.colspan }}" rowspan="{{ cell.rowspan }}">
+                        {% if cell.type == "action" %}
                             <a href="{{ url(cell.route, cell.params) }}" class="btn btn-link btn-sm">{{ cell.name }}</a>
-                        </td>
-                    {% elseif cell.type == "checkbox" %}
-                        <td class="align-middle">
+                        {% elseif cell.type == "checkbox" %}
                             <input type="checkbox" class="checkbox-input-{{ loop.index }}" style="transform: scale(1.25)" name="{{ cell.name }}" {% if cell.isChecked %}checked{% endif %}>
-                        </td>
-                    {% elseif cell.type == "field" %}
-                        <td class="align-middle">
-                            <input type="{{ cell.valueType }}" class="form-control field-input-{{ loop.index }}" name="{{ cell.name }}" value="{{ cell.value }}">
-                        </td>
-                    {% elseif cell.type == "html" %}
-                        <td class="align-middle">{{ cell.html|raw }}</td>
-                    {% elseif cell.type == "image" %}
-                        <td class="align-middle">
+                        {% elseif cell.type == "field" %}
+                            <input type="{{ cell.valueType }}" class="form-control px-1 field-input-{{ loop.index }}" name="{{ cell.name }}" value="{{ cell.value }}">
+                        {% elseif cell.type == "html" %}
+                            {{ cell.html|raw }}
+                        {% elseif cell.type == "image" %}
                             {% if cell.href %}
                                 <img src="{{ cell.href }}"{% if cell.alt %} alt="{{ cell.alt }}"{% endif %} class="img-fluid">
                             {% endif %}
-                        </td>
-                    {% elseif cell.type == "link" %}
-                        <td class="align-middle">
+                        {% elseif cell.type == "link" %}
                             {% if cell.href %}
                                 <a href="{{ cell.href }}">{{ cell.text }}</a>
                             {% else %}
                                 {{ cell.text }}
                             {% endif %}
-                        </td>
-                    {% elseif cell.type == "text" %}
-                        <td class="align-middle">{{ cell.text }}</td>
-                    {% endif %}
+                        {% elseif cell.type == "text" %}
+                            {{ cell.text }}
+                        {% endif %}
+                    </td>
                 {% endfor %}
             </tr>
         {% endfor %}
@@ -116,7 +121,7 @@
                             input.checked = isSelected ? '' : 'checked';
                         }
 
-                        button.innerText = isSelected ? 'Select all' : 'Unselect all';
+                        button.innerText = isSelected ? 'Select' : 'Unselect';
                         isSelected = !isSelected;
                     }.bind(this);
                 })();

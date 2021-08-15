@@ -2,6 +2,7 @@
 
 namespace App\ViewModel\Device\Edit;
 
+use App\Config;
 use App\Entity\Catalog\Device;
 use App\Entity\Catalog\DeviceCraftingComponent;
 use App\Entity\Catalog\Material;
@@ -45,9 +46,9 @@ class CraftingComponentGrid implements GridBindingInterface
      */
     function buildColumns(): array
     {
-        $imageColumn = (new Column())->setName('Image')->setWidth(15);
+        $imageColumn = (new Column())->setName('Image')->setWidth(Config::IMAGE_COLUMN_WIDTH);
         $nameColumn = (new Column())->setName('Name');
-        $qtyColumn = (new Column())->setName('Qty')->setWidth(20)
+        $qtyColumn = (new Column())->setName('Qty')->setWidth(Config::FIELD_COLUMN_WIDTH)
             ->setControlType(Column::CONTROL_TYPE_CLEAR);
 
         return [

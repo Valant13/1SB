@@ -2,6 +2,7 @@
 
 namespace App\ViewModel\Device;
 
+use App\Config;
 use App\Entity\Catalog\Device;
 use App\ViewModel\AbstractViewModel;
 use App\ViewModel\Formatter;
@@ -29,11 +30,13 @@ class ListModelModel extends AbstractViewModel
         $this->grid = new Grid('device-grid');
 
         $this->grid->setColumns([
-            (new Column())->setName('Image')->setWidth(15),
+            (new Column())->setName('Image')->setWidth(Config::IMAGE_COLUMN_WIDTH),
             (new Column())->setName('Name'),
-            (new Column())->setName('Marketp.')->setWidth(15),
-            (new Column())->setName('Modified')->setWidth(17),
-            (new Column())->setName('Actions')->setWidth(10)
+            (new Column())->setName('Marketp. price')->setWidth(Config::PRICE_COLUMN_WIDTH),
+            (new Column())->setName('Auction price')->setWidth(Config::PRICE_COLUMN_WIDTH),
+            (new Column())->setName('Cost price')->setWidth(Config::PRICE_COLUMN_WIDTH),
+            (new Column())->setName('Modified')->setWidth(Config::MODIFICATION_COLUMN_WIDTH),
+            (new Column())->setName('Actions')->setWidth(Config::EDIT_COLUMN_WIDTH)
         ]);
     }
 
@@ -57,6 +60,12 @@ class ListModelModel extends AbstractViewModel
             $marketplaceCell = (new Text())
                 ->setText(Formatter::formatPrice($product->getMarketplacePrice()));
 
+            $auctionCell = (new Text())
+                ->setText(Formatter::formatPrice($product->getAuctionPrice()->getValue()));
+
+            $costCell = (new Text())
+                ->setText(Formatter::formatPrice(null));
+
             $modifiedCell = (new Html())
                 ->setHtml(Formatter::formatModification(
                     $product->getModificationTime(),
@@ -68,7 +77,15 @@ class ListModelModel extends AbstractViewModel
                 ->setRoute('devices_edit')
                 ->setParams(['id' => $device->getId()]);
 
-            $row->setCells([$imageCell, $nameCell, $marketplaceCell, $modifiedCell, $actionsCell]);
+            $row->setCells([
+                $imageCell,
+                $nameCell,
+                $marketplaceCell,
+                $auctionCell,
+                $costCell,
+                $modifiedCell,
+                $actionsCell
+            ]);
 
             $this->grid->addRow($row);
         }

@@ -2,6 +2,7 @@
 
 namespace App\ViewModel\Price\Index;
 
+use App\Config;
 use App\Entity\Catalog\Device;
 use App\Entity\User\User;
 use App\ViewModel\Formatter;
@@ -46,10 +47,10 @@ class DeviceGrid implements GridBindingInterface
      */
     function buildColumns(): array
     {
-        $imageColumn = (new Column())->setName('Image')->setWidth(15);
+        $imageColumn = (new Column())->setName('Image')->setWidth(Config::IMAGE_COLUMN_WIDTH);
         $nameColumn = (new Column())->setName('Name');
-        $modifiedColumn = (new Column())->setName('Price modified')->setWidth(17);
-        $auctionPriceColumn = (new Column())->setName('Auction price')->setWidth(20)
+        $modifiedColumn = (new Column())->setName('Price modified')->setWidth(Config::MODIFICATION_COLUMN_WIDTH);
+        $auctionPriceColumn = (new Column())->setName('Auction price')->setWidth(Config::FIELD_COLUMN_WIDTH)
             ->setControlType(Column::CONTROL_TYPE_CLEAR);
 
         return [
@@ -74,7 +75,8 @@ class DeviceGrid implements GridBindingInterface
         $imageCell = (new Image())->setHref($product->getImageUrl());
         $nameCell = (new Text())->setText($product->getName());
         $modifiedCell = new Html();
-        $auctionPriceCell = (new Field())->setName("devices[$index]");
+        $auctionPriceCell = (new Field())->setValueType('number')
+            ->setName("devices[$index]");
 
         $row->setCells([
             'image' => $imageCell,

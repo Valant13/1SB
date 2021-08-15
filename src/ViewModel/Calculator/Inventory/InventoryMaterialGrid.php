@@ -2,6 +2,7 @@
 
 namespace App\ViewModel\Calculator\Inventory;
 
+use App\Config;
 use App\Entity\Calculator\UserInventoryMaterial;
 use App\Entity\Calculator\UserMining;
 use App\Entity\Calculator\UserMiningMaterial;
@@ -46,9 +47,9 @@ class InventoryMaterialGrid implements GridBindingInterface
      */
     function buildColumns(): array
     {
-        $imageColumn = (new Column())->setName('Image')->setWidth(15);
+        $imageColumn = (new Column())->setName('Image')->setWidth(Config::IMAGE_COLUMN_WIDTH);
         $nameColumn = (new Column())->setName('Name');
-        $qtyColumn = (new Column())->setName('Qty')->setWidth(20)
+        $qtyColumn = (new Column())->setName('Qty')->setWidth(Config::FIELD_COLUMN_WIDTH)
             ->setControlType(Column::CONTROL_TYPE_CLEAR);
 
         return [
@@ -71,7 +72,8 @@ class InventoryMaterialGrid implements GridBindingInterface
 
         $imageCell = (new Image())->setHref($product->getImageUrl());
         $nameCell = (new Text())->setText($product->getName());
-        $qtyCell = (new Field())->setName("inventory-materials[$index]");
+        $qtyCell = (new Field())->setValueType('number')
+            ->setName("inventory-materials[$index]");
 
         $row->setCells([
             'image' => $imageCell,
