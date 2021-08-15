@@ -15,9 +15,19 @@ interface DealInterface
     function getProfit(): int;
 
     /**
+     * @param int $profit
+     */
+    public function setProfit(int $profit): void;
+
+    /**
      * @return int|null
      */
     function getQty(): ?int;
+
+    /**
+     * @param int|null $qty
+     */
+    function setQty(?int $qty): void;
 
     /**
      * @return bool

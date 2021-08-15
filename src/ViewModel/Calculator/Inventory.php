@@ -4,8 +4,10 @@ namespace App\ViewModel\Calculator;
 
 use App\Entity\Calculator\UserCalculation;
 use App\Entity\Calculator\UserInventory;
+use App\Entity\Catalog\Device;
 use App\Entity\Catalog\Material;
 use App\Entity\Catalog\ResearchPoint;
+use App\Service\Calculator\Data\DealInterface;
 use App\ViewModel\AbstractViewModel;
 use App\ViewModel\Calculator\Inventory\InventoryMaterialGrid;
 use App\ViewModel\Grid\Grid;
@@ -19,17 +21,25 @@ class Inventory extends AbstractViewModel
     private $maximizationParamList;
 
     /**
+     * @var DealGrid
+     */
+    private $dealGrid;
+
+    /**
      * @var Grid
      */
     private $inventoryMaterialGrid;
 
     /**
-     * @param ResearchPoint[] $researchPoints
      * @param Material[] $materials
+     * @param Device[] $devices
+     * @param ResearchPoint[] $researchPoints
      */
-    public function __construct(array $researchPoints, array $materials)
+    public function __construct(array $materials, array $devices, array $researchPoints)
     {
         $this->maximizationParamList = new MaximizationParamList($researchPoints);
+
+        $this->dealGrid = new DealGrid('deal-grid', $materials, $devices, $researchPoints);
 
         $this->inventoryMaterialGrid = new Grid(
             'inventory-material-grid',
@@ -57,6 +67,14 @@ class Inventory extends AbstractViewModel
     {
         $this->maximizationParamList->fillFromUserCalculation($userCalculation);
         $this->inventoryMaterialGrid->fillFromModels($userInventory->getMaterials()->toArray());
+    }
+
+    /**
+     * @param DealInterface[] $deals
+     */
+    public function fillFromDeals(array $deals): void
+    {
+        $this->dealGrid->fillForInventory($deals);
     }
 
     /**
@@ -99,5 +117,21 @@ class Inventory extends AbstractViewModel
     public function setMaximizationParamList(MaximizationParamList $maximizationParamList): void
     {
         $this->maximizationParamList = $maximizationParamList;
+    }
+
+    /**
+     * @return DealGrid
+     */
+    public function getDealGrid(): DealGrid
+    {
+        return $this->dealGrid;
+    }
+
+    /**
+     * @param DealGrid $dealGrid
+     */
+    public function setDealGrid(DealGrid $dealGrid): void
+    {
+        $this->dealGrid = $dealGrid;
     }
 }

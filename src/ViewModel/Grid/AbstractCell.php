@@ -24,10 +24,12 @@ abstract class AbstractCell implements CellInterface
 
     /**
      * @param int $colspan
+     * @return CellInterface
      */
-    public function setColspan(int $colspan): void
+    public function setColspan(int $colspan): CellInterface
     {
         $this->colspan = $colspan;
+        return $this;
     }
 
     /**
@@ -40,9 +42,11 @@ abstract class AbstractCell implements CellInterface
 
     /**
      * @param int $rowspan
+     * @return CellInterface
      */
-    public function setRowspan(int $rowspan): void
+    public function setRowspan(int $rowspan): CellInterface
     {
         $this->rowspan = $rowspan;
+        return $this;
     }
 }

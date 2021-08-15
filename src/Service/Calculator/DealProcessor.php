@@ -17,6 +17,8 @@ use App\Service\Calculator\Data\StockSource;
 
 class DealProcessor
 {
+    const CREDIT_PARAM = 'credit';
+
     /**
      * @param DealInterface[] $deals
      * @param bool $isProfitable
@@ -40,12 +42,15 @@ class DealProcessor
 
     /**
      * @param DealInterface[] $deals
-     * @param string $maximizationParam
+     * @param string $param
      * @param bool $asc
      */
-    public function orderDealsByParam(array &$deals, string $maximizationParam, bool $asc = false): void
-    {
-        if ($maximizationParam === CalculatorParams::CREDIT_PARAM) {
+    public function orderDealsByParam(
+        array  &$deals,
+        string $param = self::CREDIT_PARAM,
+        bool   $asc = false
+    ): void {
+        if ($param === self::CREDIT_PARAM) {
             $orderingDeals = $deals;
 
             usort($deals, function ($a, $b) {
@@ -59,16 +64,16 @@ class DealProcessor
                 }
             }
 
-            usort($orderingDeals, function ($a, $b) use ($maximizationParam) {
+            usort($orderingDeals, function ($a, $b) use ($param) {
                 $aParamValue = 0;
                 $bParamValue = 0;
 
-                if (array_key_exists($maximizationParam, $a->getExperience())) {
-                    $aParamValue = $a->getExperience()[$maximizationParam];
+                if (array_key_exists($param, $a->getExperience())) {
+                    $aParamValue = $a->getExperience()[$param];
                 }
 
-                if (array_key_exists($maximizationParam, $b->getExperience())) {
-                    $bParamValue = $b->getExperience()[$maximizationParam];
+                if (array_key_exists($param, $b->getExperience())) {
+                    $bParamValue = $b->getExperience()[$param];
                 }
 
                 $paramDifference = $aParamValue - $bParamValue;
@@ -268,18 +273,13 @@ class DealProcessor
         $lowestSource = null;
 
         foreach ($sources as $source) {
-            if ($lowestSource === null) {
-                $lowestSource = $source;
-                break;
-            }
+            if (in_array($source->getType(), $allowedSourceTypes)) {
+                if ($requiredQty !== null && !$source->isQtyInfinite() && $source->getQty() < $requiredQty) {
+                    continue;
+                }
 
-            if (in_array($source->getType(), $allowedSourceTypes) && $source->getPrice() < $lowestSource->getPrice()) {
-                if ($requiredQty === null) {
+                if ($lowestSource === null || $source->getPrice() < $lowestSource->getPrice()) {
                     $lowestSource = $source;
-                } else {
-                    if ($source->isQtyInfinite() || $source->getQty() >= $requiredQty) {
-                        $lowestSource = $source;
-                    }
                 }
             }
         }
@@ -296,12 +296,7 @@ class DealProcessor
         $highestDestination = null;
 
         foreach ($destinations as $destination) {
-            if ($highestDestination === null) {
-                $highestDestination = $destination;
-                break;
-            }
-
-            if ($destination->getPrice() > $highestDestination->getPrice()) {
+            if ($highestDestination === null || $destination->getPrice() > $highestDestination->getPrice()) {
                 $highestDestination = $destination;
             }
         }

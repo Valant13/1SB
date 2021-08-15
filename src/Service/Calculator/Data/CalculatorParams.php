@@ -4,8 +4,6 @@ namespace App\Service\Calculator\Data;
 
 class CalculatorParams
 {
-    const CREDIT_PARAM = 'credit';
-
     /**
      * @var MaterialStockItem[]
      */
@@ -15,11 +13,6 @@ class CalculatorParams
      * @var DeviceStockItem[]
      */
     private $deviceStockItems = [];
-
-    /**
-     * @var string
-     */
-    private $maximizationParam = self::CREDIT_PARAM;
 
     /**
      *
@@ -69,21 +62,5 @@ class CalculatorParams
     public function setDeviceStockItems(array $deviceStockItems): void
     {
         $this->deviceStockItems = $deviceStockItems;
-    }
-
-    /**
-     * @return string
-     */
-    public function getMaximizationParam(): string
-    {
-        return $this->maximizationParam;
-    }
-
-    /**
-     * @param string $maximizationParam
-     */
-    public function setMaximizationParam(string $maximizationParam): void
-    {
-        $this->maximizationParam = $maximizationParam;
     }
 }

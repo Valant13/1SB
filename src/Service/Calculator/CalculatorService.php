@@ -30,11 +30,15 @@ class CalculatorService
 
     /**
      * @param CalculatorParams $params
+     * @param string $maximizationParam
      * @param int $limit
      * @return DealInterface[]
      */
-    public function calculateForInventory(CalculatorParams $params, int $limit = 1): array
-    {
+    public function calculateForInventory(
+        CalculatorParams $params,
+        string $maximizationParam = DealProcessor::CREDIT_PARAM,
+        int $limit = 1
+    ): array {
         $this->validateParams($params);
         $state = $this->getStateByParams($params);
 
@@ -48,7 +52,7 @@ class CalculatorService
             );
 
             $this->dealProcessor->filterDealsByProfit($deals, true);
-            $this->dealProcessor->orderDealsByParam($deals, $state->getMaximizationParam());
+            $this->dealProcessor->orderDealsByParam($deals, $maximizationParam);
 
             if (empty($deals)) {
                 break;
@@ -65,11 +69,15 @@ class CalculatorService
 
     /**
      * @param CalculatorParams $params
+     * @param string $maximizationParam
      * @param int $limit
      * @return DealInterface[]
      */
-    public function calculateForMining(CalculatorParams $params, int $limit = 1): array
-    {
+    public function calculateForMining(
+        CalculatorParams $params,
+        string $maximizationParam = DealProcessor::CREDIT_PARAM,
+        int $limit = 1
+    ): array {
         $this->validateParams($params);
         $state = $this->getStateByParams($params);
 
@@ -80,7 +88,7 @@ class CalculatorService
         );
 
         $this->dealProcessor->filterDealsByProfit($deals, true);
-        $this->dealProcessor->orderDealsByParam($deals, $state->getMaximizationParam());
+        $this->dealProcessor->orderDealsByParam($deals, $maximizationParam);
 
         return array_slice($deals, 0, $limit);
     }

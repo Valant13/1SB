@@ -3,12 +3,16 @@
 namespace App\Controller;
 
 use App\Auth;
+use App\Config;
 use App\Logger;
 use App\Repository\Calculator\UserCalculationRepository;
 use App\Repository\Calculator\UserInventoryRepository;
 use App\Repository\Calculator\UserMiningRepository;
+use App\Repository\Catalog\DeviceRepository;
 use App\Repository\Catalog\MaterialRepository;
 use App\Repository\Catalog\ResearchPointRepository;
+use App\Service\Calculator\CalculatorParamsFactory;
+use App\Service\Calculator\CalculatorService;
 use App\Service\Catalog\UserInterestService;
 use App\ViewModel\Calculator\Inventory;
 use App\ViewModel\Calculator\Mining;
@@ -72,11 +76,29 @@ class CalculatorController extends AbstractController
     private $calculationRepository;
 
     /**
+     * @var DeviceRepository
+     */
+    private $deviceRepository;
+
+    /**
+     * @var CalculatorService
+     */
+    private $calculatorService;
+
+    /**
+     * @var CalculatorParamsFactory
+     */
+    private $calculatorParamsFactory;
+
+    /**
      * @param Auth $auth
      * @param Logger $logger
      * @param RequestStack $requestStack
      * @param MaterialRepository $materialRepository
+     * @param DeviceRepository $deviceRepository
      * @param ResearchPointRepository $researchPointRepository
+     * @param CalculatorService $calculatorService
+     * @param CalculatorParamsFactory $calculatorParamsFactory
      * @param UserMiningRepository $miningRepository
      * @param UserCalculationRepository $calculationRepository
      * @param UserInventoryRepository $inventoryRepository
@@ -88,7 +110,10 @@ class CalculatorController extends AbstractController
         Logger $logger,
         RequestStack $requestStack,
         MaterialRepository $materialRepository,
+        DeviceRepository $deviceRepository,
         ResearchPointRepository $researchPointRepository,
+        CalculatorService $calculatorService,
+        CalculatorParamsFactory $calculatorParamsFactory,
         UserMiningRepository $miningRepository,
         UserCalculationRepository $calculationRepository,
         UserInventoryRepository $inventoryRepository,
@@ -105,6 +130,9 @@ class CalculatorController extends AbstractController
         $this->logger = $logger;
         $this->researchPointRepository = $researchPointRepository;
         $this->calculationRepository = $calculationRepository;
+        $this->deviceRepository = $deviceRepository;
+        $this->calculatorService = $calculatorService;
+        $this->calculatorParamsFactory = $calculatorParamsFactory;
     }
 
     /**
@@ -126,8 +154,12 @@ class CalculatorController extends AbstractController
             $this->materialRepository->findOrderedByName(),
             $user
         );
+        $devices = $this->interestService->filterDevicesByExclusion(
+            $this->deviceRepository->findOrderedByName(),
+            $user
+        );
 
-        $viewModel = new Mining($researchPoints, $materials);
+        $viewModel = new Mining($materials, $devices, $researchPoints);
 
         if ($this->request->getMethod() === 'GET') {
             $viewModel->fillFromUser($userCalculation, $userMining);
@@ -139,6 +171,21 @@ class CalculatorController extends AbstractController
             $viewModel->addErrorsFromViolations($this->validator->validate($userMining));
             if (!$viewModel->hasErrors()) {
                 $this->getDoctrine()->getManager()->flush();
+
+                $calculatorParams = $this->calculatorParamsFactory->createParams(
+                    $materials,
+                    $devices,
+                    [],
+                    $userMining->getAcceptableMaterialIds()
+                );
+
+                $deals = $this->calculatorService->calculateForMining(
+                    $calculatorParams,
+                    $userCalculation->getMaximizationParamCode(),
+                    Config::MINING_DEALS_LIMIT
+                );
+
+                $viewModel->fillFromDeals($deals);
             }
         }
 
@@ -166,8 +213,12 @@ class CalculatorController extends AbstractController
             $this->materialRepository->findOrderedByName(),
             $user
         );
+        $devices = $this->interestService->filterDevicesByExclusion(
+            $this->deviceRepository->findOrderedByName(),
+            $user
+        );
 
-        $viewModel = new Inventory($researchPoints, $materials);
+        $viewModel = new Inventory($materials, $devices, $researchPoints);
 
         if ($this->request->getMethod() === 'GET') {
             $viewModel->fillFromUser($userCalculation, $userInventory);
@@ -179,6 +230,20 @@ class CalculatorController extends AbstractController
             $viewModel->addErrorsFromViolations($this->validator->validate($userInventory));
             if (!$viewModel->hasErrors()) {
                 $this->getDoctrine()->getManager()->flush();
+
+                $calculatorParams = $this->calculatorParamsFactory->createParams(
+                    $materials,
+                    $devices,
+                    $userInventory->getMaterialQtys()
+                );
+
+                $deals = $this->calculatorService->calculateForInventory(
+                    $calculatorParams,
+                    $userCalculation->getMaximizationParamCode(),
+                    Config::INVENTORY_DEALS_LIMIT
+                );
+
+                $viewModel->fillFromDeals($deals);
             }
         }
 

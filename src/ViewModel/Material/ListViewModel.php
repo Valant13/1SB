@@ -32,8 +32,8 @@ class ListViewModel extends AbstractViewModel
         $this->grid->setColumns([
             (new Column())->setName('Image')->setWidth(Config::IMAGE_COLUMN_WIDTH),
             (new Column())->setName('Name'),
-            (new Column())->setName('Marketp.')->setWidth(Config::PRICE_COLUMN_WIDTH),
-            (new Column())->setName('Auction')->setWidth(Config::PRICE_COLUMN_WIDTH),
+            (new Column())->setName('Marketp. price')->setWidth(Config::PRICE_COLUMN_WIDTH),
+            (new Column())->setName('Auction price')->setWidth(Config::PRICE_COLUMN_WIDTH),
             (new Column())->setName('Modified')->setWidth(Config::MODIFICATION_COLUMN_WIDTH),
             (new Column())->setName('Actions')->setWidth(Config::EDIT_COLUMN_WIDTH)
         ]);

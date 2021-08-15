@@ -12,6 +12,11 @@ class Grid
     private $idForJs;
 
     /**
+     * @var bool
+     */
+    private $isStriped = true;
+
+    /**
      * @var GridBindingInterface
      */
     private $binding;
@@ -130,6 +135,22 @@ class Grid
     }
 
     /**
+     * @return bool
+     */
+    public function isStriped(): bool
+    {
+        return $this->isStriped;
+    }
+
+    /**
+     * @param bool $isStriped
+     */
+    public function setIsStriped(bool $isStriped): void
+    {
+        $this->isStriped = $isStriped;
+    }
+
+    /**
      * @return Column[]
      */
     public function getColumns(): array
@@ -194,6 +215,14 @@ class Grid
     public function hasRow(int $index): bool
     {
         return array_key_exists($index, $this->rows);
+    }
+
+    /**
+     * @return bool
+     */
+    public function isEmpty(): bool
+    {
+        return count($this->rows) === 0;
     }
 
     /**

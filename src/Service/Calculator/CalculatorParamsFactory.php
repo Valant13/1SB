@@ -19,15 +19,13 @@ class CalculatorParamsFactory
      * @param Device[] $devices
      * @param int[] $inventoryQtys
      * @param int[] $miningAcceptableIds
-     * @param string|null $maximizationParam
      * @return CalculatorParams
      */
     public function createParams(
         array $materials,
         array $devices,
-        array $inventoryQtys,
-        array $miningAcceptableIds,
-        string $maximizationParam = null
+        array $inventoryQtys = [],
+        array $miningAcceptableIds = []
     ): CalculatorParams {
         $params = new CalculatorParams();
 
@@ -38,10 +36,6 @@ class CalculatorParamsFactory
         ));
 
         $params->setDeviceStockItems($this->createDeviceStockItems($devices));
-
-        if ($maximizationParam !== null) {
-            $params->setMaximizationParam($maximizationParam);
-        }
 
         return $params;
     }
@@ -62,28 +56,37 @@ class CalculatorParamsFactory
 
             $materialItem = new MaterialStockItem($materialId);
 
+            /** @var StockSource[] $sources */
+            $sources = [];
+
+            /** @var StockDestination[] $destinations */
+            $destinations = [];
+
             $marketplacePrice = $material->getProduct()->getMarketplacePrice();
             $auctionPrice = $material->getProduct()->getAuctionPrice()->getValue();
 
             if (array_key_exists($materialId, $inventoryQtys) && $inventoryQtys[$materialId] > 0) {
-                $materialItem->getSources()[] = $this->createInventorySource($inventoryQtys[$materialId]);
+                $sources[] = $this->createInventorySource($inventoryQtys[$materialId]);
             }
 
             if ($auctionPrice !== null) {
-                $materialItem->getSources()[] = $this->createAuctionSource($auctionPrice);
+                $sources[] = $this->createAuctionSource($auctionPrice);
             }
 
             if (in_array($materialId, $miningAcceptableIds)) {
-                $materialItem->getSources()[] = $this->createMiningSource();
+                $sources[] = $this->createMiningSource();
             }
 
             if ($marketplacePrice !== null) {
-                $materialItem->getDestinations()[] = $this->createMarketplaceDestination($marketplacePrice);
+                $destinations[] = $this->createMarketplaceDestination($marketplacePrice);
             }
 
             if ($auctionPrice !== null) {
-                $materialItem->getDestinations()[] = $this->createAuctionDestination($auctionPrice);
+                $destinations[] = $this->createAuctionDestination($auctionPrice);
             }
+
+            $materialItem->setSources($sources);
+            $materialItem->setDestinations($destinations);
 
             $materialItems[] = $materialItem;
         }
@@ -109,20 +112,29 @@ class CalculatorParamsFactory
                 $device->getCraftingComponentsQtys()
             );
 
+            /** @var StockSource[] $sources */
+            $sources = [];
+
+            /** @var StockDestination[] $destinations */
+            $destinations = [];
+
             $marketplacePrice = $device->getProduct()->getMarketplacePrice();
             $auctionPrice = $device->getProduct()->getAuctionPrice()->getValue();
 
             if ($auctionPrice !== null) {
-                $deviceItem->getSources()[] = $this->createAuctionSource($auctionPrice);
+                $sources[] = $this->createAuctionSource($auctionPrice);
             }
 
             if ($marketplacePrice !== null) {
-                $deviceItem->getDestinations()[] = $this->createMarketplaceDestination($marketplacePrice);
+                $destinations[] = $this->createMarketplaceDestination($marketplacePrice);
             }
 
             if ($auctionPrice !== null) {
-                $deviceItem->getDestinations()[] = $this->createAuctionDestination($auctionPrice);
+                $destinations[] = $this->createAuctionDestination($auctionPrice);
             }
+
+            $deviceItem->setSources($sources);
+            $deviceItem->setDestinations($destinations);
 
             $deviceItems[] = $deviceItem;
         }

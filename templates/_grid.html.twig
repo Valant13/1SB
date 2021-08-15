@@ -5,21 +5,8 @@
     {% endif %}
 {% endfor %}
 
-<style>
-    input::-webkit-outer-spin-button,
-    input::-webkit-inner-spin-button {
-        -webkit-appearance: none;
-        margin: 0;
-    }
-
-    input[type=number] {
-        -moz-appearance: textfield;
-        text-align: right;
-    }
-</style>
-
 <div class="table-responsive">
-    <table class="table table-bordered table-striped table-sm text-center small"{% if grid.idForJs %} id="{{ grid.idForJs }}"{% endif %}>
+    <table class="table table-bordered{% if grid.striped %} table-striped{% endif %} table-sm text-center small"{% if grid.idForJs %} id="{{ grid.idForJs }}"{% endif %}>
         <thead class="thead-dark">
         <tr>
             {% for column in grid.columns %}
@@ -50,7 +37,7 @@
                         {% elseif cell.type == "checkbox" %}
                             <input type="checkbox" class="checkbox-input-{{ loop.index }}" style="transform: scale(1.25)" name="{{ cell.name }}" {% if cell.isChecked %}checked{% endif %}>
                         {% elseif cell.type == "field" %}
-                            <input type="{{ cell.valueType }}" class="form-control px-1 field-input-{{ loop.index }}" name="{{ cell.name }}" value="{{ cell.value }}">
+                            <input type="{{ cell.valueType }}" class="form-control text-right px-1 field-input-{{ loop.index }}" name="{{ cell.name }}" value="{{ cell.value }}">
                         {% elseif cell.type == "html" %}
                             {{ cell.html|raw }}
                         {% elseif cell.type == "image" %}

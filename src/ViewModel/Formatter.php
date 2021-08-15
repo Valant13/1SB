@@ -74,6 +74,19 @@ class Formatter
             return null;
         }
 
-        return number_format($price, 0, ',', ' ')/* . ' C'*/;
+        return number_format($price, 0, null, ' ');
+    }
+
+    /**
+     * @param float|null $qty
+     * @return string|null
+     */
+    public static function formatQty(?float $qty): ?string
+    {
+        if ($qty === null) {
+            return null;
+        }
+
+        return number_format($qty, 1);
     }
 }
