@@ -10,9 +10,9 @@ class CraftingDeal extends AbstractDeal implements DealInterface
     private $deviceId;
 
     /**
-     * @var int[]
+     * @var float[]
      */
-    private $experience;
+    private $totalExperience;
 
     /**
      * @var CraftingDealComponent[]
@@ -21,16 +21,16 @@ class CraftingDeal extends AbstractDeal implements DealInterface
 
     /**
      * @param int $deviceId
-     * @param int[] $experience
+     * @param float[] $totalExperience
      * @param CraftingDealComponent[] $components
      * @param DealDestination $destination
      */
-    public function __construct(int $deviceId, array $experience, array $components, DealDestination $destination)
+    public function __construct(int $deviceId, array $totalExperience, array $components, DealDestination $destination)
     {
         parent::__construct($destination);
 
         $this->deviceId = $deviceId;
-        $this->experience = $experience;
+        $this->totalExperience = $totalExperience;
         $this->components = $components;
     }
 
@@ -43,28 +43,11 @@ class CraftingDeal extends AbstractDeal implements DealInterface
     }
 
     /**
-     * @return int[]
-     */
-    public function getExperience(): array
-    {
-        return $this->experience;
-    }
-
-    /**
-     * @return int[]
+     * @return float[]
      */
     public function getTotalExperience(): array
     {
-        if ($this->getQty() === null) {
-            return $this->experience;
-        } else {
-            $totalExperience = [];
-            foreach ($this->experience as $code => $qty) {
-                $totalExperience[$code] = $qty * $this->getQty();
-            }
-
-            return $totalExperience;
-        }
+        return $this->totalExperience;
     }
 
     /**
@@ -73,16 +56,5 @@ class CraftingDeal extends AbstractDeal implements DealInterface
     public function getComponents(): array
     {
         return $this->components;
-    }
-
-    /**
-     * @param int|null $qty
-     */
-    public function setQty(?int $qty): void
-    {
-        parent::setQty($qty);
-        foreach ($this->components as $component) {
-            $component->setDealQty($qty);
-        }
     }
 }

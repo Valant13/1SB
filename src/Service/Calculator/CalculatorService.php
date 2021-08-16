@@ -51,7 +51,7 @@ class CalculatorService
                 [StockSource::TYPE_INVENTORY]
             );
 
-            $this->dealProcessor->filterDealsByProfit($deals, true);
+            $this->dealProcessor->filterDealsByProfitability($deals, true);
             $this->dealProcessor->orderDealsByParam($deals, $maximizationParam);
 
             if (empty($deals)) {
@@ -87,7 +87,7 @@ class CalculatorService
             [StockSource::TYPE_MINING, StockSource::TYPE_AUCTION]
         );
 
-        $this->dealProcessor->filterDealsByProfit($deals, true);
+        $this->dealProcessor->filterDealsByProfitability($deals, true);
         $this->dealProcessor->orderDealsByParam($deals, $maximizationParam);
 
         return array_slice($deals, 0, $limit);
@@ -97,7 +97,7 @@ class CalculatorService
      * @param CalculatorParams $params
      * @return int[]
      */
-    public function calculateDeviceCostPrices(CalculatorParams $params): array
+    public function calculateDeviceCosts(CalculatorParams $params): array
     {
         $this->validateParams($params);
         $state = $this->getStateByParams($params);
@@ -111,12 +111,7 @@ class CalculatorService
         );
 
         foreach ($deals as $deal) {
-            $costPrice = 0;
-            foreach ($deal->getComponents() as $component) {
-                $costPrice += $component->getSource()->getPrice();
-            }
-
-            $costPrices[$deal->getDeviceId()] = $costPrice;
+            $costPrices[$deal->getDeviceId()] = $deal->getTotalCost();
         }
 
         return $costPrices;

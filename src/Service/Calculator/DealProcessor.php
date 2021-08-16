@@ -2,7 +2,6 @@
 
 namespace App\Service\Calculator;
 
-use App\Service\Calculator\Data\CalculatorParams;
 use App\Service\Calculator\Data\CraftingDeal;
 use App\Service\Calculator\Data\CraftingDealComponent;
 use App\Service\Calculator\Data\DealDestination;
@@ -23,13 +22,13 @@ class DealProcessor
      * @param DealInterface[] $deals
      * @param bool $isProfitable
      */
-    public function filterDealsByProfit(array &$deals, bool $isProfitable): void
+    public function filterDealsByProfitability(array &$deals, bool $isProfitable): void
     {
         $profitableDeals = [];
         $unprofitableDeals = [];
 
         foreach ($deals as $deal) {
-            if ($deal->getProfit() >= 0) {
+            if ($deal->getProfitability() >= 0) {
                 $profitableDeals[] = $deal;
                 break;
             }
@@ -54,13 +53,7 @@ class DealProcessor
             $orderingDeals = $deals;
 
             usort($deals, function ($a, $b) {
-                $aCost = $a->getDestination()->getPrice() - $a->getProfit();
-                $bCost = $b->getDestination()->getPrice() - $b->getProfit();
-
-                $aProfitability = $aCost / $a->getProfit();
-                $bProfitability = $bCost / $b->getProfit();
-
-                return $aProfitability - $bProfitability;
+                return $a->getProfitability() - $b->getProfitability();
             });
         } else {
             $orderingDeals = [];
@@ -71,29 +64,23 @@ class DealProcessor
             }
 
             usort($orderingDeals, function ($a, $b) use ($param) {
-                $aParamValue = 0;
-                $bParamValue = 0;
+                $aParam = 0;
+                $bParam = 0;
 
                 if (array_key_exists($param, $a->getExperience())) {
-                    $aParamValue = $a->getExperience()[$param];
+                    $aParam = $a->getTotalExperience()[$param];
                 }
 
                 if (array_key_exists($param, $b->getExperience())) {
-                    $bParamValue = $b->getExperience()[$param];
+                    $bParam = $b->getTotalExperience()[$param];
                 }
 
-                $aCost = $a->getDestination()->getPrice() - $a->getProfit();
-                $bCost = $b->getDestination()->getPrice() - $b->getProfit();
-
-                $aProfitability = $aCost / $a->getProfit();
-                $bProfitability = $bCost / $b->getProfit();
-
-                $aParamCost = $aCost / $aParamValue;
-                $bParamCost = $bCost / $bParamValue;
+                $aParamCost = $aParam / $a->getTotalCost();
+                $bParamCost = $bParam / $b->getTotalCost();
 
                 $paramCostDifference = $aParamCost - $bParamCost;
 
-                return $paramCostDifference ?: $aProfitability - $bProfitability;
+                return $paramCostDifference ?: $a->getProfitability() - $b->getProfitability();
             });
         }
 
@@ -114,24 +101,28 @@ class DealProcessor
         $deals = [];
 
         foreach ($materialItems as $materialItem) {
-            $stockSource = $this->getLowestPriceSource($materialItem->getSources(), $allowedSourceTypes);
-            $stockDestination = $this->getHighestPriceDestination($materialItem->getDestinations());
+            $stockSource = $this->getLowestStockSource($materialItem->getSources(), $allowedSourceTypes);
+            $stockDestination = $this->getHighestStockDestination($materialItem->getDestinations());
 
             if ($stockSource === null || $stockDestination === null) {
                 break;
             }
 
-            $dealSource = new DealSource($stockSource->getType());
-            $dealSource->setPrice($stockSource->getPrice());
-            $dealSource->setQty(1);
+            $dealQty = $stockSource->getQty();
+            $normalizedDealQty = $this->getNormalizedDealQty($dealQty);
 
-            $dealDestination = new DealDestination($stockDestination->getType());
-            $dealDestination->setPrice($stockDestination->getPrice());
-            $dealDestination->setQty(1);
+            $dealSource = $this->createDealSource($stockSource, $normalizedDealQty);
+            $dealDestination = $this->createDealDestination($stockDestination, $normalizedDealQty);
+
+            $dealTotalCost = $this->getTotalCost($stockSource, $stockDestination, $normalizedDealQty);
+            $dealTotalProfit = $this->getTotalProfit($stockSource, $stockDestination, $normalizedDealQty);
+            $dealProfitability = $this->getProfitability($dealTotalCost, $dealTotalProfit);
 
             $deal = new MaterialDeal($materialItem->getMaterialId(), $dealSource, $dealDestination);
-            $deal->setProfit($dealDestination->getPrice() - $dealSource->getPrice());
-            $deal->setQty($stockSource->getQty());
+            $deal->setTotalCost($dealTotalCost);
+            $deal->setTotalProfit($dealTotalProfit);
+            $deal->setProfitability($dealProfitability);
+            $deal->setQty($dealQty);
 
             $deals[] = $deal;
         }
@@ -149,24 +140,28 @@ class DealProcessor
         $deals = [];
 
         foreach ($deviceItems as $deviceItem) {
-            $stockSource = $this->getLowestPriceSource($deviceItem->getSources(), $allowedSourceTypes);
-            $stockDestination = $this->getHighestPriceDestination($deviceItem->getDestinations());
+            $stockSource = $this->getLowestStockSource($deviceItem->getSources(), $allowedSourceTypes);
+            $stockDestination = $this->getHighestStockDestination($deviceItem->getDestinations());
 
             if ($stockSource === null || $stockDestination === null) {
                 break;
             }
 
-            $dealSource = new DealSource($stockSource->getType());
-            $dealSource->setPrice($stockSource->getPrice());
-            $dealSource->setQty(1);
+            $dealQty = $stockSource->getQty();
+            $normalizedDealQty = $this->getNormalizedDealQty($dealQty);
 
-            $dealDestination = new DealDestination($stockDestination->getType());
-            $dealDestination->setPrice($stockDestination->getPrice());
-            $dealDestination->setQty(1);
+            $dealSource = $this->createDealSource($stockSource, $normalizedDealQty);
+            $dealDestination = $this->createDealDestination($stockDestination, $normalizedDealQty);
+
+            $dealTotalCost = $this->getTotalCost($stockSource, $stockDestination, $normalizedDealQty);
+            $dealTotalProfit = $this->getTotalProfit($stockSource, $stockDestination, $normalizedDealQty);
+            $dealProfitability = $this->getProfitability($dealTotalCost, $dealTotalProfit);
 
             $deal = new DeviceDeal($deviceItem->getDeviceId(), $dealSource, $dealDestination);
-            $deal->setProfit($dealDestination->getPrice() - $dealSource->getPrice());
-            $deal->setQty($stockSource->getQty());
+            $deal->setTotalCost($dealTotalCost);
+            $deal->setTotalProfit($dealTotalProfit);
+            $deal->setProfitability($dealProfitability);
+            $deal->setQty($dealQty);
 
             $deals[] = $deal;
         }
@@ -186,15 +181,33 @@ class DealProcessor
 
         foreach ($deviceItems as $deviceItem) {
             $dealComponents = $this->getCraftingDealComponents($deviceItem, $materialItems, $allowedSourceTypes);
-            $stockDestination = $this->getHighestPriceDestination($deviceItem->getDestinations());
+            $stockDestination = $this->getHighestStockDestination($deviceItem->getDestinations());
 
             if ($dealComponents === null || $stockDestination === null) {
                 break;
             }
 
-            $dealDestination = new DealDestination($stockDestination->getType());
-            $dealDestination->setPrice($stockDestination->getPrice());
-            $dealDestination->setQty(1);
+            $dealQty = $this->getCraftingDealQty($dealComponents, $materialItems);
+            $normalizedDealQty = $this->getNormalizedDealQty($dealQty);
+
+            foreach ($dealComponents as $dealComponent) {
+                $dealSource = $dealComponent->getSource();
+                $dealSource->setTotalPrice($dealSource->getTotalPrice() * $normalizedDealQty);
+                $dealSource->setTotalQty($dealSource->getTotalQty() * $normalizedDealQty);
+
+                $dealComponent->setTotalCost($dealComponent->getTotalCost() * $normalizedDealQty);
+            }
+
+            $dealDestination = $this->createDealDestination($stockDestination, $normalizedDealQty);
+
+            $dealTotalCost = 0.0;
+            $dealTotalProfit = $dealDestination->getTotalPrice();
+            foreach ($dealComponents as $dealComponent) {
+                $dealTotalCost += $dealComponent->getTotalCost();
+                $dealTotalProfit -= $dealComponent->getSource()->getTotalPrice();
+            }
+
+            $dealProfitability = $this->getProfitability($dealTotalCost, $dealTotalProfit);
 
             $deal = new CraftingDeal(
                 $deviceItem->getDeviceId(),
@@ -203,13 +216,10 @@ class DealProcessor
                 $dealDestination
             );
 
-            $profit = $dealDestination->getPrice();
-            foreach ($dealComponents as $dealComponent) {
-                $profit -= $dealComponent->getSource()->getPrice() * $dealComponent->getSource()->getQty();
-            }
-
-            $deal->setProfit($profit);
-            $deal->setQty($this->getMaxQtyForCraftingDealComponents($dealComponents, $materialItems));
+            $deal->setTotalCost($dealTotalCost);
+            $deal->setTotalProfit($dealTotalProfit);
+            $deal->setProfitability($dealProfitability);
+            $deal->setQty($dealQty);
 
             $deals[] = $deal;
         }
@@ -236,42 +246,51 @@ class DealProcessor
             }
 
             $materialItem = $materialItems[$materialId];
-            $stockSource = $this->getLowestPriceSource($materialItem->getSources(), $allowedSourceTypes, $materialQty);
+
+            $stockSource = $this->getLowestStockSource($materialItem->getSources(), $allowedSourceTypes, $materialQty);
+            $stockDestination = $this->getHighestStockDestination($materialItem->getDestinations());
 
             if ($stockSource === null) {
                 return null;
             }
 
-            $dealSource = new DealSource($stockSource->getType());
-            $dealSource->setPrice($stockSource->getPrice());
-            $dealSource->setQty($materialQty);
+            $dealSource = $this->createDealSource($stockSource, $materialQty);
+            $dealTotalCost = $this->getTotalCost($stockSource, $stockDestination, $materialQty);
 
-            $dealComponents[] = new CraftingDealComponent($materialId, $dealSource);
+            $dealComponents = new CraftingDealComponent($materialId, $dealSource);
+            $dealComponents->setTotalCost($dealTotalCost);
+
+            $dealComponents[] = $dealComponents;
         }
 
         return $dealComponents;
     }
 
     /**
-     * @param CraftingDealComponent[] $components
+     * @param CraftingDealComponent[] $dealComponents
      * @param MaterialStockItem[] $materialItems
-     * @return int|null
+     * @return float|null
      */
-    private function getMaxQtyForCraftingDealComponents(array $components, array $materialItems): ?int
+    private function getCraftingDealQty(array $dealComponents, array $materialItems): ?float
     {
-        $maxQty = PHP_INT_MAX;
-        foreach ($components as $component) {
-            $materialId = $component->getMaterialId();
-            $stockSourceQty = $materialItems[$materialId]->getSources()[$component->getSource()->getType()]->getQty();
-
-            if ($stockSourceQty === null) {
-                return null;
-            }
-
-            $maxQty = min($maxQty, $stockSourceQty / $component->getSource()->getQty());
+        if (count($dealComponents) === 0) {
+            throw new \InvalidArgumentException('At least one component needed for crafting deal');
         }
 
-        return $maxQty;
+        $dealQty = null;
+        foreach ($dealComponents as $component) {
+            $materialId = $component->getMaterialId();
+            $stockSource = $materialItems[$materialId]->getSources()[$component->getSource()->getType()];
+
+            if ($stockSource->isQtyInfinite()) {
+                continue;
+            }
+
+            $componentQty = $stockSource->getQty() / $component->getSource()->getTotalQty();
+            $dealQty = $dealQty === null ? floor($componentQty) : min($dealQty, floor($componentQty));
+        }
+
+        return $dealQty;
     }
 
     /**
@@ -280,7 +299,7 @@ class DealProcessor
      * @param float|null $requiredQty
      * @return StockSource|null
      */
-    private function getLowestPriceSource(
+    private function getLowestStockSource(
         array $sources,
         array $allowedSourceTypes,
         ?float $requiredQty = null
@@ -306,7 +325,7 @@ class DealProcessor
      * @param StockDestination[] $destinations
      * @return StockDestination|null
      */
-    private function getHighestPriceDestination(array $destinations): ?StockDestination
+    private function getHighestStockDestination(array $destinations): ?StockDestination
     {
         $highestDestination = null;
 
@@ -317,5 +336,90 @@ class DealProcessor
         }
 
         return $highestDestination;
+    }
+
+    /**
+     * @param StockSource $stockSource
+     * @param float $totalQty
+     * @return DealSource
+     */
+    private function createDealSource(StockSource $stockSource, float $totalQty): DealSource
+    {
+        $dealSource = new DealSource($stockSource->getType());
+        $dealSource->setTotalPrice($stockSource->getPrice() * $totalQty);
+        $dealSource->setTotalQty($totalQty);
+
+        return $dealSource;
+    }
+
+    /**
+     * @param StockDestination $stockDestination
+     * @param float $totalQty
+     * @return DealDestination
+     */
+    private function createDealDestination(StockDestination $stockDestination, float $totalQty): DealDestination
+    {
+        $dealDestination = new DealDestination($stockDestination->getType());
+        $dealDestination->setTotalPrice($stockDestination->getPrice() * $totalQty);
+        $dealDestination->setTotalQty($totalQty);
+
+        return $dealDestination;
+    }
+
+    /**
+     * @param StockSource $lowestStockSource
+     * @param StockDestination|null $stockDestination
+     * @param float $totalQty
+     * @return float
+     */
+    private function getTotalCost(
+        StockSource $lowestStockSource,
+        ?StockDestination $stockDestination,
+        float $totalQty
+    ): float {
+        if ($lowestStockSource->getPrice() > 0) {
+            return $lowestStockSource->getPrice() * $totalQty;
+        } elseif ($stockDestination !== null) {
+            return $stockDestination->getPrice() * $totalQty;
+        } else {
+            return 0.0;
+        }
+    }
+
+    /**
+     * @param StockSource $lowestStockSource
+     * @param StockDestination $stockDestination
+     * @param float $totalQty
+     * @return float
+     */
+    private function getTotalProfit(
+        StockSource $lowestStockSource,
+        StockDestination $stockDestination,
+        float $totalQty
+    ): float {
+        return ($stockDestination->getPrice() - $lowestStockSource->getPrice()) * $totalQty;
+    }
+
+    /**
+     * @param float $cost
+     * @param float $profit
+     * @return float
+     */
+    private function getProfitability(float $cost, float $profit): float
+    {
+        if ($cost == 0) {
+            return 999.9;
+        }
+
+        return $profit / $cost;
+    }
+
+    /**
+     * @param float|null $dealQty
+     * @return float
+     */
+    private function getNormalizedDealQty(?float $dealQty): float
+    {
+        return $dealQty === null ? 1.0 : $dealQty;
     }
 }

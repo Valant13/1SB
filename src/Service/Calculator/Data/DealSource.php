@@ -10,19 +10,14 @@ class DealSource
     private $type;
 
     /**
-     * @var int
+     * @var float
      */
-    private $price = 0;
+    private $totalPrice = 0.0;
 
     /**
      * @var float
      */
-    private $qty = 0.0;
-
-    /**
-     * @var int|null
-     */
-    private $dealQty = null;
+    private $totalQty = 0.0;
 
     /**
      * @param string $type
@@ -41,43 +36,19 @@ class DealSource
     }
 
     /**
-     * @return int
-     */
-    public function getPrice(): int
-    {
-        return $this->price;
-    }
-
-    /**
-     * @param int $price
-     */
-    public function setPrice(int $price): void
-    {
-        $this->price = $price;
-    }
-
-    /**
-     * @return int
-     */
-    public function getTotalPrice(): int
-    {
-        return $this->dealQty === null ? $this->price : $this->price * $this->dealQty;
-    }
-
-    /**
      * @return float
      */
-    public function getQty(): float
+    public function getTotalPrice(): float
     {
-        return $this->qty;
+        return $this->totalPrice;
     }
 
     /**
-     * @param float $qty
+     * @param float $totalPrice
      */
-    public function setQty(float $qty): void
+    public function setTotalPrice(float $totalPrice): void
     {
-        $this->qty = $qty;
+        $this->totalPrice = $totalPrice;
     }
 
     /**
@@ -85,14 +56,14 @@ class DealSource
      */
     public function getTotalQty(): float
     {
-        return $this->dealQty === null ? $this->qty : $this->qty * $this->dealQty;
+        return $this->totalQty;
     }
 
     /**
-     * @param int|null $dealQty
+     * @param float $totalQty
      */
-    public function setDealQty(?int $dealQty): void
+    public function setTotalQty(float $totalQty): void
     {
-        $this->dealQty = $dealQty;
+        $this->totalQty = $totalQty;
     }
 }

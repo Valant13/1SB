@@ -15,6 +15,11 @@ class CraftingDealComponent
     private $source;
 
     /**
+     * @var float
+     */
+    private $totalCost;
+
+    /**
      * @param int $materialId
      * @param DealSource $source
      */
@@ -41,10 +46,18 @@ class CraftingDealComponent
     }
 
     /**
-     * @param int|null $dealQty
+     * @return float
      */
-    public function setDealQty(?int $dealQty): void
+    public function getTotalCost(): float
     {
-        $this->source->setDealQty($dealQty);
+        return $this->totalCost;
+    }
+
+    /**
+     * @param float $totalCost
+     */
+    public function setTotalCost(float $totalCost): void
+    {
+        $this->totalCost = $totalCost;
     }
 }

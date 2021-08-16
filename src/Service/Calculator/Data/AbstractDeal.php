@@ -10,9 +10,19 @@ abstract class AbstractDeal implements DealInterface
     private $destination;
 
     /**
-     * @var int
+     * @var float
      */
-    private $profit = 0;
+    private $totalCost = 0.0;
+
+    /**
+     * @var float
+     */
+    private $totalProfit = 0.0;
+
+    /**
+     * @var float
+     */
+    private $profitability = 0.0;
 
     /**
      * @var int|null
@@ -36,27 +46,51 @@ abstract class AbstractDeal implements DealInterface
     }
 
     /**
-     * @return int
+     * @return float
      */
-    public function getProfit(): int
+    public function getTotalCost(): float
     {
-        return $this->profit;
+        return $this->totalCost;
     }
 
     /**
-     * @param int $profit
+     * @param float $totalCost
      */
-    public function setProfit(int $profit): void
+    public function setTotalCost(float $totalCost): void
     {
-        $this->profit = $profit;
+        $this->totalCost = $totalCost;
     }
 
     /**
-     * @return int
+     * @return float
      */
-    public function getTotalProfit(): int
+    public function getTotalProfit(): float
     {
-        return $this->qty === null ? $this->profit : $this->profit * $this->qty;
+        return $this->totalProfit;
+    }
+
+    /**
+     * @param float $totalProfit
+     */
+    public function setTotalProfit(float $totalProfit): void
+    {
+        $this->totalProfit = $totalProfit;
+    }
+
+    /**
+     * @return float
+     */
+    public function getProfitability(): float
+    {
+        return $this->profitability;
+    }
+
+    /**
+     * @param float $profitability
+     */
+    public function setProfitability(float $profitability): void
+    {
+        $this->profitability = $profitability;
     }
 
     /**
@@ -73,7 +107,6 @@ abstract class AbstractDeal implements DealInterface
     public function setQty(?int $qty): void
     {
         $this->qty = $qty;
-        $this->destination->setDealQty($qty);
     }
 
     /**

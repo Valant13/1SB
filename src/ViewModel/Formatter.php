@@ -87,13 +87,12 @@ class Formatter
             return null;
         }
 
-        // TODO: refactor
-        $formattedQty = number_format($qty, 1, '.', ' ');
+        $roundedQty = round($qty, 1);
 
-        if ($qty > 0 && substr($formattedQty, -1) === '0') {
-            return substr($formattedQty, 0, -2);
+        if (abs(round($roundedQty) - $roundedQty) > 0) {
+            return number_format($roundedQty, 1, '.', ' ');
+        } else {
+            return number_format($roundedQty, 0, null, ' ');
         }
-
-        return $formattedQty;
     }
 }

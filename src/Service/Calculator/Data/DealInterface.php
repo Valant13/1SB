@@ -10,19 +10,34 @@ interface DealInterface
     function getDestination(): DealDestination;
 
     /**
-     * @return int
+     * @return float
      */
-    function getProfit(): int;
+    function getTotalCost(): float;
 
     /**
-     * @param int $profit
+     * @param float $totalCost
      */
-    public function setProfit(int $profit): void;
+    public function setTotalCost(float $totalCost): void;
 
     /**
-     * @return int
+     * @return float
      */
-    function getTotalProfit(): int;
+    function getTotalProfit(): float;
+
+    /**
+     * @param float $totalProfit
+     */
+    public function setTotalProfit(float $totalProfit): void;
+
+    /**
+     * @return float
+     */
+    function getProfitability(): float;
+
+    /**
+     * @param float $profitability
+     */
+    public function setProfitability(float $profitability): void;
 
     /**
      * @return int|null
