@@ -147,7 +147,7 @@ class DealGrid extends Grid
             'craft' => $this->createCellForCrafting(),
             'device' => $this->createCellForDevice(),
             'sell' => $this->createCellForDestination($deal->getDestination()),
-            'profit' => $this->createCellForProfit($deal->getTotalProfit())
+            'profit' => $this->createCellForProfit($deal->getTotalProfit(), $deal->getProfitability())
         ]);
 
         return [$row];
@@ -169,7 +169,7 @@ class DealGrid extends Grid
             'craft' => $this->createCellForCrafting(),
             'device' => $this->createCellForDevice($deal->getDeviceId()),
             'sell' => $this->createCellForDestination($deal->getDestination()),
-            'profit' => $this->createCellForProfit($deal->getTotalProfit())
+            'profit' => $this->createCellForProfit($deal->getTotalProfit(), $deal->getProfitability())
         ]);
 
         return [$row];
@@ -209,6 +209,7 @@ class DealGrid extends Grid
                     ->setRowspan($componentsCount));
                 $row->setCell('profit', $this->createCellForProfit(
                     $deal->getTotalProfit(),
+                    $deal->getProfitability(),
                     $deal->getTotalExperience()
                 )->setRowspan($componentsCount));
             }
@@ -311,10 +312,11 @@ class DealGrid extends Grid
 
     /**
      * @param int $profit
+     * @param float $profitability
      * @param int[] $experience
      * @return Html
      */
-    private function createCellForProfit(int $profit, array $experience = []): Html
+    private function createCellForProfit(int $profit, float $profitability, array $experience = []): Html
     {
         $cell = new Html();
 
@@ -325,6 +327,9 @@ class DealGrid extends Grid
             $name = $this->indexedResearchPoints[$code]->getName();
             $html .= "<span>$name: $qty</span><br>";
         }
+
+        $formattedProfitability = (int)($profitability * 100) . '%';
+        $html .= "<span>Profitability: $formattedProfitability</span><br>";
 
         $cell->setHtml($html);
 

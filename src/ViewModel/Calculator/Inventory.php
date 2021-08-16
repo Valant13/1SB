@@ -31,6 +31,11 @@ class Inventory extends AbstractViewModel
     private $inventoryMaterialGrid;
 
     /**
+     * @var bool
+     */
+    private $hasCalculationResult = false;
+
+    /**
      * @param Material[] $materials
      * @param Device[] $devices
      * @param ResearchPoint[] $researchPoints
@@ -75,6 +80,7 @@ class Inventory extends AbstractViewModel
     public function fillFromDeals(array $deals): void
     {
         $this->dealGrid->fillForInventory($deals);
+        $this->hasCalculationResult = true;
     }
 
     /**
@@ -133,5 +139,21 @@ class Inventory extends AbstractViewModel
     public function setDealGrid(DealGrid $dealGrid): void
     {
         $this->dealGrid = $dealGrid;
+    }
+
+    /**
+     * @return bool
+     */
+    public function hasCalculationResult(): bool
+    {
+        return $this->hasCalculationResult;
+    }
+
+    /**
+     * @param bool $hasCalculationResult
+     */
+    public function setHasCalculationResult(bool $hasCalculationResult): void
+    {
+        $this->hasCalculationResult = $hasCalculationResult;
     }
 }

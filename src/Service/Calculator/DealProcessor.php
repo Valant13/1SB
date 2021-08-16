@@ -198,6 +198,11 @@ class DealProcessor
                 $dealComponent->setTotalCost($dealComponent->getTotalCost() * $normalizedDealQty);
             }
 
+            $dealTotalExperience = [];
+            foreach ($deviceItem->getCraftingExperience() as $code => $value) {
+                $dealTotalExperience[$code] = $value * $normalizedDealQty;
+            }
+
             $dealDestination = $this->createDealDestination($stockDestination, $normalizedDealQty);
 
             $dealTotalCost = 0.0;
@@ -211,7 +216,7 @@ class DealProcessor
 
             $deal = new CraftingDeal(
                 $deviceItem->getDeviceId(),
-                $deviceItem->getCraftingExperience(),
+                $dealTotalExperience,
                 $dealComponents,
                 $dealDestination
             );
@@ -257,10 +262,10 @@ class DealProcessor
             $dealSource = $this->createDealSource($stockSource, $materialQty);
             $dealTotalCost = $this->getTotalCost($stockSource, $stockDestination, $materialQty);
 
-            $dealComponents = new CraftingDealComponent($materialId, $dealSource);
-            $dealComponents->setTotalCost($dealTotalCost);
+            $dealComponent = new CraftingDealComponent($materialId, $dealSource);
+            $dealComponent->setTotalCost($dealTotalCost);
 
-            $dealComponents[] = $dealComponents;
+            $dealComponents[] = $dealComponent;
         }
 
         return $dealComponents;
@@ -273,9 +278,9 @@ class DealProcessor
      */
     private function getCraftingDealQty(array $dealComponents, array $materialItems): ?float
     {
-        if (count($dealComponents) === 0) {
-            throw new \InvalidArgumentException('At least one component needed for crafting deal');
-        }
+//        if (count($dealComponents) === 0) {
+//            throw new \InvalidArgumentException('At least one component needed for crafting deal');
+//        }
 
         $dealQty = null;
         foreach ($dealComponents as $component) {

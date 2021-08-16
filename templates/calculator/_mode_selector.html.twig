@@ -1,0 +1,19 @@
+<div class="clearfix mb-3">
+    <div class="btn-group btn-group-lg float-right">
+        {% if mode == 'inventory' %}
+            <button type="button" class="btn btn-primary active">Inventory</button>
+        {% else %}
+            <a href="{{ url('calculator_inventory') }}" class="btn btn-primary">Inventory</a>
+        {% endif %}
+        {% if mode == 'mining' %}
+            <button type="button" class="btn btn-primary active">Mining</button>
+        {% else %}
+            <a href="{{ url('calculator_mining') }}" class="btn btn-primary">Mining</a>
+        {% endif %}
+{#        {% if mode == 'trade' %}#}
+{#            <button type="button" class="btn btn-primary active">Trade</button>#}
+{#        {% else %}#}
+{#            <a href="{{ url('calculator_trade') }}" class="btn btn-primary">Trade</a>#}
+{#        {% endif %}#}
+    </div>
+</div>

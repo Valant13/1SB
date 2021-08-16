@@ -3,12 +3,7 @@
 {% block title %}Calculator{% endblock %}
 
 {% block main %}
-    <div class="clearfix mb-3">
-        <div class="btn-group btn-group-lg float-right">
-            <button type="button" class="btn btn-primary active">Inventory</button>
-            <a href="{{ url('calculator_mining') }}" class="btn btn-primary">Mining</a>
-        </div>
-    </div>
+    {{ include('calculator/_mode_selector.html.twig', {mode: 'inventory'}) }}
     <hr class="mt-4 mb-4">
 
     <form action="{{ url('calculator_inventory') }}" method="post" id="form">
@@ -26,7 +21,7 @@
         {{ include('_errors.html.twig', {errors: viewModel.errors}) }}
         {{ include('_notices.html.twig', {notices: viewModel.notices}) }}
 
-        {% if not viewModel.dealGrid.empty %}
+        {% if viewModel.calculationResult %}
             <h2 class="mt-5">Deals</h2>
             {{ include('_grid.html.twig', {grid: viewModel.dealGrid}) }}
         {% endif %}
