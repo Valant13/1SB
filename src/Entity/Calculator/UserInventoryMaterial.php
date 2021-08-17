@@ -21,13 +21,13 @@ class UserInventoryMaterial
 
     /**
      * @ORM\ManyToOne(targetEntity=UserInventory::class, inversedBy="materials")
-     * @ORM\JoinColumn(nullable=false)
+     * @ORM\JoinColumn(nullable=false, onDelete="CASCADE")
      */
     private $userInventory;
 
     /**
      * @ORM\ManyToOne(targetEntity=Material::class)
-     * @ORM\JoinColumn(nullable=false)
+     * @ORM\JoinColumn(nullable=false, onDelete="CASCADE")
      */
     private $material;
 

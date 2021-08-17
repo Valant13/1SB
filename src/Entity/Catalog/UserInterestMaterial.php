@@ -19,13 +19,13 @@ class UserInterestMaterial
 
     /**
      * @ORM\ManyToOne(targetEntity=UserInterest::class, inversedBy="materials")
-     * @ORM\JoinColumn(nullable=false)
+     * @ORM\JoinColumn(nullable=false, onDelete="CASCADE")
      */
     private $userInterest;
 
     /**
      * @ORM\ManyToOne(targetEntity=Material::class)
-     * @ORM\JoinColumn(nullable=false)
+     * @ORM\JoinColumn(nullable=false, onDelete="CASCADE")
      */
     private $material;
 

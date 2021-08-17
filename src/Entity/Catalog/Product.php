@@ -23,6 +23,7 @@ class Product
 
     /**
      * @ORM\Column(type="string", length=255, unique=true)
+     * @Assert\Length(min=1, max=255, minMessage="Name is required", maxMessage="Name is too long")
      */
     private $name;
 
@@ -34,7 +35,7 @@ class Product
 
     /**
      * @ORM\OneToOne(targetEntity=ProductAuctionPrice::class, cascade={"persist", "remove"})
-     * @ORM\JoinColumn(nullable=false, unique=true)
+     * @ORM\JoinColumn(nullable=false, onDelete="CASCADE", unique=true)
      * @Assert\Valid
      */
     private $auctionPrice;

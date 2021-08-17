@@ -39,26 +39,26 @@ final class Version20210810181240 extends AbstractMigration
         $this->addSql('CREATE TABLE user_mining_material (id INT AUTO_INCREMENT NOT NULL, user_mining_id INT NOT NULL, material_id INT NOT NULL, is_acceptable TINYINT(1) NOT NULL, INDEX IDX_9DB42EF569E037B7 (user_mining_id), INDEX IDX_9DB42EF5E308AC6F (material_id), PRIMARY KEY(id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB');
         $this->addSql('ALTER TABLE device ADD CONSTRAINT FK_92FB68E4584665A FOREIGN KEY (product_id) REFERENCES product (id) ON DELETE CASCADE');
         $this->addSql('ALTER TABLE device_crafting_component ADD CONSTRAINT FK_40F0896094A4C7D4 FOREIGN KEY (device_id) REFERENCES device (id)');
-        $this->addSql('ALTER TABLE device_crafting_component ADD CONSTRAINT FK_40F08960E308AC6F FOREIGN KEY (material_id) REFERENCES material (id)');
+        $this->addSql('ALTER TABLE device_crafting_component ADD CONSTRAINT FK_40F08960E308AC6F FOREIGN KEY (material_id) REFERENCES material (id) ON DELETE CASCADE');
         $this->addSql('ALTER TABLE device_crafting_experience ADD CONSTRAINT FK_BD246A2494A4C7D4 FOREIGN KEY (device_id) REFERENCES device (id)');
-        $this->addSql('ALTER TABLE device_crafting_experience ADD CONSTRAINT FK_BD246A243DD39968 FOREIGN KEY (research_point_id) REFERENCES research_point (id)');
+        $this->addSql('ALTER TABLE device_crafting_experience ADD CONSTRAINT FK_BD246A243DD39968 FOREIGN KEY (research_point_id) REFERENCES research_point (id) ON DELETE CASCADE');
         $this->addSql('ALTER TABLE material ADD CONSTRAINT FK_7CBE75954584665A FOREIGN KEY (product_id) REFERENCES product (id) ON DELETE CASCADE');
-        $this->addSql('ALTER TABLE product ADD CONSTRAINT FK_D34A04AD639C1909 FOREIGN KEY (auction_price_id) REFERENCES product_auction_price (id)');
+        $this->addSql('ALTER TABLE product ADD CONSTRAINT FK_D34A04AD639C1909 FOREIGN KEY (auction_price_id) REFERENCES product_auction_price (id) ON DELETE CASCADE');
         $this->addSql('ALTER TABLE product ADD CONSTRAINT FK_D34A04AD337A48F0 FOREIGN KEY (modification_user_id) REFERENCES user_entity (id)');
         $this->addSql('ALTER TABLE product_auction_price ADD CONSTRAINT FK_5F31A722337A48F0 FOREIGN KEY (modification_user_id) REFERENCES user_entity (id)');
         $this->addSql('ALTER TABLE user_calculation ADD CONSTRAINT FK_5FBCA0E5A76ED395 FOREIGN KEY (user_id) REFERENCES user_entity (id) ON DELETE CASCADE');
         $this->addSql('ALTER TABLE user_interest ADD CONSTRAINT FK_8CB3FE67A76ED395 FOREIGN KEY (user_id) REFERENCES user_entity (id) ON DELETE CASCADE');
-        $this->addSql('ALTER TABLE user_interest_device ADD CONSTRAINT FK_617D2048F38E361C FOREIGN KEY (user_interest_id) REFERENCES user_interest (id)');
-        $this->addSql('ALTER TABLE user_interest_device ADD CONSTRAINT FK_617D204894A4C7D4 FOREIGN KEY (device_id) REFERENCES device (id)');
-        $this->addSql('ALTER TABLE user_interest_material ADD CONSTRAINT FK_F8725B7EF38E361C FOREIGN KEY (user_interest_id) REFERENCES user_interest (id)');
-        $this->addSql('ALTER TABLE user_interest_material ADD CONSTRAINT FK_F8725B7EE308AC6F FOREIGN KEY (material_id) REFERENCES material (id)');
+        $this->addSql('ALTER TABLE user_interest_device ADD CONSTRAINT FK_617D2048F38E361C FOREIGN KEY (user_interest_id) REFERENCES user_interest (id) ON DELETE CASCADE');
+        $this->addSql('ALTER TABLE user_interest_device ADD CONSTRAINT FK_617D204894A4C7D4 FOREIGN KEY (device_id) REFERENCES device (id) ON DELETE CASCADE');
+        $this->addSql('ALTER TABLE user_interest_material ADD CONSTRAINT FK_F8725B7EF38E361C FOREIGN KEY (user_interest_id) REFERENCES user_interest (id) ON DELETE CASCADE');
+        $this->addSql('ALTER TABLE user_interest_material ADD CONSTRAINT FK_F8725B7EE308AC6F FOREIGN KEY (material_id) REFERENCES material (id) ON DELETE CASCADE');
         $this->addSql('ALTER TABLE user_inventory ADD CONSTRAINT FK_B1CDC7D2A76ED395 FOREIGN KEY (user_id) REFERENCES user_entity (id) ON DELETE CASCADE');
-        $this->addSql('ALTER TABLE user_inventory_material ADD CONSTRAINT FK_64B029FF8922DB5B FOREIGN KEY (user_inventory_id) REFERENCES user_inventory (id)');
-        $this->addSql('ALTER TABLE user_inventory_material ADD CONSTRAINT FK_64B029FFE308AC6F FOREIGN KEY (material_id) REFERENCES material (id)');
+        $this->addSql('ALTER TABLE user_inventory_material ADD CONSTRAINT FK_64B029FF8922DB5B FOREIGN KEY (user_inventory_id) REFERENCES user_inventory (id) ON DELETE CASCADE');
+        $this->addSql('ALTER TABLE user_inventory_material ADD CONSTRAINT FK_64B029FFE308AC6F FOREIGN KEY (material_id) REFERENCES material (id) ON DELETE CASCADE');
         $this->addSql('ALTER TABLE user_log ADD CONSTRAINT FK_6429094EA76ED395 FOREIGN KEY (user_id) REFERENCES user_entity (id)');
         $this->addSql('ALTER TABLE user_mining ADD CONSTRAINT FK_408F716BA76ED395 FOREIGN KEY (user_id) REFERENCES user_entity (id) ON DELETE CASCADE');
-        $this->addSql('ALTER TABLE user_mining_material ADD CONSTRAINT FK_9DB42EF569E037B7 FOREIGN KEY (user_mining_id) REFERENCES user_mining (id)');
-        $this->addSql('ALTER TABLE user_mining_material ADD CONSTRAINT FK_9DB42EF5E308AC6F FOREIGN KEY (material_id) REFERENCES material (id)');
+        $this->addSql('ALTER TABLE user_mining_material ADD CONSTRAINT FK_9DB42EF569E037B7 FOREIGN KEY (user_mining_id) REFERENCES user_mining (id) ON DELETE CASCADE');
+        $this->addSql('ALTER TABLE user_mining_material ADD CONSTRAINT FK_9DB42EF5E308AC6F FOREIGN KEY (material_id) REFERENCES material (id) ON DELETE CASCADE');
     }
 
     public function down(Schema $schema): void

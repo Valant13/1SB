@@ -20,13 +20,13 @@ class UserMiningMaterial
 
     /**
      * @ORM\ManyToOne(targetEntity=UserMining::class, inversedBy="materials")
-     * @ORM\JoinColumn(nullable=false)
+     * @ORM\JoinColumn(nullable=false, onDelete="CASCADE")
      */
     private $userMining;
 
     /**
      * @ORM\ManyToOne(targetEntity=Material::class)
-     * @ORM\JoinColumn(nullable=false)
+     * @ORM\JoinColumn(nullable=false, onDelete="CASCADE")
      */
     private $material;
 

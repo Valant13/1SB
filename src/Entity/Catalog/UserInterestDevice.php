@@ -19,13 +19,13 @@ class UserInterestDevice
 
     /**
      * @ORM\ManyToOne(targetEntity=UserInterest::class, inversedBy="devices")
-     * @ORM\JoinColumn(nullable=false)
+     * @ORM\JoinColumn(nullable=false, onDelete="CASCADE")
      */
     private $userInterest;
 
     /**
      * @ORM\ManyToOne(targetEntity=Device::class)
-     * @ORM\JoinColumn(nullable=false)
+     * @ORM\JoinColumn(nullable=false, onDelete="CASCADE")
      */
     private $device;
 
