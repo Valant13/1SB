@@ -137,7 +137,7 @@ class DeviceController extends AbstractController
                 $this->getDoctrine()->getManager()->persist($device);
                 $this->getDoctrine()->getManager()->flush();
 
-                return $this->redirectToRoute('devices_edit', ['id' => $device->getId()]);
+                return $this->redirectToRoute('devices');
             }
         }
 

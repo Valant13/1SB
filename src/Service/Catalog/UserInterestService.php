@@ -71,7 +71,7 @@ class UserInterestService
         foreach ($materials as $material) {
             if (in_array($material->getId(), $excludedMaterialIds)) {
                 $excludedMaterials[] = $material;
-                break;
+                continue;
             }
 
             $includedMaterials[] = $material;
@@ -98,7 +98,7 @@ class UserInterestService
         foreach ($devices as $device) {
             if (in_array($device->getId(), $excludedDeviceIds)) {
                 $excludedDevices[] = $device;
-                break;
+                continue;
             } else {
                 $hasExcludedComponent = false;
 
@@ -111,7 +111,7 @@ class UserInterestService
 
                 if ($hasExcludedComponent) {
                     $excludedDevices[] = $device;
-                    break;
+                    continue;
                 }
             }
 

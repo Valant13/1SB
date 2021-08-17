@@ -30,7 +30,7 @@ class DealProcessor
         foreach ($deals as $deal) {
             if ($deal->getProfitability() >= 0) {
                 $profitableDeals[] = $deal;
-                break;
+                continue;
             }
 
             $unprofitableDeals[] = $deal;
@@ -50,44 +50,17 @@ class DealProcessor
         bool   $asc = false
     ): void {
         if ($param === self::CREDIT_PARAM) {
-            $orderingDeals = $deals;
-
             usort($deals, function ($a, $b) {
-                return $a->getProfitability() - $b->getProfitability();
+                return $this->compareDealsByCredit($a, $b);
             });
         } else {
-            $orderingDeals = [];
-            foreach ($deals as $deal) {
-                if ($deal instanceof CraftingDeal) {
-                    $orderingDeals[] = $deal;
-                }
-            }
-
-            usort($orderingDeals, function ($a, $b) use ($param) {
-                $aParam = 0;
-                $bParam = 0;
-
-                if (array_key_exists($param, $a->getExperience())) {
-                    $aParam = $a->getTotalExperience()[$param];
-                }
-
-                if (array_key_exists($param, $b->getExperience())) {
-                    $bParam = $b->getTotalExperience()[$param];
-                }
-
-                $aParamCost = $aParam / $a->getTotalCost();
-                $bParamCost = $bParam / $b->getTotalCost();
-
-                $paramCostDifference = $aParamCost - $bParamCost;
-
-                return $paramCostDifference ?: $a->getProfitability() - $b->getProfitability();
+            usort($deals, function ($a, $b) use ($param) {
+                return $this->compareDealsByResearchPoint($a, $b, $param);
             });
         }
 
-        if ($asc) {
-            $deals = $orderingDeals;
-        } else {
-            $deals = array_reverse($orderingDeals);
+        if (!$asc) {
+            $deals = array_reverse($deals);
         }
     }
 
@@ -105,7 +78,7 @@ class DealProcessor
             $stockDestination = $this->getHighestStockDestination($materialItem->getDestinations());
 
             if ($stockSource === null || $stockDestination === null) {
-                break;
+                continue;
             }
 
             $dealQty = $stockSource->getQty();
@@ -116,7 +89,7 @@ class DealProcessor
 
             $dealTotalCost = $this->getTotalCost($stockSource, $stockDestination, $normalizedDealQty);
             $dealTotalProfit = $this->getTotalProfit($stockSource, $stockDestination, $normalizedDealQty);
-            $dealProfitability = $this->getProfitability($dealTotalCost, $dealTotalProfit);
+            $dealProfitability = $this->getProfitability($dealTotalCost, $dealDestination->getTotalPrice());
 
             $deal = new MaterialDeal($materialItem->getMaterialId(), $dealSource, $dealDestination);
             $deal->setTotalCost($dealTotalCost);
@@ -144,7 +117,7 @@ class DealProcessor
             $stockDestination = $this->getHighestStockDestination($deviceItem->getDestinations());
 
             if ($stockSource === null || $stockDestination === null) {
-                break;
+                continue;
             }
 
             $dealQty = $stockSource->getQty();
@@ -155,7 +128,7 @@ class DealProcessor
 
             $dealTotalCost = $this->getTotalCost($stockSource, $stockDestination, $normalizedDealQty);
             $dealTotalProfit = $this->getTotalProfit($stockSource, $stockDestination, $normalizedDealQty);
-            $dealProfitability = $this->getProfitability($dealTotalCost, $dealTotalProfit);
+            $dealProfitability = $this->getProfitability($dealTotalCost, $dealDestination->getTotalPrice());
 
             $deal = new DeviceDeal($deviceItem->getDeviceId(), $dealSource, $dealDestination);
             $deal->setTotalCost($dealTotalCost);
@@ -184,7 +157,7 @@ class DealProcessor
             $stockDestination = $this->getHighestStockDestination($deviceItem->getDestinations());
 
             if ($dealComponents === null || $stockDestination === null) {
-                break;
+                continue;
             }
 
             $dealQty = $this->getCraftingDealQty($dealComponents, $materialItems);
@@ -212,7 +185,7 @@ class DealProcessor
                 $dealTotalProfit -= $dealComponent->getSource()->getTotalPrice();
             }
 
-            $dealProfitability = $this->getProfitability($dealTotalCost, $dealTotalProfit);
+            $dealProfitability = $this->getProfitability($dealTotalCost, $dealDestination->getTotalPrice());
 
             $deal = new CraftingDeal(
                 $deviceItem->getDeviceId(),
@@ -278,10 +251,6 @@ class DealProcessor
      */
     private function getCraftingDealQty(array $dealComponents, array $materialItems): ?float
     {
-//        if (count($dealComponents) === 0) {
-//            throw new \InvalidArgumentException('At least one component needed for crafting deal');
-//        }
-
         $dealQty = null;
         foreach ($dealComponents as $component) {
             $materialId = $component->getMaterialId();
@@ -313,6 +282,10 @@ class DealProcessor
 
         foreach ($sources as $source) {
             if (in_array($source->getType(), $allowedSourceTypes)) {
+                if (!$source->isQtyInfinite() && $source->getQty() === 0.0) {
+                    continue;
+                }
+
                 if ($requiredQty !== null && !$source->isQtyInfinite() && $source->getQty() < $requiredQty) {
                     continue;
                 }
@@ -373,19 +346,19 @@ class DealProcessor
 
     /**
      * @param StockSource $lowestStockSource
-     * @param StockDestination|null $stockDestination
+     * @param StockDestination|null $highestStockDestination
      * @param float $totalQty
      * @return float
      */
     private function getTotalCost(
         StockSource $lowestStockSource,
-        ?StockDestination $stockDestination,
+        ?StockDestination $highestStockDestination,
         float $totalQty
     ): float {
         if ($lowestStockSource->getPrice() > 0) {
             return $lowestStockSource->getPrice() * $totalQty;
-        } elseif ($stockDestination !== null) {
-            return $stockDestination->getPrice() * $totalQty;
+        } elseif ($highestStockDestination !== null) {
+            return $highestStockDestination->getPrice() * $totalQty;
         } else {
             return 0.0;
         }
@@ -407,16 +380,19 @@ class DealProcessor
 
     /**
      * @param float $cost
-     * @param float $profit
+     * @param float $sellPrice
      * @return float
      */
-    private function getProfitability(float $cost, float $profit): float
+    private function getProfitability(float $cost, float $sellPrice): float
     {
         if ($cost == 0) {
             return 999.9;
         }
 
-        return $profit / $cost;
+        // This profit may not be equal to deal profit, since it is calculated from cost but not purchase price
+        $productionProfit = $sellPrice - $cost;
+
+        return $productionProfit / $cost;
     }
 
     /**
@@ -426,5 +402,49 @@ class DealProcessor
     private function getNormalizedDealQty(?float $dealQty): float
     {
         return $dealQty === null ? 1.0 : $dealQty;
+    }
+
+    /**
+     * @param DealInterface $a
+     * @param DealInterface $b
+     * @return int
+     */
+    private function compareDealsByCredit(DealInterface $a, DealInterface $b): int
+    {
+        $difference = $a->getProfitability() - $b->getProfitability();
+
+        if ($difference !== 0.0) {
+            return $difference > 0 ? 1 : -1;
+        } else {
+            return $a->getTotalProfit() > $b->getTotalProfit() ? 1 : -1;
+        }
+    }
+
+    /**
+     * @param DealInterface $a
+     * @param DealInterface $b
+     * @param string $researchPointCode
+     * @return int
+     */
+    private function compareDealsByResearchPoint(DealInterface $a, DealInterface $b, string $researchPointCode): int
+    {
+        $aExperience = 0;
+        $bExperience = 0;
+
+        if ($a instanceof CraftingDeal && array_key_exists($researchPointCode, $a->getTotalExperience())) {
+            $aExperience = $a->getTotalExperience()[$researchPointCode];
+        }
+
+        if ($b instanceof CraftingDeal && array_key_exists($researchPointCode, $b->getTotalExperience())) {
+            $bExperience = $b->getTotalExperience()[$researchPointCode];
+        }
+
+        $difference = $aExperience / $a->getTotalCost() - $bExperience / $b->getTotalCost();
+
+        if ($difference !== 0.0) {
+            return $difference > 0 ? 1 : -1;
+        } else {
+            return $this->compareDealsByCredit($a, $b);
+        }
     }
 }

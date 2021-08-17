@@ -95,4 +95,17 @@ class Formatter
             return number_format($roundedQty, 0, null, ' ');
         }
     }
+
+    /**
+     * @param float|null $percent
+     * @return string|null
+     */
+    public static function formatPercent(?float $percent): ?string
+    {
+        if ($percent === null) {
+            return null;
+        }
+
+        return round($percent * 100) . '%';
+    }
 }

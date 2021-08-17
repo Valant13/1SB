@@ -101,7 +101,7 @@ class MiningMaterialGrid implements GridBindingInterface
      */
     function fillRowFromModel(int $index, Row $row, $model): void
     {
-        $row->getCell('acceptable')->setIsChecked(!$model->getIsAcceptable());
+        $row->getCell('acceptable')->setIsChecked($model->getIsAcceptable());
     }
 
     /**
@@ -113,7 +113,7 @@ class MiningMaterialGrid implements GridBindingInterface
      */
     function fillModelFromRow(int $index, Row $row, $prototype, $model, $parentModel): void
     {
-        $isAcceptable = !$row->getCell('acceptable')->isChecked();
+        $isAcceptable = $row->getCell('acceptable')->isChecked();
 
         $model->setIsAcceptable($isAcceptable);
     }

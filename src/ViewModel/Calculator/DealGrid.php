@@ -248,15 +248,15 @@ class DealGrid extends Grid
 
             $type = $source->getType();
             $typeName = self::SOURCE_TYPE_NAMES[$type];
-            $html .= "<span>$typeName</span><br>";
+            $html .= "<span class=\"font-weight-bold\">$typeName</span><br>";
 
             $formattedQty = Formatter::formatQty($source->getTotalQty());
-            $html .= "<span>Qty: $formattedQty</span><br>";
+            $html .= "<span>Qty: <span class=\"font-weight-bold\">$formattedQty</span></span><br>";
 
             $price = $source->getTotalPrice();
             if ($price > 0) {
                 $formattedPrice = Formatter::formatPrice($price);
-                $html .= "<span>Price: $formattedPrice</span><br>";
+                $html .= "<span>Price: <span class=\"font-weight-bold\">$formattedPrice</span></span><br>";
             }
 
             $cell->setHtml($html);
@@ -278,15 +278,15 @@ class DealGrid extends Grid
 
             $type = $destination->getType();
             $typeName = self::DESTINATION_TYPE_NAMES[$type];
-            $html .= "<span>$typeName</span><br>";
+            $html .= "<span class=\"font-weight-bold\">$typeName</span><br>";
 
             $formattedQty = Formatter::formatQty($destination->getTotalQty());
-            $html .= "<span>Qty: $formattedQty</span><br>";
+            $html .= "<span>Qty: <span class=\"font-weight-bold\">$formattedQty</span></span><br>";
 
             $price = $destination->getTotalPrice();
             if ($price > 0) {
                 $formattedPrice = Formatter::formatPrice($price);
-                $html .= "<span>Price: $formattedPrice</span><br>";
+                $html .= "<span>Price: <span class=\"font-weight-bold\">$formattedPrice</span></span><br>";
             }
 
             $cell->setHtml($html);
@@ -304,7 +304,7 @@ class DealGrid extends Grid
         $cell = new Html();
 
         if ($qty !== null) {
-            $cell->setHtml("<span>Qty: $qty</span>");
+            $cell->setHtml("<span>Qty: <span class=\"font-weight-bold\">$qty</span></span>");
         }
 
         return $cell;
@@ -321,15 +321,15 @@ class DealGrid extends Grid
         $cell = new Html();
 
         $formattedProfit = Formatter::formatPrice($profit);
-        $html = "<span>Credit: $formattedProfit</span><br>";
+        $html = "<span>Credit: <span class=\"font-weight-bold\">$formattedProfit</span></span><br>";
 
         foreach ($experience as $code => $qty) {
             $name = $this->indexedResearchPoints[$code]->getName();
-            $html .= "<span>$name: $qty</span><br>";
+            $html .= "<span>$name: <span class=\"font-weight-bold\">$qty</span></span><br>";
         }
 
-        $formattedProfitability = (int)($profitability * 100) . '%';
-        $html .= "<span>Profitability: $formattedProfitability</span><br>";
+        $formattedProfitability = Formatter::formatPercent($profitability);
+        $html .= "<span>Profitability: <span class=\"font-weight-bold\">$formattedProfitability</span></span><br>";
 
         $cell->setHtml($html);
 
@@ -345,7 +345,8 @@ class DealGrid extends Grid
         $cell = new Html();
 
         if ($materialId !== null) {
-            $cell->setHtml($this->indexedMaterials[$materialId]->getProduct()->getName());
+            $name = $this->indexedMaterials[$materialId]->getProduct()->getName();
+            $cell->setHtml("<span class=\"font-weight-bold\">$name</span>");
         }
 
         return $cell;
@@ -360,7 +361,8 @@ class DealGrid extends Grid
         $cell = new Html();
 
         if ($deviceId !== null) {
-            $cell->setHtml($this->indexedDevices[$deviceId]->getProduct()->getName());
+            $name = $this->indexedDevices[$deviceId]->getProduct()->getName();
+            $cell->setHtml("<span class=\"font-weight-bold\">$name</span>");
         }
 
         return $cell;

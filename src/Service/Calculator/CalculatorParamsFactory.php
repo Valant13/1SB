@@ -171,7 +171,7 @@ class CalculatorParamsFactory
      */
     private function createMiningSource(): StockSource
     {
-        return new StockSource(StockSource::TYPE_AUCTION);
+        return new StockSource(StockSource::TYPE_MINING);
     }
 
     /**
