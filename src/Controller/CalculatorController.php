@@ -16,6 +16,7 @@ use App\Service\Calculator\CalculatorService;
 use App\Service\Catalog\UserInterestService;
 use App\ViewModel\Calculator\Inventory;
 use App\ViewModel\Calculator\Mining;
+use App\ViewModel\Calculator\Trade;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
@@ -136,6 +137,64 @@ class CalculatorController extends AbstractController
     }
 
     /**
+     * @Route("/calculator/inventory", methods="GET|POST", name="calculator_inventory")
+     */
+    public function inventory(): Response
+    {
+        if (!$this->auth->isAuthorized()) {
+            return $this->auth->getRedirectToLogin();
+        }
+        $this->logger->logUserRequest();
+
+        $user = $this->auth->getUser();
+        $userInventory = $this->inventoryRepository->findOneByUser($user);
+        $userCalculation = $this->calculationRepository->findOneByUser($user);
+
+        $researchPoints = $this->researchPointRepository->findOrderedBySortOrder();
+        $materials = $this->interestService->filterMaterialsByExclusion(
+            $this->materialRepository->findOrderedByName(),
+            $user
+        );
+        $devices = $this->interestService->filterDevicesByExclusion(
+            $this->deviceRepository->findOrderedByName(),
+            $user
+        );
+
+        $viewModel = new Inventory($materials, $devices, $researchPoints);
+
+        if ($this->request->getMethod() === 'GET') {
+            $viewModel->fillFromUser($userCalculation, $userInventory);
+        } else {
+            $viewModel->fillFromRequest($this->request);
+            $viewModel->fillUser($userCalculation, $userInventory);
+
+            $viewModel->addErrorsFromViolations($this->validator->validate($userCalculation));
+            $viewModel->addErrorsFromViolations($this->validator->validate($userInventory));
+            if (!$viewModel->hasErrors()) {
+                $this->getDoctrine()->getManager()->flush();
+
+                $calculatorParams = $this->calculatorParamsFactory->createParams(
+                    $materials,
+                    $devices,
+                    $userInventory->getMaterialQtys()
+                );
+
+                $deals = $this->calculatorService->calculateForInventory(
+                    $calculatorParams,
+                    $userCalculation->getMaximizationParamCode(),
+                    Config::INVENTORY_DEALS_LIMIT
+                );
+
+                $viewModel->fillFromDeals($deals);
+            }
+        }
+
+        return $this->render('calculator/inventory.html.twig', [
+            'viewModel' => $viewModel,
+        ]);
+    }
+
+    /**
      * @Route("/calculator/mining", methods="GET|POST", name="calculator_mining")
      */
     public function mining(): Response
@@ -195,9 +254,9 @@ class CalculatorController extends AbstractController
     }
 
     /**
-     * @Route("/calculator/inventory", methods="GET|POST", name="calculator_inventory")
+     * @Route("/calculator/trade", methods="GET|POST", name="calculator_trade")
      */
-    public function inventory(): Response
+    public function trade(): Response
     {
         if (!$this->auth->isAuthorized()) {
             return $this->auth->getRedirectToLogin();
@@ -205,7 +264,6 @@ class CalculatorController extends AbstractController
         $this->logger->logUserRequest();
 
         $user = $this->auth->getUser();
-        $userInventory = $this->inventoryRepository->findOneByUser($user);
         $userCalculation = $this->calculationRepository->findOneByUser($user);
 
         $researchPoints = $this->researchPointRepository->findOrderedBySortOrder();
@@ -218,36 +276,31 @@ class CalculatorController extends AbstractController
             $user
         );
 
-        $viewModel = new Inventory($materials, $devices, $researchPoints);
+        $viewModel = new Trade($materials, $devices, $researchPoints);
 
         if ($this->request->getMethod() === 'GET') {
-            $viewModel->fillFromUser($userCalculation, $userInventory);
+            $viewModel->fillFromUser($userCalculation);
         } else {
             $viewModel->fillFromRequest($this->request);
-            $viewModel->fillUser($userCalculation, $userInventory);
+            $viewModel->fillUser($userCalculation);
 
             $viewModel->addErrorsFromViolations($this->validator->validate($userCalculation));
-            $viewModel->addErrorsFromViolations($this->validator->validate($userInventory));
             if (!$viewModel->hasErrors()) {
                 $this->getDoctrine()->getManager()->flush();
 
-                $calculatorParams = $this->calculatorParamsFactory->createParams(
-                    $materials,
-                    $devices,
-                    $userInventory->getMaterialQtys()
-                );
+                $calculatorParams = $this->calculatorParamsFactory->createParams($materials, $devices);
 
-                $deals = $this->calculatorService->calculateForInventory(
+                $deals = $this->calculatorService->calculateForMining(
                     $calculatorParams,
                     $userCalculation->getMaximizationParamCode(),
-                    Config::INVENTORY_DEALS_LIMIT
+                    Config::TRADE_DEALS_LIMIT
                 );
 
                 $viewModel->fillFromDeals($deals);
             }
         }
 
-        return $this->render('calculator/inventory.html.twig', [
+        return $this->render('calculator/trade.html.twig', [
             'viewModel' => $viewModel,
         ]);
     }

@@ -60,6 +60,14 @@ abstract class AbstractViewModel implements ViewModelInterface
     /**
      * @inheritDoc
      */
+    public function addErrors(array $errors): void
+    {
+        $this->errors = array_merge($this->errors, $errors);
+    }
+
+    /**
+     * @inheritDoc
+     */
     public function addErrorsFromViolations(ConstraintViolationListInterface $violationList): void
     {
         foreach ($violationList as $violation) {

@@ -59,7 +59,7 @@ class Inventory extends AbstractViewModel
     public function fillFromRequest(Request $request): void
     {
         $this->maximizationParamList->fillFromRequest($request);
-        $this->errors = array_merge($this->errors, $this->maximizationParamList->getErrors());
+        $this->addErrors($this->maximizationParamList->getErrors());
 
         $this->inventoryMaterialGrid->fillFromRequest($request);
     }

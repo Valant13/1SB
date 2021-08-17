@@ -10,10 +10,10 @@
         {% else %}
             <a href="{{ url('calculator_mining') }}" class="btn btn-primary">Mining</a>
         {% endif %}
-{#        {% if mode == 'trade' %}#}
-{#            <button type="button" class="btn btn-primary active">Trade</button>#}
-{#        {% else %}#}
-{#            <a href="{{ url('calculator_trade') }}" class="btn btn-primary">Trade</a>#}
-{#        {% endif %}#}
+        {% if mode == 'trade' %}
+            <button type="button" class="btn btn-primary active">Trade</button>
+        {% else %}
+            <a href="{{ url('calculator_trade') }}" class="btn btn-primary">Trade</a>
+        {% endif %}
     </div>
 </div>

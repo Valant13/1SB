@@ -1,0 +1,29 @@
+{% extends 'layout.html.twig' %}
+
+{% block title %}Calculator{% endblock %}
+
+{% block main %}
+    {{ include('calculator/_mode_selector.html.twig', {mode: 'trade'}) }}
+    <hr class="mt-4 mb-4">
+
+    <form action="{{ url('calculator_trade') }}" method="post" id="form">
+        <div class="clearfix mb-4">
+            <div class="float-left">
+                <label>Maximize by:</label>
+                {{ include('calculator/_maximization_param_list.html.twig', {list: viewModel.maximizationParamList}) }}
+            </div>
+
+            <div class="float-right text-right mb-3">
+                <button type="submit" class="btn btn-primary btn-lg" form="form">Calculate</button>
+            </div>
+        </div>
+
+        {{ include('_errors.html.twig', {errors: viewModel.errors}) }}
+        {{ include('_notices.html.twig', {notices: viewModel.notices}) }}
+
+        {% if viewModel.calculationResult %}
+            <h2 class="mt-5">Deals</h2>
+            {{ include('_grid.html.twig', {grid: viewModel.dealGrid}) }}
+        {% endif %}
+    </form>
+{% endblock %}

@@ -3,17 +3,14 @@
 namespace App\ViewModel\Calculator;
 
 use App\Entity\Calculator\UserCalculation;
-use App\Entity\Calculator\UserMining;
 use App\Entity\Catalog\Device;
 use App\Entity\Catalog\Material;
 use App\Entity\Catalog\ResearchPoint;
 use App\Service\Calculator\Data\DealInterface;
 use App\ViewModel\AbstractViewModel;
-use App\ViewModel\Calculator\Mining\MiningMaterialGrid;
-use App\ViewModel\Grid\Grid;
 use Symfony\Component\HttpFoundation\Request;
 
-class Mining extends AbstractViewModel
+class Trade extends AbstractViewModel
 {
     /**
      * @var MaximizationParamList
@@ -24,11 +21,6 @@ class Mining extends AbstractViewModel
      * @var DealGrid
      */
     private $dealGrid;
-
-    /**
-     * @var Grid
-     */
-    private $miningMaterialGrid;
 
     /**
      * @var bool
@@ -45,12 +37,6 @@ class Mining extends AbstractViewModel
         $this->maximizationParamList = new MaximizationParamList($researchPoints);
 
         $this->dealGrid = new DealGrid('deal-grid', $materials, $devices, $researchPoints);
-
-        $this->miningMaterialGrid = new Grid(
-            'mining-material-grid',
-            new MiningMaterialGrid(),
-            $materials
-        );
     }
 
     /**
@@ -60,18 +46,14 @@ class Mining extends AbstractViewModel
     {
         $this->maximizationParamList->fillFromRequest($request);
         $this->addErrors($this->maximizationParamList->getErrors());
-
-        $this->miningMaterialGrid->fillFromRequest($request);
     }
 
     /**
      * @param UserCalculation $userCalculation
-     * @param UserMining $userMining
      */
-    public function fillFromUser(UserCalculation $userCalculation, UserMining $userMining): void
+    public function fillFromUser(UserCalculation $userCalculation): void
     {
         $this->maximizationParamList->fillFromUserCalculation($userCalculation);
-        $this->miningMaterialGrid->fillFromModels($userMining->getMaterials()->toArray());
     }
 
     /**
@@ -85,28 +67,10 @@ class Mining extends AbstractViewModel
 
     /**
      * @param UserCalculation $userCalculation
-     * @param UserMining $userMining
      */
-    public function fillUser(UserCalculation $userCalculation, UserMining $userMining): void
+    public function fillUser(UserCalculation $userCalculation): void
     {
         $this->maximizationParamList->fillUserCalculation($userCalculation);
-        $this->miningMaterialGrid->fillModels($userMining->getMaterials()->toArray(), $userMining);
-    }
-
-    /**
-     * @return Grid
-     */
-    public function getMiningMaterialGrid(): Grid
-    {
-        return $this->miningMaterialGrid;
-    }
-
-    /**
-     * @param Grid $miningMaterialGrid
-     */
-    public function setMiningMaterialGrid(Grid $miningMaterialGrid): void
-    {
-        $this->miningMaterialGrid = $miningMaterialGrid;
     }
 
     /**

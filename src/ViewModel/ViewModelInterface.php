@@ -18,7 +18,7 @@ interface ViewModelInterface
     public function getErrors(): array;
 
     /**
-     * @param array $errors
+     * @param string[] $errors
      */
     public function setErrors(array $errors): void;
 
@@ -31,6 +31,11 @@ interface ViewModelInterface
      * @param string $error
      */
     public function addError(string $error): void;
+
+    /**
+     * @param string[] $errors
+     */
+    public function addErrors(array $errors): void;
 
     /**
      * @param ConstraintViolationListInterface $violationList

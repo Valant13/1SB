@@ -17,4 +17,5 @@ class Config
 
     const INVENTORY_DEALS_LIMIT = 5;
     const MINING_DEALS_LIMIT = 5;
+    const TRADE_DEALS_LIMIT = 5;
 }
