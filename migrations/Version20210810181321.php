@@ -27,20 +27,6 @@ final class Version20210810181321 extends AbstractMigration implements Container
         $this->container = $container;
     }
 
-    const RESEARCH_POINT_NAMES = [
-        'Box',
-        'Lightning',
-        'Shield',
-        'Gear'
-    ];
-
-    const RESEARCH_POINT_ICON_URLS = [
-        '/research-point/box.svg',
-        '/research-point/lightning.svg',
-        '/research-point/shield.svg',
-        '/research-point/gear.svg'
-    ];
-
     public function getDescription(): string
     {
         return '';
@@ -57,19 +43,12 @@ final class Version20210810181321 extends AbstractMigration implements Container
         /** @var EntityManagerInterface $entityManager */
         $entityManager = $this->container->get('doctrine.orm.entity_manager');
 
-        $sortOrder = 0;
-        foreach (self::RESEARCH_POINT_NAMES as $index => $researchPointName) {
-            $sortOrder += 10;
+        $entityManager->persist($this->createResearchPoint('box', 'Box', '/research-point/box.svg', 10));
+        $entityManager->persist($this->createResearchPoint('lightning', 'Lightning', '/research-point/lightning.svg', 20));
+        $entityManager->persist($this->createResearchPoint('shield', 'Shield', '/research-point/shield.svg', 30));
+        $entityManager->persist($this->createResearchPoint('gear', 'Gear', '/research-point/gear.svg', 40));
 
-            $researchPoint = new ResearchPoint();
-            $researchPoint->setCode(strtolower($researchPointName));
-            $researchPoint->setName($researchPointName);
-            $researchPoint->setIconUrl(self::RESEARCH_POINT_ICON_URLS[$index]);
-            $researchPoint->setSortOrder($sortOrder);
-
-            $entityManager->persist($researchPoint);
-            $entityManager->flush();
-        }
+        $entityManager->flush();
     }
 
     public function down(Schema $schema): void
@@ -78,18 +57,22 @@ final class Version20210810181321 extends AbstractMigration implements Container
 
     }
 
-    public function postDown(Schema $schema): void
+    /**
+     * @param string $code
+     * @param string $name
+     * @param string|null $iconUrl
+     * @param int $sortOrder
+     * @return ResearchPoint
+     */
+    private function createResearchPoint(string $code, string $name, ?string $iconUrl, int $sortOrder): ResearchPoint
     {
-        /** @var EntityManagerInterface $entityManager */
-        $entityManager = $this->container->get('doctrine.orm.entity_manager');
+        $researchPoint = new ResearchPoint();
 
-        foreach (self::RESEARCH_POINT_NAMES as $researchPointName) {
-            /** @var ResearchPoint $researchPoint */
-            $researchPoint = $entityManager->getRepository(ResearchPoint::class)
-                ->findOneBy(['name' => $researchPointName]);
+        $researchPoint->setCode($code);
+        $researchPoint->setName($name);
+        $researchPoint->setIconUrl($iconUrl);
+        $researchPoint->setSortOrder($sortOrder);
 
-            $entityManager->remove($researchPoint);
-            $entityManager->flush();
-        }
+        return $researchPoint;
     }
 }

@@ -11,7 +11,7 @@ use Symfony\Component\Validator\Constraints as Assert;
  */
 class Material
 {
-    const STACK_SIZE = 1000; // TODO: clarify
+    const STACK_SIZE = 1728000;
 
     /**
      * @ORM\Id
