@@ -1,58 +1,16 @@
 {% extends 'base.html.twig' %}
 
-{% block header %}
-    <nav class="navbar navbar-expand bg-primary navbar-dark fixed-top justify-content-center">
-        <ul class="navbar-nav d-flex d-md-none">
-            <li class="nav-item">
-                <a class="nav-link small" href="{{ url('calculator_inventory') }}">Calculator</a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link small" href="{{ url('auction') }}">Auction</a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link small" href="{{ url('materials') }}">Materials</a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link small" href="{{ url('devices') }}">Devices</a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link small" href="{{ url('user_account') }}">Account</a>
-            </li>
-        </ul>
-        <ul class="navbar-nav d-none d-md-flex">
-            <li class="nav-item">
-                <a class="nav-link" href="{{ url('calculator_inventory') }}">Calculator</a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" href="{{ url('auction') }}">Auction</a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" href="{{ url('materials') }}">Materials</a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" href="{{ url('devices') }}">Devices</a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" href="{{ url('user_account') }}">Account</a>
-            </li>
-        </ul>
-    </nav>
-{% endblock %}
-
 {% block body %}
+    {% block header %}
+        {{ include('_navbar.html.twig') }}
+    {% endblock %}
     <div class="container-fluid">
         <div class="row bg-light min-vh-100">
             <main class="col-md-6 bg-white offset-md-3 pt-3" style="margin-top: 56px">
                 {% block main %}{% endblock %}
-                <hr class="mt-4 mb-4">
-                <footer class="my-5 pt-5 text-muted text-center text-small">
-                    <p class="mb-1">1SB:Trader Pro <small class="text-muted">by Valant13</small></p>
-                    <ul class="list-inline">
-                        <li class="list-inline-item"><a href="https://symfony.com/" rel="nofollow">Symfony</a></li>
-                        <li class="list-inline-item"><a href="https://bootswatch.com/" rel="nofollow">Bootswatch</a></li>
-                        <li class="list-inline-item"><a href="https://wiki.starbasegame.com/" rel="nofollow">Starbase wiki</a></li>
-                    </ul>
-                </footer>
+                {% block footer %}
+                    {{ include('_footer.html.twig') }}
+                {% endblock %}
             </main>
         </div>
     </div>

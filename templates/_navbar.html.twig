@@ -1,0 +1,36 @@
+<nav class="navbar navbar-expand bg-primary navbar-dark fixed-top justify-content-center">
+    <ul class="navbar-nav d-flex d-md-none">
+        <li class="nav-item">
+            <a href="{{ url('calculator_inventory') }}" class="nav-link small{% if menuScopeProvider.menuScope == 'calculator' %} active{% endif %}">Calculator</a>
+        </li>
+        <li class="nav-item">
+            <a href="{{ url('auction') }}" class="nav-link small{% if menuScopeProvider.menuScope == 'auction' %} active{% endif %}">Auction</a>
+        </li>
+        <li class="nav-item">
+            <a href="{{ url('materials') }}" class="nav-link small{% if menuScopeProvider.menuScope == 'material' %} active{% endif %}">Materials</a>
+        </li>
+        <li class="nav-item">
+            <a href="{{ url('devices') }}" class="nav-link small{% if menuScopeProvider.menuScope == 'device' %} active{% endif %}">Devices</a>
+        </li>
+        <li class="nav-item">
+            <a href="{{ url('user_account') }}" class="nav-link small{% if menuScopeProvider.menuScope == 'account' %} active{% endif %}">Account</a>
+        </li>
+    </ul>
+    <ul class="navbar-nav d-none d-md-flex">
+        <li class="nav-item">
+            <a href="{{ url('calculator_inventory') }}" class="nav-link{% if menuScopeProvider.menuScope == 'calculator' %} active{% endif %}">Calculator</a>
+        </li>
+        <li class="nav-item">
+            <a href="{{ url('auction') }}" class="nav-link{% if menuScopeProvider.menuScope == 'auction' %} active{% endif %}">Auction</a>
+        </li>
+        <li class="nav-item">
+            <a href="{{ url('materials') }}" class="nav-link{% if menuScopeProvider.menuScope == 'material' %} active{% endif %}">Materials</a>
+        </li>
+        <li class="nav-item">
+            <a href="{{ url('devices') }}" class="nav-link{% if menuScopeProvider.menuScope == 'device' %} active{% endif %}">Devices</a>
+        </li>
+        <li class="nav-item">
+            <a href="{{ url('user_account') }}" class="nav-link{% if menuScopeProvider.menuScope == 'account' %} active{% endif %}">Account</a>
+        </li>
+    </ul>
+</nav>
