@@ -3,7 +3,7 @@
 namespace App\Controller;
 
 use App\Auth;
-use App\Logger;
+use App\AuthorizedInterface;
 use App\Repository\Catalog\DeviceRepository;
 use App\Repository\Catalog\MaterialRepository;
 use App\Service\Catalog\UserInterestService;
@@ -15,7 +15,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
-class AuctionController extends AbstractController
+class AuctionController extends AbstractController implements AuthorizedInterface
 {
     /**
      * @var Auth
@@ -48,13 +48,7 @@ class AuctionController extends AbstractController
     private $interestService;
 
     /**
-     * @var Logger
-     */
-    private $logger;
-
-    /**
      * @param Auth $auth
-     * @param Logger $logger
      * @param MaterialRepository $materialRepository
      * @param DeviceRepository $deviceRepository
      * @param UserInterestService $interestService
@@ -63,7 +57,6 @@ class AuctionController extends AbstractController
      */
     public function __construct(
         Auth $auth,
-        Logger $logger,
         MaterialRepository $materialRepository,
         DeviceRepository $deviceRepository,
         UserInterestService $interestService,
@@ -76,7 +69,6 @@ class AuctionController extends AbstractController
         $this->materialRepository = $materialRepository;
         $this->deviceRepository = $deviceRepository;
         $this->interestService = $interestService;
-        $this->logger = $logger;
     }
 
     /**
@@ -84,11 +76,6 @@ class AuctionController extends AbstractController
      */
     public function index(): Response
     {
-        if (!$this->auth->isAuthorized()) {
-            return $this->auth->getRedirectToLogin();
-        }
-        $this->logger->logUserRequest();
-
         $user = $this->auth->getUser();
 
         $materials = $this->interestService->filterMaterialsByExclusion(

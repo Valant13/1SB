@@ -42,8 +42,9 @@ class ListViewModel extends AbstractViewModel
 
     /**
      * @param Device[] $devices
+     * @param float[]
      */
-    public function fillFromDevices(array $devices): void
+    public function fillFromDevices(array $devices, array $deviceCosts): void
     {
         foreach ($devices as $device) {
             $row = new Row();
@@ -63,8 +64,13 @@ class ListViewModel extends AbstractViewModel
             $auctionCell = (new Html())
                 ->setHtml(Formatter::formatPrice($product->getAuctionPrice()->getValue()));
 
+            $deviceCost = null;
+            if (array_key_exists($device->getId(), $deviceCosts)) {
+                $deviceCost = $deviceCosts[$device->getId()];
+            }
+
             $costCell = (new Html())
-                ->setHtml(Formatter::formatPrice(null));
+                ->setHtml(Formatter::formatPrice($deviceCost));
 
             $modifiedCell = (new Html())
                 ->setHtml(Formatter::formatModification(

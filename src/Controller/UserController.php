@@ -127,8 +127,6 @@ class UserController extends AbstractController
                 }
             }
 
-            $this->logger->logUserRequest();
-
             return $this->redirectToRoute('homepage');
         }
     }
@@ -141,7 +139,6 @@ class UserController extends AbstractController
         if (!$this->auth->isAuthorized()) {
             return $this->auth->getRedirectToLogin();
         }
-        $this->logger->logUserRequest();
 
         $this->auth->logout();
 

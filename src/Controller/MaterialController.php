@@ -3,7 +3,7 @@
 namespace App\Controller;
 
 use App\Auth;
-use App\Logger;
+use App\AuthorizedInterface;
 use App\Repository\Catalog\MaterialRepository;
 use App\ViewModel\Material\Edit;
 use App\ViewModel\Material\ListViewModel;
@@ -14,7 +14,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
-class MaterialController extends AbstractController
+class MaterialController extends AbstractController implements AuthorizedInterface
 {
     /**
      * @var Auth
@@ -37,20 +37,13 @@ class MaterialController extends AbstractController
     private $materialRepository;
 
     /**
-     * @var Logger
-     */
-    private $logger;
-
-    /**
      * @param Auth $auth
-     * @param Logger $logger
      * @param MaterialRepository $materialRepository
      * @param RequestStack $requestStack
      * @param ValidatorInterface $validator
      */
     public function __construct(
         Auth $auth,
-        Logger $logger,
         MaterialRepository $materialRepository,
         RequestStack $requestStack,
         ValidatorInterface $validator
@@ -59,7 +52,6 @@ class MaterialController extends AbstractController
         $this->request = $requestStack->getCurrentRequest();
         $this->validator = $validator;
         $this->materialRepository = $materialRepository;
-        $this->logger = $logger;
     }
 
     /**
@@ -67,11 +59,6 @@ class MaterialController extends AbstractController
      */
     public function list(): Response
     {
-        if (!$this->auth->isAuthorized()) {
-            return $this->auth->getRedirectToLogin();
-        }
-        $this->logger->logUserRequest();
-
         $materials = $this->materialRepository->findOrderedByName();
 
         $viewModel = new ListViewModel();
@@ -87,11 +74,6 @@ class MaterialController extends AbstractController
      */
     public function edit(int $id): Response
     {
-        if (!$this->auth->isAuthorized()) {
-            return $this->auth->getRedirectToLogin();
-        }
-        $this->logger->logUserRequest();
-
         $material = $this->materialRepository->find($id);
         if ($material === null) {
             return new Response('', 404);

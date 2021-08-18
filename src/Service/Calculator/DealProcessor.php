@@ -216,6 +216,10 @@ class DealProcessor
         array $materialItems,
         array $allowedSourceTypes
     ): ?array {
+        if (empty($deviceItem->getCraftingComponents())) {
+            return null;
+        }
+
         $dealComponents = [];
 
         foreach ($deviceItem->getCraftingComponents() as $materialId => $materialQty) {

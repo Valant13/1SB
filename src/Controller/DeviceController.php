@@ -3,14 +3,14 @@
 namespace App\Controller;
 
 use App\Auth;
+use App\AuthorizedInterface;
 use App\Config;
 use App\Entity\Catalog\Device;
-use App\Entity\Catalog\Product;
-use App\Entity\Catalog\ProductAuctionPrice;
-use App\Logger;
 use App\Repository\Catalog\DeviceRepository;
 use App\Repository\Catalog\MaterialRepository;
 use App\Repository\Catalog\ResearchPointRepository;
+use App\Service\Calculator\CalculatorParamsFactory;
+use App\Service\Calculator\CalculatorService;
 use App\ViewModel\Device\ListViewModel;
 use App\ViewModel\Device\Edit;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -20,7 +20,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
-class DeviceController extends AbstractController
+class DeviceController extends AbstractController implements AuthorizedInterface
 {
     /**
      * @var Auth
@@ -53,25 +53,32 @@ class DeviceController extends AbstractController
     private $researchPointRepository;
 
     /**
-     * @var Logger
+     * @var CalculatorService
      */
-    private $logger;
+    private $calculatorService;
+
+    /**
+     * @var CalculatorParamsFactory
+     */
+    private $calculatorParamsFactory;
 
     /**
      * @param Auth $auth
-     * @param Logger $logger
      * @param DeviceRepository $deviceRepository
      * @param MaterialRepository $materialRepository
      * @param ResearchPointRepository $researchPointRepository
+     * @param CalculatorService $calculatorService
+     * @param CalculatorParamsFactory $calculatorParamsFactory
      * @param RequestStack $requestStack
      * @param ValidatorInterface $validator
      */
     public function __construct(
         Auth $auth,
-        Logger $logger,
         DeviceRepository $deviceRepository,
         MaterialRepository $materialRepository,
         ResearchPointRepository $researchPointRepository,
+        CalculatorService $calculatorService,
+        CalculatorParamsFactory $calculatorParamsFactory,
         RequestStack $requestStack,
         ValidatorInterface $validator
     ) {
@@ -81,7 +88,8 @@ class DeviceController extends AbstractController
         $this->deviceRepository = $deviceRepository;
         $this->materialRepository = $materialRepository;
         $this->researchPointRepository = $researchPointRepository;
-        $this->logger = $logger;
+        $this->calculatorService = $calculatorService;
+        $this->calculatorParamsFactory = $calculatorParamsFactory;
     }
 
     /**
@@ -89,15 +97,14 @@ class DeviceController extends AbstractController
      */
     public function list(): Response
     {
-        if (!$this->auth->isAuthorized()) {
-            return $this->auth->getRedirectToLogin();
-        }
-        $this->logger->logUserRequest();
-
         $devices = $this->deviceRepository->findOrderedByName();
+        $materials = $this->materialRepository->findOrderedByName();
+
+        $calculatorParams = $this->calculatorParamsFactory->createParams($materials, $devices);
+        $deviceCosts = $this->calculatorService->calculateDeviceCosts($calculatorParams);
 
         $viewModel = new ListViewModel();
-        $viewModel->fillFromDevices($devices);
+        $viewModel->fillFromDevices($devices, $deviceCosts);
 
         return $this->render('device/list.html.twig', [
             'viewModel' => $viewModel,
@@ -109,11 +116,6 @@ class DeviceController extends AbstractController
      */
     public function new(): Response
     {
-        if (!$this->auth->isAuthorized()) {
-            return $this->auth->getRedirectToLogin();
-        }
-        $this->logger->logUserRequest();
-
         if ($this->deviceRepository->count([]) >= Config::DEVICE_LIMIT) {
             return new Response('Device limit reached', 507);
         }
@@ -151,11 +153,6 @@ class DeviceController extends AbstractController
      */
     public function edit(int $id): Response
     {
-        if (!$this->auth->isAuthorized()) {
-            return $this->auth->getRedirectToLogin();
-        }
-        $this->logger->logUserRequest();
-
         $device = $this->deviceRepository->find($id);
         if ($device === null) {
             return new Response('', 404);
@@ -194,11 +191,6 @@ class DeviceController extends AbstractController
      */
     public function delete(int $id): Response
     {
-        if (!$this->auth->isAuthorized()) {
-            return $this->auth->getRedirectToLogin();
-        }
-        $this->logger->logUserRequest();
-
         $device = $this->deviceRepository->find($id);
         if ($device === null) {
             return new Response('', 404);
