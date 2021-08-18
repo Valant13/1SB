@@ -1,6 +1,6 @@
 <?php
 
-namespace App\ViewModel\Price\Index;
+namespace App\ViewModel\Auction\Index;
 
 use App\Config;
 use App\Entity\Catalog\Material;
@@ -14,7 +14,7 @@ use App\ViewModel\Grid\Row;
 use App\ViewModel\Grid\Cell\Image;
 use App\ViewModel\Grid\Cell\Text;
 
-class MaterialGrid implements GridBindingInterface
+class MaterialPriceGrid implements GridBindingInterface
 {
     /**
      * @param Material $prototype
@@ -39,7 +39,7 @@ class MaterialGrid implements GridBindingInterface
      */
     function getRequestValueKeys(): array
     {
-        return ['materials'];
+        return ['material-prices'];
     }
 
     /**
@@ -76,7 +76,7 @@ class MaterialGrid implements GridBindingInterface
         $nameCell = (new Text())->setText($product->getName());
         $modifiedCell = new Html();
         $auctionPriceCell = (new Field())->setValueType('number')
-            ->setName("materials[$index]");
+            ->setName("material-prices[$index]");
 
         $row->setCells([
             'image' => $imageCell,
@@ -95,7 +95,7 @@ class MaterialGrid implements GridBindingInterface
      */
     function fillRowFromRequest(int $index, Row $row, array $requestValues): void
     {
-        $value = $requestValues['materials'];
+        $value = $requestValues['material-prices'];
 
         if ($value !== null) {
             $row->getCell('auction_price')->setValue($value);

@@ -1,14 +1,14 @@
 <?php
 
-namespace App\ViewModel\Price;
+namespace App\ViewModel\Auction;
 
 use App\Entity\Catalog\Device;
 use App\Entity\Catalog\Material;
 use App\Entity\User\User;
 use App\ViewModel\AbstractViewModel;
 use App\ViewModel\Grid\Grid;
-use App\ViewModel\Price\Index\DeviceGrid;
-use App\ViewModel\Price\Index\MaterialGrid;
+use App\ViewModel\Auction\Index\DevicePriceGrid;
+use App\ViewModel\Auction\Index\MaterialPriceGrid;
 use Symfony\Component\HttpFoundation\Request;
 
 class Index extends AbstractViewModel
@@ -16,12 +16,12 @@ class Index extends AbstractViewModel
     /**
      * @var Grid
      */
-    private $materialGrid;
+    private $materialPriceGrid;
 
     /**
      * @var Grid
      */
-    private $deviceGrid;
+    private $devicePriceGrid;
 
     /**
      * @param Material[] $materials
@@ -29,15 +29,15 @@ class Index extends AbstractViewModel
      */
     public function __construct(array $materials, array $devices)
     {
-        $this->materialGrid = new Grid(
-            'material-grid',
-            new MaterialGrid(),
+        $this->materialPriceGrid = new Grid(
+            'material-price-grid',
+            new MaterialPriceGrid(),
             $materials
         );
 
-        $this->deviceGrid = new Grid(
-            'device-grid',
-            new DeviceGrid(),
+        $this->devicePriceGrid = new Grid(
+            'device-price-grid',
+            new DevicePriceGrid(),
             $devices
         );
     }
@@ -47,8 +47,8 @@ class Index extends AbstractViewModel
      */
     public function fillFromRequest(Request $request): void
     {
-        $this->materialGrid->fillFromRequest($request);
-        $this->deviceGrid->fillFromRequest($request);
+        $this->materialPriceGrid->fillFromRequest($request);
+        $this->devicePriceGrid->fillFromRequest($request);
     }
 
     /**
@@ -56,7 +56,7 @@ class Index extends AbstractViewModel
      */
     public function fillFromMaterials(array $materials): void
     {
-        $this->materialGrid->fillFromModels($materials);
+        $this->materialPriceGrid->fillFromModels($materials);
     }
 
     /**
@@ -64,7 +64,7 @@ class Index extends AbstractViewModel
      */
     public function fillFromDevices(array $devices): void
     {
-        $this->deviceGrid->fillFromModels($devices);
+        $this->devicePriceGrid->fillFromModels($devices);
     }
 
     /**
@@ -73,7 +73,7 @@ class Index extends AbstractViewModel
      */
     public function fillMaterials(array $materials, User $user): void
     {
-        $this->materialGrid->fillModels($materials, $user);
+        $this->materialPriceGrid->fillModels($materials, $user);
     }
 
     /**
@@ -82,38 +82,38 @@ class Index extends AbstractViewModel
      */
     public function fillDevices(array $devices, User $user): void
     {
-        $this->deviceGrid->fillModels($devices, $user);
+        $this->devicePriceGrid->fillModels($devices, $user);
     }
 
     /**
      * @return Grid
      */
-    public function getMaterialGrid(): Grid
+    public function getMaterialPriceGrid(): Grid
     {
-        return $this->materialGrid;
+        return $this->materialPriceGrid;
     }
 
     /**
-     * @param Grid $materialGrid
+     * @param Grid $materialPriceGrid
      */
-    public function setMaterialGrid(Grid $materialGrid): void
+    public function setMaterialPriceGrid(Grid $materialPriceGrid): void
     {
-        $this->materialGrid = $materialGrid;
+        $this->materialPriceGrid = $materialPriceGrid;
     }
 
     /**
      * @return Grid
      */
-    public function getDeviceGrid(): Grid
+    public function getDevicePriceGrid(): Grid
     {
-        return $this->deviceGrid;
+        return $this->devicePriceGrid;
     }
 
     /**
-     * @param Grid $deviceGrid
+     * @param Grid $devicePriceGrid
      */
-    public function setDeviceGrid(Grid $deviceGrid): void
+    public function setDevicePriceGrid(Grid $devicePriceGrid): void
     {
-        $this->deviceGrid = $deviceGrid;
+        $this->devicePriceGrid = $devicePriceGrid;
     }
 }

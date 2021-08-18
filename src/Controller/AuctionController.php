@@ -7,7 +7,7 @@ use App\Logger;
 use App\Repository\Catalog\DeviceRepository;
 use App\Repository\Catalog\MaterialRepository;
 use App\Service\Catalog\UserInterestService;
-use App\ViewModel\Price\Index;
+use App\ViewModel\Auction\Index;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
@@ -15,7 +15,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
-class PriceController extends AbstractController
+class AuctionController extends AbstractController
 {
     /**
      * @var Auth
@@ -80,7 +80,7 @@ class PriceController extends AbstractController
     }
 
     /**
-     * @Route("/prices", methods="GET|POST", name="prices")
+     * @Route("/auction", methods="GET|POST", name="auction")
      */
     public function index(): Response
     {
@@ -125,7 +125,7 @@ class PriceController extends AbstractController
             }
         }
 
-        return $this->render('price/index.html.twig', [
+        return $this->render('auction/index.html.twig', [
             'viewModel' => $viewModel,
         ]);
     }

@@ -1,6 +1,6 @@
 {% extends 'layout.html.twig' %}
 
-{% block title %}Prices{% endblock %}
+{% block title %}Auction{% endblock %}
 
 {% block main %}
     <div class="text-right mb-3">
@@ -11,29 +11,32 @@
     {{ include('_notices.html.twig', {notices: viewModel.notices}) }}
 
     <h2>Materials</h2>
-    {{ include('_grid.html.twig', {grid: viewModel.materialGrid}) }}
+    {{ include('_grid.html.twig', {grid: viewModel.materialPriceGrid}) }}
 
     <h2 class="mt-5">Devices</h2>
-    {{ include('_grid.html.twig', {grid: viewModel.deviceGrid}) }}
+    {{ include('_grid.html.twig', {grid: viewModel.devicePriceGrid}) }}
 
-    <form action="{{ url('prices') }}" method="post" id="form"></form>
+    <form action="{{ url('auction') }}" method="post" id="form"></form>
 
     <script>
         ;(function() {
-            let oldMaterialValues = getInputValues('materials');
-            let oldDeviceValues = getInputValues('devices');
+            const materialInputName = 'material-prices';
+            const deviceInputName = 'device-prices';
+
+            let oldMaterialValues = getInputValues(materialInputName);
+            let oldDeviceValues = getInputValues(deviceInputName);
 
             let button = document.getElementById('save-button');
 
             button.onclick = function () {
-                let newMaterialValues = getInputValues('materials');
-                let newDeviceValues = getInputValues('devices');
+                let newMaterialValues = getInputValues(materialInputName);
+                let newDeviceValues = getInputValues(deviceInputName);
 
                 let materialDifference = getValueDifference(newMaterialValues, oldMaterialValues);
                 let deviceDifference = getValueDifference(newDeviceValues, oldDeviceValues);
 
-                let materialInputs = createInputsWithValues(materialDifference, 'materials');
-                let deviceInputs = createInputsWithValues(deviceDifference, 'devices');
+                let materialInputs = createInputsWithValues(materialDifference, materialInputName);
+                let deviceInputs = createInputsWithValues(deviceDifference, deviceInputName);
 
                 let inputs = materialInputs.concat(deviceInputs);
 
