@@ -173,7 +173,7 @@ class CalculatorController extends AbstractController
             if (!$viewModel->hasErrors()) {
                 $this->getDoctrine()->getManager()->flush();
 
-                $calculatorParams = $this->calculatorParamsFactory->createParams(
+                $calculatorParams = $this->calculatorParamsFactory->createParamsForInventory(
                     $materials,
                     $devices,
                     $userInventory->getMaterialQtys()
@@ -231,10 +231,9 @@ class CalculatorController extends AbstractController
             if (!$viewModel->hasErrors()) {
                 $this->getDoctrine()->getManager()->flush();
 
-                $calculatorParams = $this->calculatorParamsFactory->createParams(
+                $calculatorParams = $this->calculatorParamsFactory->createParamsForMining(
                     $materials,
                     $devices,
-                    [],
                     $userMining->getAcceptableMaterialIds()
                 );
 
@@ -288,9 +287,9 @@ class CalculatorController extends AbstractController
             if (!$viewModel->hasErrors()) {
                 $this->getDoctrine()->getManager()->flush();
 
-                $calculatorParams = $this->calculatorParamsFactory->createParams($materials, $devices);
+                $calculatorParams = $this->calculatorParamsFactory->createParamsForTrade($materials, $devices);
 
-                $deals = $this->calculatorService->calculateForMining(
+                $deals = $this->calculatorService->calculateForTrade(
                     $calculatorParams,
                     $userCalculation->getMaximizationParamCode(),
                     Config::TRADE_DEALS_LIMIT

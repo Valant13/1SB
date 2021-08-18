@@ -62,11 +62,10 @@ class DealGrid extends Grid
         $this->indexedResearchPoints = $this->getIndexedResearchPoints($researchPoints);
 
         $this->setColumns([
-            'number' => (new Column())->setName('Number'),
+            'number' => (new Column())->setName('Num.')->setWidth(40),
             'get' => (new Column())->setName('Get'),
-            'material' => (new Column())->setName('Material'),
-            'craft' => (new Column())->setName('Craft'),
-            'device' => (new Column())->setName('Device'),
+            'material' => (new Column())->setName('Material')->setWidth(100),
+            'device' => (new Column())->setName('Device')->setWidth(100),
             'sell' => (new Column())->setName('Sell'),
             'profit' => (new Column())->setName('Profit')
         ]);
@@ -89,7 +88,7 @@ class DealGrid extends Grid
     {
         $this->fillFromDeals($deals);
 
-        $this->getColumns()['number']->setName('Option');
+        $this->getColumns()['number']->setName('Opt.');
     }
 
     /**
@@ -144,7 +143,6 @@ class DealGrid extends Grid
             'number' => $this->createCellForNumber($number),
             'get' => $this->createCellForSource($deal->getSource()),
             'material' => $this->createCellForMaterial($deal->getMaterialId()),
-            'craft' => $this->createCellForCrafting(),
             'device' => $this->createCellForDevice(),
             'sell' => $this->createCellForDestination($deal->getDestination()),
             'profit' => $this->createCellForProfit($deal->getTotalProfit(), $deal->getProfitability())
@@ -166,7 +164,6 @@ class DealGrid extends Grid
             'number' => $this->createCellForNumber($number),
             'get' => $this->createCellForSource($deal->getSource()),
             'material' => $this->createCellForMaterial(),
-            'craft' => $this->createCellForCrafting(),
             'device' => $this->createCellForDevice($deal->getDeviceId()),
             'sell' => $this->createCellForDestination($deal->getDestination()),
             'profit' => $this->createCellForProfit($deal->getTotalProfit(), $deal->getProfitability())
@@ -199,10 +196,6 @@ class DealGrid extends Grid
             $row->setCell('material', $this->createCellForMaterial($component->getMaterialId()));
 
             if ($isFirst) {
-                $craftQty = $deal->getQty() !== null ? $deal->getQty() : 1;
-
-                $row->setCell('craft', $this->createCellForCrafting($craftQty)
-                    ->setRowspan($componentsCount));
                 $row->setCell('device', $this->createCellForDevice($deal->getDeviceId())
                     ->setRowspan($componentsCount));
                 $row->setCell('sell', $this->createCellForDestination($deal->getDestination())
@@ -256,7 +249,7 @@ class DealGrid extends Grid
             $price = $source->getTotalPrice();
             if ($price > 0) {
                 $formattedPrice = Formatter::formatPrice($price);
-                $html .= "<span class=\"text-nowrap\">Price: <span class=\"font-weight-bold\">$formattedPrice</span></span><br>";
+                $html .= "<span class=\"font-weight-bold\">$formattedPrice</span><br>";
             }
 
             $cell->setHtml($html);
@@ -286,25 +279,10 @@ class DealGrid extends Grid
             $price = $destination->getTotalPrice();
             if ($price > 0) {
                 $formattedPrice = Formatter::formatPrice($price);
-                $html .= "<span class=\"text-nowrap\">Price: <span class=\"font-weight-bold\">$formattedPrice</span></span><br>";
+                $html .= "<span class=\"font-weight-bold\">$formattedPrice</span><br>";
             }
 
             $cell->setHtml($html);
-        }
-
-        return $cell;
-    }
-
-    /**
-     * @param int|null $qty
-     * @return Html
-     */
-    private function createCellForCrafting(?int $qty = null): Html
-    {
-        $cell = new Html();
-
-        if ($qty !== null) {
-            $cell->setHtml("<span class=\"text-nowrap\">Qty: <span class=\"font-weight-bold\">$qty</span></span>");
         }
 
         return $cell;
@@ -321,15 +299,21 @@ class DealGrid extends Grid
         $cell = new Html();
 
         $formattedProfit = Formatter::formatPrice($profit);
-        $html = "<span class=\"text-nowrap\">Credit: <span class=\"font-weight-bold\">$formattedProfit</span></span><br>";
+        $html = "<span class=\"font-weight-bold\">$formattedProfit</span><br>";
 
-        foreach ($experience as $code => $qty) {
-            $name = $this->indexedResearchPoints[$code]->getName();
-            $html .= "<span class=\"text-nowrap\">$name: <span class=\"font-weight-bold\">$qty</span></span><br>";
+        if (count($experience) > 0) {
+            $html .= "<br>Experience:<br>";
+
+            foreach ($experience as $code => $qty) {
+                $icon = Formatter::getIcon($this->indexedResearchPoints[$code]->getIconUrl());
+
+                $html .= "<span class=\"font-weight-bold\">$qty</span> $icon<br>";
+            }
         }
 
         $formattedProfitability = Formatter::formatPercent($profitability);
-        $html .= "<span class=\"text-nowrap\">Profitability: <span class=\"font-weight-bold\">$formattedProfitability</span></span><br>";
+        $html .= "<br><span>Profitability:</span><br>"
+            . "<span class=\"font-weight-bold\">$formattedProfitability</span><br>";
 
         $cell->setHtml($html);
 
@@ -345,8 +329,14 @@ class DealGrid extends Grid
         $cell = new Html();
 
         if ($materialId !== null) {
-            $name = $this->indexedMaterials[$materialId]->getProduct()->getName();
-            $cell->setHtml("<span class=\"font-weight-bold\">$name</span>");
+            $product = $this->indexedMaterials[$materialId]->getProduct();
+            $name = $product->getName();
+            $imageUrl = $product->getImageUrl();
+
+            $cell->setHtml(
+                "<img src=\"$imageUrl\" class=\"img-fluid mb-1\">"
+                . "<span class=\"font-weight-bold\">$name</span>"
+            );
         }
 
         return $cell;
@@ -361,8 +351,14 @@ class DealGrid extends Grid
         $cell = new Html();
 
         if ($deviceId !== null) {
-            $name = $this->indexedDevices[$deviceId]->getProduct()->getName();
-            $cell->setHtml("<span class=\"font-weight-bold\">$name</span>");
+            $product = $this->indexedDevices[$deviceId]->getProduct();
+            $name = $product->getName();
+            $imageUrl = $product->getImageUrl();
+
+            $cell->setHtml(
+                "<img src=\"$imageUrl\" class=\"img-fluid mb-1\">"
+                . "<span class=\"font-weight-bold\">$name</span>"
+            );
         }
 
         return $cell;

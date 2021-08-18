@@ -18,6 +18,46 @@ class CalculatorParamsFactory
      * @param Material[] $materials
      * @param Device[] $devices
      * @param int[] $inventoryQtys
+     * @return CalculatorParams
+     */
+    public function createParamsForInventory(
+        array $materials,
+        array $devices,
+        array $inventoryQtys
+    ): CalculatorParams {
+        return $this->createParams($materials, $devices, $inventoryQtys);
+    }
+
+    /**
+     * @param Material[] $materials
+     * @param Device[] $devices
+     * @param int[] $miningAcceptableIds
+     * @return CalculatorParams
+     */
+    public function createParamsForMining(
+        array $materials,
+        array $devices,
+        array $miningAcceptableIds
+    ): CalculatorParams {
+        return $this->createParams($materials, $devices, [], $miningAcceptableIds);
+    }
+
+    /**
+     * @param Material[] $materials
+     * @param Device[] $devices
+     * @return CalculatorParams
+     */
+    public function createParamsForTrade(
+        array $materials,
+        array $devices
+    ): CalculatorParams {
+        return $this->createParams($materials, $devices);
+    }
+
+    /**
+     * @param Material[] $materials
+     * @param Device[] $devices
+     * @param int[] $inventoryQtys
      * @param int[] $miningAcceptableIds
      * @return CalculatorParams
      */

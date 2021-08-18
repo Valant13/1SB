@@ -6,6 +6,7 @@ use App\Config;
 use App\Entity\Catalog\Device;
 use App\Entity\Catalog\DeviceCraftingExperience;
 use App\Entity\Catalog\ResearchPoint;
+use App\ViewModel\Formatter;
 use App\ViewModel\Grid\Cell\Field;
 use App\ViewModel\Grid\Cell\Html;
 use App\ViewModel\Grid\Column;
@@ -64,7 +65,10 @@ class CraftingExperienceGrid implements GridBindingInterface
     {
         $row = new Row();
 
-        $nameCell = (new Html())->setHtml($prototype->getName());
+        $name = $prototype->getName();
+        $icon = Formatter::getIcon($prototype->getIconUrl());
+
+        $nameCell = (new Html())->setHtml("$name ($icon)");
         $qtyCell = (new Field())->setValueType('number')
             ->setName("crafting-experience[$index]");
 

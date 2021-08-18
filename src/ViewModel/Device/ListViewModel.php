@@ -15,7 +15,7 @@ use App\ViewModel\Grid\Cell\Image;
 use App\ViewModel\Grid\Cell\Link;
 use App\ViewModel\Grid\Cell\Text;
 
-class ListModelModel extends AbstractViewModel
+class ListViewModel extends AbstractViewModel
 {
     /**
      * @var Grid
@@ -51,20 +51,20 @@ class ListModelModel extends AbstractViewModel
             $product = $device->getProduct();
 
             $imageCell = (new Image())
-                ->setHref($product->getImageUrl());
+                ->setSrc($product->getImageUrl());
 
             $nameCell = (new Link())
                 ->setText($product->getName())
                 ->setHref($product->getWikiPageUrl());
 
-            $marketplaceCell = (new Text())
-                ->setText(Formatter::formatPrice($product->getMarketplacePrice()));
+            $marketplaceCell = (new Html())
+                ->setHtml(Formatter::formatPrice($product->getMarketplacePrice()));
 
-            $auctionCell = (new Text())
-                ->setText(Formatter::formatPrice($product->getAuctionPrice()->getValue()));
+            $auctionCell = (new Html())
+                ->setHtml(Formatter::formatPrice($product->getAuctionPrice()->getValue()));
 
-            $costCell = (new Text())
-                ->setText(Formatter::formatPrice(null));
+            $costCell = (new Html())
+                ->setHtml(Formatter::formatPrice(null));
 
             $modifiedCell = (new Html())
                 ->setHtml(Formatter::formatModification(

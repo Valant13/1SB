@@ -5,6 +5,7 @@ namespace App\ViewModel\Calculator;
 use App\Entity\Calculator\UserCalculation;
 use App\Entity\Catalog\ResearchPoint;
 use App\ViewModel\AbstractViewModel;
+use App\ViewModel\Formatter;
 use Symfony\Component\HttpFoundation\Request;
 
 class MaximizationParamList extends AbstractViewModel
@@ -33,10 +34,14 @@ class MaximizationParamList extends AbstractViewModel
             $this->indexedResearchPoints[$researchPoint->getCode()] = $researchPoint;
         }
 
-        $this->options[UserCalculation::CREDIT_CODE] = 'Credit';
+        $creditIcon = Formatter::getIcon('/credit.svg');
+        $this->options[UserCalculation::CREDIT_CODE] = "Credit ($creditIcon)";
 
         foreach ($this->indexedResearchPoints as $code => $researchPoint) {
-            $this->options[$code] = $researchPoint->getName();
+            $icon = Formatter::getIcon($researchPoint->getIconUrl());
+            $name = $researchPoint->getName();
+
+            $this->options[$code] = "$name ($icon)";
         }
     }
 

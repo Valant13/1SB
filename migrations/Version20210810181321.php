@@ -34,6 +34,13 @@ final class Version20210810181321 extends AbstractMigration implements Container
         'Gear'
     ];
 
+    const RESEARCH_POINT_ICON_URLS = [
+        '/research-point/box.svg',
+        '/research-point/lightning.svg',
+        '/research-point/shield.svg',
+        '/research-point/gear.svg'
+    ];
+
     public function getDescription(): string
     {
         return '';
@@ -51,12 +58,13 @@ final class Version20210810181321 extends AbstractMigration implements Container
         $entityManager = $this->container->get('doctrine.orm.entity_manager');
 
         $sortOrder = 0;
-        foreach (self::RESEARCH_POINT_NAMES as $researchPointName) {
+        foreach (self::RESEARCH_POINT_NAMES as $index => $researchPointName) {
             $sortOrder += 10;
 
             $researchPoint = new ResearchPoint();
             $researchPoint->setCode(strtolower($researchPointName));
             $researchPoint->setName($researchPointName);
+            $researchPoint->setIconUrl(self::RESEARCH_POINT_ICON_URLS[$index]);
             $researchPoint->setSortOrder($sortOrder);
 
             $entityManager->persist($researchPoint);

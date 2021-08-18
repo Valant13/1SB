@@ -95,6 +95,32 @@ class CalculatorService
 
     /**
      * @param CalculatorParams $params
+     * @param string $maximizationParam
+     * @param int $limit
+     * @return DealInterface[]
+     */
+    public function calculateForTrade(
+        CalculatorParams $params,
+        string $maximizationParam = DealProcessor::CREDIT_PARAM,
+        int $limit = 1
+    ): array {
+        $this->validateParams($params);
+        $state = $this->getStateByParams($params);
+
+        $deals = $this->getPossibleDeals(
+            $state->getMaterialStockItems(),
+            $state->getDeviceStockItems(),
+            [StockSource::TYPE_AUCTION]
+        );
+
+        $this->dealProcessor->filterDealsByProfitability($deals, true);
+        $this->dealProcessor->orderDealsByParam($deals, $maximizationParam);
+
+        return array_slice($deals, 0, $limit);
+    }
+
+    /**
+     * @param CalculatorParams $params
      * @return int[]
      */
     public function calculateDeviceCosts(CalculatorParams $params): array

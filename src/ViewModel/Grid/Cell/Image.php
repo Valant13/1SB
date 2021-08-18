@@ -10,7 +10,7 @@ class Image extends AbstractCell implements CellInterface
     /**
      * @var string|null
      */
-    private $href;
+    private $src;
 
     /**
      * @var string|null
@@ -28,18 +28,18 @@ class Image extends AbstractCell implements CellInterface
     /**
      * @return string|null
      */
-    public function getHref(): ?string
+    public function getSrc(): ?string
     {
-        return $this->href;
+        return $this->src;
     }
 
     /**
-     * @param string|null $href
+     * @param string|null $src
      * @return Image
      */
-    public function setHref(?string $href): Image
+    public function setSrc(?string $src): Image
     {
-        $this->href = $href;
+        $this->src = $src;
         return $this;
     }
 

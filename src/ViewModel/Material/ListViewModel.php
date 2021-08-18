@@ -50,17 +50,17 @@ class ListViewModel extends AbstractViewModel
             $product = $material->getProduct();
 
             $imageCell = (new Image())
-                ->setHref($product->getImageUrl());
+                ->setSrc($product->getImageUrl());
 
             $nameCell = (new Link())
                 ->setText($product->getName())
                 ->setHref($product->getWikiPageUrl());
 
-            $marketplaceCell = (new Text())
-                ->setText(Formatter::formatPrice($product->getMarketplacePrice()));
+            $marketplaceCell = (new Html())
+                ->setHtml(Formatter::formatPrice($product->getMarketplacePrice()));
 
-            $auctionCell = (new Text())
-                ->setText(Formatter::formatPrice($product->getAuctionPrice()->getValue()));
+            $auctionCell = (new Html())
+                ->setHtml(Formatter::formatPrice($product->getAuctionPrice()->getValue()));
 
             $modifiedCell = (new Html())
                 ->setHtml(Formatter::formatModification(

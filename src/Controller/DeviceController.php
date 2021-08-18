@@ -11,7 +11,7 @@ use App\Logger;
 use App\Repository\Catalog\DeviceRepository;
 use App\Repository\Catalog\MaterialRepository;
 use App\Repository\Catalog\ResearchPointRepository;
-use App\ViewModel\Device\ListModelModel;
+use App\ViewModel\Device\ListViewModel;
 use App\ViewModel\Device\Edit;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\RequestStack;
@@ -96,7 +96,7 @@ class DeviceController extends AbstractController
 
         $devices = $this->deviceRepository->findOrderedByName();
 
-        $viewModel = new ListModelModel();
+        $viewModel = new ListViewModel();
         $viewModel->fillFromDevices($devices);
 
         return $this->render('device/list.html.twig', [

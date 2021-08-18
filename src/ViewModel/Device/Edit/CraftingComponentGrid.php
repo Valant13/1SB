@@ -69,7 +69,7 @@ class CraftingComponentGrid implements GridBindingInterface
 
         $product = $prototype->getProduct();
 
-        $imageCell = (new Image())->setHref($product->getImageUrl());
+        $imageCell = (new Image())->setSrc($product->getImageUrl());
         $nameCell = (new Text())->setText($product->getName());
         $qtyCell = (new Field())->setValueType('number')
             ->setName("crafting-components[$index]");

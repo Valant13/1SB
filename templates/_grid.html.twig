@@ -41,8 +41,8 @@
                         {% elseif cell.type == "html" %}
                             {{ cell.html|raw }}
                         {% elseif cell.type == "image" %}
-                            {% if cell.href %}
-                                <img src="{{ cell.href }}"{% if cell.alt %} alt="{{ cell.alt }}"{% endif %} class="img-fluid">
+                            {% if cell.src %}
+                                <img src="{{ cell.src }}"{% if cell.alt %} alt="{{ cell.alt }}"{% endif %} class="img-fluid">
                             {% endif %}
                         {% elseif cell.type == "link" %}
                             {% if cell.href %}

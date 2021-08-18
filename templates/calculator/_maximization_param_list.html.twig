@@ -5,7 +5,7 @@
     {% endif %}
     <div class="form-check">
         <label class="form-check-label" for="maximization-param-{{ optionCode }}">
-            <input type="radio" class="form-check-input" id="maximization-param-{{ optionCode }}" name="maximization-param" value="{{ optionCode }}"{% if isChecked %} checked{% endif %}>{{ optionName }}
+            <input type="radio" class="form-check-input" id="maximization-param-{{ optionCode }}" name="maximization-param" value="{{ optionCode }}"{% if isChecked %} checked{% endif %}>{{ optionName|raw }}
         </label>
     </div>
 {% endfor %}

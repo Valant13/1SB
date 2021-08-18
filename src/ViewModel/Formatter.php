@@ -3,6 +3,8 @@
 namespace App\ViewModel;
 
 use App\Entity\User\User;
+use Symfony\Component\Asset\Package;
+use Symfony\Component\Asset\VersionStrategy\EmptyVersionStrategy;
 
 class Formatter
 {
@@ -13,6 +15,11 @@ class Formatter
     private const WEEK = self::DAY * 7;
     private const MONTH = self::DAY * 30;
     private const YEAR = self::DAY * 365;
+
+    /**
+     * @var Package|null
+     */
+    private static $package;
 
     /**
      * @param \DateTime|null $modificationTime
@@ -74,7 +81,9 @@ class Formatter
             return null;
         }
 
-        return number_format($price, 0, null, ' ');
+        $text = number_format($price, 0, null, ' ');
+
+        return self::addIconToText($text, '/credit.svg');
     }
 
     /**
@@ -107,5 +116,48 @@ class Formatter
         }
 
         return round($percent * 100) . '%';
+    }
+
+    /**
+     * @param string|null $iconUrl
+     * @return string|null
+     */
+    public static function getIcon(?string $iconUrl): ?string
+    {
+        if ($iconUrl === null) {
+            return null;
+        }
+
+        $preparedIconUrl = self::getPackage()->getUrl($iconUrl);
+
+        return "<img src=\"$preparedIconUrl\" style=\"height: 16px; margin-bottom: 2px\"/>";
+    }
+
+    /**
+     * @param string|null $text
+     * @param string|null $iconUrl
+     * @return string|null
+     */
+    public static function addIconToText(?string $text, ?string $iconUrl): ?string
+    {
+        if ($text === null) {
+            return null;
+        }
+
+        $icon = self::getIcon($iconUrl);
+
+        return "$text $icon";
+    }
+
+    /**
+     * @return Package
+     */
+    private static function getPackage(): Package
+    {
+        if (self::$package === null) {
+            self::$package = new Package(new EmptyVersionStrategy());
+        }
+
+        return self::$package;
     }
 }
