@@ -29,7 +29,7 @@
             </tr>
         {% endif %}
         {% for row in grid.rows %}
-            <tr>
+            <tr {% if row.style %}style="{{ row.style }}"{% endif %}>
                 {% for cell in row.cells %}
                     <td class="align-middle" colspan="{{ cell.colspan }}" rowspan="{{ cell.rowspan }}">
                         {% if cell.type == "action" %}

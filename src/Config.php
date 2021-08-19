@@ -12,10 +12,10 @@ class Config
     const PRICE_COLUMN_WIDTH = 75;
     const MODIFICATION_COLUMN_WIDTH = 95;
     const EDIT_COLUMN_WIDTH = 62;
-    const FIELD_COLUMN_WIDTH = 80;
+    const FIELD_COLUMN_WIDTH = 110;
     const CHECKBOX_COLUMN_WIDTH = 110;
 
-    const INVENTORY_DEALS_LIMIT = 5;
-    const MINING_DEALS_LIMIT = 5;
-    const TRADE_DEALS_LIMIT = 5;
+    const INVENTORY_DEALS_LIMIT = 10;
+    const MINING_DEALS_LIMIT = 10;
+    const TRADE_DEALS_LIMIT = 10;
 }

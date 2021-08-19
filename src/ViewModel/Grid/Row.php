@@ -5,9 +5,30 @@ namespace App\ViewModel\Grid;
 class Row
 {
     /**
+     * @var string|null
+     */
+    private $style;
+
+    /**
      * @var CellInterface[]
      */
     private $cells = [];
+
+    /**
+     * @return string|null
+     */
+    public function getStyle(): ?string
+    {
+        return $this->style;
+    }
+
+    /**
+     * @param string|null $style
+     */
+    public function setStyle(?string $style): void
+    {
+        $this->style = $style;
+    }
 
     /**
      * @return CellInterface[]

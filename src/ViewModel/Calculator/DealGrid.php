@@ -119,15 +119,24 @@ class DealGrid extends Grid
      */
     public function createRowsForDeal(DealInterface $deal, int $number): array
     {
+        /** @var Row[] $rows */
+        $rows = [];
+
         if ($deal instanceof MaterialDeal) {
-            return $this->createRowsForMaterialDeal($deal, $number);
+            $rows = $this->createRowsForMaterialDeal($deal, $number);
         } elseif ($deal instanceof DeviceDeal) {
-            return $this->createRowsForDeviceDeal($deal, $number);
+            $rows = $this->createRowsForDeviceDeal($deal, $number);
         } elseif ($deal instanceof CraftingDeal) {
-            return $this->createRowsForCraftingDeal($deal, $number);
+            $rows = $this->createRowsForCraftingDeal($deal, $number);
         }
 
-        return [];
+        if ($number % 2 === 0) {
+            foreach ($rows as $row) {
+                $row->setStyle('background-color: rgba(0,0,0,.05)');
+            }
+        }
+
+        return $rows;
     }
 
     /**

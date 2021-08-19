@@ -1,5 +1,5 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="100" height="100">
     <polygon points="15,0 40,0 40,100 20,100 20,10 15,10" style="fill:DarkKhaki;"/>
-    <polygon points="40,0 80,60 80,90 40,30" style="fill:DarkKhaki;"/>
+    <polygon points="20,0 40,0 80,60 80,90 40,30 20,30" style="fill:DarkKhaki;"/>
     <polygon points="10,100 20,80 80,80 90,100" style="fill:DarkKhaki;"/>
 </svg>
