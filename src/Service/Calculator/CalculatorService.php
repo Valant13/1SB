@@ -128,19 +128,11 @@ class CalculatorService
         $this->validateParams($params);
         $state = $this->getStateByParams($params);
 
-        $costPrices = [];
-
-        $deals = $this->dealProcessor->getCraftingDeals(
+        return $this->dealProcessor->getDeviceCosts(
             $state->getMaterialStockItems(),
             $state->getDeviceStockItems(),
             [StockSource::TYPE_AUCTION]
         );
-
-        foreach ($deals as $deal) {
-            $costPrices[$deal->getDeviceId()] = $deal->getTotalCost();
-        }
-
-        return $costPrices;
     }
 
     /**

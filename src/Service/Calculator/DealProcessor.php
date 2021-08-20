@@ -206,6 +206,34 @@ class DealProcessor
     }
 
     /**
+     * @param MaterialStockItem[] $materialItems
+     * @param DeviceStockItem[] $deviceItems
+     * @param string[] $allowedSourceTypes
+     * @return int[]
+     */
+    public function getDeviceCosts(array $materialItems, array $deviceItems, array $allowedSourceTypes): array
+    {
+        $costPrices = [];
+
+        foreach ($deviceItems as $deviceItem) {
+            $dealComponents = $this->getCraftingDealComponents($deviceItem, $materialItems, $allowedSourceTypes);
+
+            if ($dealComponents === null) {
+                continue;
+            }
+
+            $dealTotalCost = 0.0;
+            foreach ($dealComponents as $dealComponent) {
+                $dealTotalCost += $dealComponent->getTotalCost();
+            }
+
+            $costPrices[$deviceItem->getDeviceId()] = $dealTotalCost;
+        }
+
+        return $costPrices;
+    }
+
+    /**
      * @param DeviceStockItem $deviceItem
      * @param MaterialStockItem[] $materialItems
      * @param string[] $allowedSourceTypes
