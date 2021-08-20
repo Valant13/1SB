@@ -48,7 +48,7 @@ class CraftingComponentGrid implements GridBindingInterface
     {
         $imageColumn = (new Column())->setName('Image')->setWidth(Config::IMAGE_COLUMN_WIDTH);
         $nameColumn = (new Column())->setName('Name');
-        $qtyColumn = (new Column())->setName('Qty')->setWidth(Config::FIELD_COLUMN_WIDTH)
+        $qtyColumn = (new Column())->setName('Qty (kv)')->setWidth(Config::FIELD_COLUMN_WIDTH)
             ->setControlType(Column::CONTROL_TYPE_CLEAR);
 
         return [
