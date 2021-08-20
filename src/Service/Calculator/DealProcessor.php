@@ -460,8 +460,8 @@ class DealProcessor
      */
     private function compareDealsByResearchPoint(DealInterface $a, DealInterface $b, string $researchPointCode): int
     {
-        $aExperience = 0;
-        $bExperience = 0;
+        $aExperience = 0.0;
+        $bExperience = 0.0;
 
         if ($a instanceof CraftingDeal && array_key_exists($researchPointCode, $a->getTotalExperience())) {
             $aExperience = $a->getTotalExperience()[$researchPointCode];
@@ -471,7 +471,15 @@ class DealProcessor
             $bExperience = $b->getTotalExperience()[$researchPointCode];
         }
 
-        $difference = $aExperience / $a->getTotalCost() - $bExperience / $b->getTotalCost();
+        if ($aExperience === 0.0 && $bExperience !== 0.0) {
+            return -1;
+        } elseif ($aExperience !== 0.0 && $bExperience === 0.0) {
+            return 1;
+        } elseif ($aExperience === 0.0 && $bExperience === 0.0) {
+            return $this->compareDealsByCredit($a, $b);
+        }
+
+        $difference = $a->getTotalProfit() / $aExperience - $b->getTotalProfit() / $bExperience;
 
         if ($difference !== 0.0) {
             return $difference > 0 ? 1 : -1;

@@ -15,7 +15,7 @@ class Config
     const FIELD_COLUMN_WIDTH = 110;
     const CHECKBOX_COLUMN_WIDTH = 110;
 
-    const INVENTORY_DEALS_LIMIT = 10;
+    const INVENTORY_DEALS_LIMIT = 25;
     const MINING_DEALS_LIMIT = 10;
     const TRADE_DEALS_LIMIT = 10;
 }
