@@ -205,7 +205,7 @@ class DealGrid extends Grid
             $row->setCell('material', $this->createCellForMaterial($component->getMaterialId()));
 
             if ($isFirst) {
-                $row->setCell('device', $this->createCellForDevice($deal->getDeviceId())
+                $row->setCell('device', $this->createCellForDevice($deal->getDeviceId(), true)
                     ->setRowspan($componentsCount));
                 $row->setCell('sell', $this->createCellForDestination($deal->getDestination())
                     ->setRowspan($componentsCount));
@@ -339,13 +339,17 @@ class DealGrid extends Grid
 
         if ($materialId !== null) {
             $product = $this->indexedMaterials[$materialId]->getProduct();
-            $name = $product->getName();
-            $imageUrl = $product->getImageUrl();
+            $html = '';
 
-            $cell->setHtml(
-                "<img src=\"$imageUrl\" class=\"img-fluid mb-1\">"
-                . "<span class=\"font-weight-bold\">$name</span>"
-            );
+            $imageUrl = $product->getImageUrl();
+            if ($imageUrl) {
+                $html .= "<img src=\"$imageUrl\" class=\"img-fluid mb-1\">";
+            }
+
+            $name = $product->getName();
+            $html .= "<span class=\"font-weight-bold\">$name</span><br>";
+
+            $cell->setHtml($html);
         }
 
         return $cell;
@@ -353,21 +357,32 @@ class DealGrid extends Grid
 
     /**
      * @param int|null $deviceId
+     * @param bool $isCrafting
      * @return Html
      */
-    private function createCellForDevice(?int $deviceId = null): Html
+    private function createCellForDevice(?int $deviceId = null, bool $isCrafting = false): Html
     {
         $cell = new Html();
 
         if ($deviceId !== null) {
             $product = $this->indexedDevices[$deviceId]->getProduct();
-            $name = $product->getName();
-            $imageUrl = $product->getImageUrl();
+            $html = '';
 
-            $cell->setHtml(
-                "<img src=\"$imageUrl\" class=\"img-fluid mb-1\">"
-                . "<span class=\"font-weight-bold\">$name</span>"
-            );
+            $imageUrl = $product->getImageUrl();
+            if ($imageUrl) {
+                $style = $isCrafting ? "style=\"padding-top: 26px\"" : "";
+
+                $html .= "<img src=\"$imageUrl\" class=\"img-fluid mb-1\" $style>";
+            }
+
+            $name = $product->getName();
+            $html .= "<span class=\"font-weight-bold\">$name</span><br>";
+
+            if ($isCrafting) {
+                $html .= "<span>(crafting)</span><br>";
+            }
+
+            $cell->setHtml($html);
         }
 
         return $cell;
