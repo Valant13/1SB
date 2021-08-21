@@ -493,26 +493,29 @@ class DealProcessor
      */
     private function compareDealsByExperience(DealInterface $a, DealInterface $b, string $researchPointCode): int
     {
-        $aExperience = 0.0;
-        $bExperience = 0.0;
+        $aTotalExperience = 0.0;
+        $bTotalExperience = 0.0;
 
         if ($a instanceof CraftingDeal && array_key_exists($researchPointCode, $a->getTotalExperience())) {
-            $aExperience = $a->getTotalExperience()[$researchPointCode];
+            $aTotalExperience = $a->getTotalExperience()[$researchPointCode];
         }
 
         if ($b instanceof CraftingDeal && array_key_exists($researchPointCode, $b->getTotalExperience())) {
-            $bExperience = $b->getTotalExperience()[$researchPointCode];
+            $bTotalExperience = $b->getTotalExperience()[$researchPointCode];
         }
 
-        if ($aExperience === 0.0 && $bExperience !== 0.0) {
+        if ($aTotalExperience === 0.0 && $bTotalExperience !== 0.0) {
             return -1;
-        } elseif ($aExperience !== 0.0 && $bExperience === 0.0) {
+        } elseif ($aTotalExperience !== 0.0 && $bTotalExperience === 0.0) {
             return 1;
-        } elseif ($aExperience === 0.0 && $bExperience === 0.0) {
+        } elseif ($aTotalExperience === 0.0 && $bTotalExperience === 0.0) {
             return $this->compareDealsByProfitability($a, $b);
         }
 
-        $difference = $a->getTotalProfit() / $aExperience - $b->getTotalProfit() / $bExperience;
+        $aTotalProductionProfit = $a->getProfitability() * $a->getTotalCost();
+        $bTotalProductionProfit = $b->getProfitability() * $b->getTotalCost();
+
+        $difference = $aTotalProductionProfit / $aTotalExperience - $bTotalProductionProfit / $bTotalExperience;
 
         if ($difference !== 0.0) {
             return $difference > 0 ? 1 : -1;
