@@ -20,23 +20,16 @@ class DealProcessor
 
     /**
      * @param DealInterface[] $deals
-     * @param bool $isProfitable
+     * @param string $param
+     * @param bool $hasParam
      */
-    public function filterDealsByProfitability(array &$deals, bool $isProfitable): void
+    public function filterDealsByParam(array &$deals, string $param = self::CREDIT_PARAM, bool $hasParam = true): void
     {
-        $profitableDeals = [];
-        $unprofitableDeals = [];
-
-        foreach ($deals as $deal) {
-            if ($deal->getProfitability() >= 0) {
-                $profitableDeals[] = $deal;
-                continue;
-            }
-
-            $unprofitableDeals[] = $deal;
+        if ($param === self::CREDIT_PARAM) {
+            $this->filterDealsByProfit($deals, $hasParam);
+        } else {
+            $this->filterDealsByExperience($deals, $param, $hasParam);
         }
-
-        $deals = $isProfitable ? $profitableDeals : $unprofitableDeals;
     }
 
     /**
@@ -44,18 +37,15 @@ class DealProcessor
      * @param string $param
      * @param bool $asc
      */
-    public function orderDealsByParam(
-        array  &$deals,
-        string $param = self::CREDIT_PARAM,
-        bool   $asc = false
-    ): void {
+    public function orderDealsByParam(array &$deals, string $param = self::CREDIT_PARAM, bool $asc = false): void
+    {
         if ($param === self::CREDIT_PARAM) {
             usort($deals, function ($a, $b) {
-                return $this->compareDealsByCredit($a, $b);
+                return $this->compareDealsByProfitability($a, $b);
             });
         } else {
             usort($deals, function ($a, $b) use ($param) {
-                return $this->compareDealsByResearchPoint($a, $b, $param);
+                return $this->compareDealsByExperience($a, $b, $param);
             });
         }
 
@@ -437,11 +427,54 @@ class DealProcessor
     }
 
     /**
+     * @param DealInterface[] $deals
+     * @param bool $isProfitable
+     */
+    private function filterDealsByProfit(array &$deals, bool $isProfitable): void
+    {
+        $profitableDeals = [];
+        $unprofitableDeals = [];
+
+        foreach ($deals as $deal) {
+            if ($deal->getTotalProfit() > 0) {
+                $profitableDeals[] = $deal;
+                continue;
+            }
+
+            $unprofitableDeals[] = $deal;
+        }
+
+        $deals = $isProfitable ? $profitableDeals : $unprofitableDeals;
+    }
+
+    /**
+     * @param DealInterface[] $deals
+     * @param string $researchPointCode
+     * @param bool $hasExperience
+     */
+    private function filterDealsByExperience(array &$deals, string $researchPointCode, bool $hasExperience): void
+    {
+        $dealsHavingExperience = [];
+        $dealsMissingExperience = [];
+
+        foreach ($deals as $deal) {
+            if ($deal instanceof CraftingDeal && array_key_exists($researchPointCode, $deal->getTotalExperience())) {
+                $dealsHavingExperience[] = $deal;
+                continue;
+            }
+
+            $dealsMissingExperience[] = $deal;
+        }
+
+        $deals = $hasExperience ? $dealsHavingExperience : $dealsMissingExperience;
+    }
+
+    /**
      * @param DealInterface $a
      * @param DealInterface $b
      * @return int
      */
-    private function compareDealsByCredit(DealInterface $a, DealInterface $b): int
+    private function compareDealsByProfitability(DealInterface $a, DealInterface $b): int
     {
         $difference = $a->getProfitability() - $b->getProfitability();
 
@@ -458,7 +491,7 @@ class DealProcessor
      * @param string $researchPointCode
      * @return int
      */
-    private function compareDealsByResearchPoint(DealInterface $a, DealInterface $b, string $researchPointCode): int
+    private function compareDealsByExperience(DealInterface $a, DealInterface $b, string $researchPointCode): int
     {
         $aExperience = 0.0;
         $bExperience = 0.0;
@@ -476,7 +509,7 @@ class DealProcessor
         } elseif ($aExperience !== 0.0 && $bExperience === 0.0) {
             return 1;
         } elseif ($aExperience === 0.0 && $bExperience === 0.0) {
-            return $this->compareDealsByCredit($a, $b);
+            return $this->compareDealsByProfitability($a, $b);
         }
 
         $difference = $a->getTotalProfit() / $aExperience - $b->getTotalProfit() / $bExperience;
@@ -484,7 +517,7 @@ class DealProcessor
         if ($difference !== 0.0) {
             return $difference > 0 ? 1 : -1;
         } else {
-            return $this->compareDealsByCredit($a, $b);
+            return $this->compareDealsByProfitability($a, $b);
         }
     }
 }

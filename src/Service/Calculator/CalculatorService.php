@@ -51,6 +51,7 @@ class CalculatorService
                 [StockSource::TYPE_INVENTORY]
             );
 
+            $this->dealProcessor->filterDealsByParam($deals, $maximizationParam);
             $this->dealProcessor->orderDealsByParam($deals, $maximizationParam);
 
             if (empty($deals)) {
@@ -86,6 +87,7 @@ class CalculatorService
             [StockSource::TYPE_MINING, StockSource::TYPE_AUCTION]
         );
 
+        $this->dealProcessor->filterDealsByParam($deals, $maximizationParam);
         $this->dealProcessor->orderDealsByParam($deals, $maximizationParam);
 
         return array_slice($deals, 0, $limit);
@@ -111,7 +113,7 @@ class CalculatorService
             [StockSource::TYPE_AUCTION]
         );
 
-        $this->dealProcessor->filterDealsByProfitability($deals, true);
+        $this->dealProcessor->filterDealsByParam($deals, $maximizationParam);
         $this->dealProcessor->orderDealsByParam($deals, $maximizationParam);
 
         return array_slice($deals, 0, $limit);
