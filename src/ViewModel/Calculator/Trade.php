@@ -61,7 +61,7 @@ class Trade extends AbstractViewModel
      */
     public function fillFromDeals(array $deals): void
     {
-        $this->dealGrid->fillForMining($deals);
+        $this->dealGrid->fillForTrade($deals);
         $this->hasCalculationResult = true;
     }
 

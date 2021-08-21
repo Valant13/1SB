@@ -33,6 +33,39 @@ class DealProcessor
     }
 
     /**
+     * Leave deal in list if it has at least one source of allowed type. Useful for crafting deals
+     *
+     * @param DealInterface[] $deals
+     * @param string[] $allowedSourceTypes
+     */
+    public function filterDealsBySourceType(array &$deals, array $allowedSourceTypes): void
+    {
+        $filteredDeals = [];
+
+        foreach ($deals as $deal) {
+            if ($deal instanceof MaterialDeal || $deal instanceof DeviceDeal) {
+                if (in_array($deal->getSource()->getType(), $allowedSourceTypes)) {
+                    $filteredDeals[] = $deal;
+                }
+            } elseif ($deal instanceof CraftingDeal) {
+                $hasAllowedSource = false;
+                foreach ($deal->getComponents() as $component) {
+                    if (in_array($component->getSource()->getType(), $allowedSourceTypes)) {
+                        $hasAllowedSource = true;
+                        break;
+                    }
+                }
+
+                if ($hasAllowedSource) {
+                    $filteredDeals[] = $deal;
+                }
+            }
+        }
+
+        $deals = $filteredDeals;
+    }
+
+    /**
      * @param DealInterface[] $deals
      * @param string $param
      * @param bool $asc

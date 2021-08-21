@@ -48,9 +48,10 @@ class CalculatorService
             $deals = $this->getPossibleDeals(
                 $state->getMaterialStockItems(),
                 $state->getDeviceStockItems(),
-                [StockSource::TYPE_INVENTORY]
+                [StockSource::TYPE_AUCTION, StockSource::TYPE_INVENTORY]
             );
 
+            $this->dealProcessor->filterDealsBySourceType($deals, [StockSource::TYPE_INVENTORY]);
             $this->dealProcessor->filterDealsByParam($deals, $maximizationParam);
             $this->dealProcessor->orderDealsByParam($deals, $maximizationParam);
 
@@ -81,21 +82,13 @@ class CalculatorService
         $this->validateParams($params);
         $state = $this->getStateByParams($params);
 
-        $materialDeals = $this->dealProcessor->getMaterialDeals(
-            $state->getMaterialStockItems(),
-            [StockSource::TYPE_MINING]
-        );
-
-        $craftingDeals = $this->dealProcessor->getCraftingDeals(
+        $deals = $this->getPossibleDeals(
             $state->getMaterialStockItems(),
             $state->getDeviceStockItems(),
-            [StockSource::TYPE_MINING, StockSource::TYPE_AUCTION]
+            [StockSource::TYPE_AUCTION, StockSource::TYPE_MINING]
         );
 
-        $this->filterMiningCraftingDeals($craftingDeals);
-
-        $deals = array_merge($materialDeals, $craftingDeals);
-
+        $this->dealProcessor->filterDealsBySourceType($deals, [StockSource::TYPE_MINING]);
         $this->dealProcessor->filterDealsByParam($deals, $maximizationParam);
         $this->dealProcessor->orderDealsByParam($deals, $maximizationParam);
 
@@ -215,30 +208,6 @@ class CalculatorService
             $this->dealProcessor->getDeviceDeals($deviceItems, $allowedSourceTypes),
             $this->dealProcessor->getCraftingDeals($materialItems, $deviceItems, $allowedSourceTypes)
         );
-    }
-
-    /**
-     * @param CraftingDeal[] $deals
-     */
-    private function filterMiningCraftingDeals(array &$deals): void
-    {
-        $filteredDeals = [];
-
-        foreach ($deals as $deal) {
-            $hasMiningSource = false;
-            foreach ($deal->getComponents() as $component) {
-                if ($component->getSource()->getType() === StockSource::TYPE_MINING) {
-                    $hasMiningSource = true;
-                    break;
-                }
-            }
-
-            if ($hasMiningSource) {
-                $filteredDeals[] = $deal;
-            }
-        }
-
-        $deals = $filteredDeals;
     }
 
     /**

@@ -92,6 +92,16 @@ class DealGrid extends Grid
     }
 
     /**
+     * @param DealInterface[] $deals
+     */
+    public function fillForTrade(array $deals): void
+    {
+        $this->fillFromDeals($deals);
+
+        $this->getColumns()['number']->setName('Opt.');
+    }
+
+    /**
      * @return bool
      */
     public function isStriped(): bool
