@@ -225,14 +225,20 @@ class CalculatorService
 
         if ($deal instanceof MaterialDeal) {
             $source = $materialItems[$deal->getMaterialId()]->getSources()[$deal->getSource()->getType()];
-            $source->setQty($source->getQty() - $deal->getSource()->getTotalQty());
+            if (!$source->isQtyInfinite()) {
+                $source->setQty($source->getQty() - $deal->getSource()->getTotalQty());
+            }
         } elseif ($deal instanceof DeviceDeal) {
             $source = $deviceItems[$deal->getDeviceId()]->getSources()[$deal->getSource()->getType()];
-            $source->setQty($source->getQty() - $deal->getSource()->getTotalQty());
+            if (!$source->isQtyInfinite()) {
+                $source->setQty($source->getQty() - $deal->getSource()->getTotalQty());
+            }
         } elseif ($deal instanceof CraftingDeal) {
             foreach ($deal->getComponents() as $component) {
                 $source = $materialItems[$component->getMaterialId()]->getSources()[$component->getSource()->getType()];
-                $source->setQty($source->getQty() - $component->getSource()->getTotalQty());
+                if (!$source->isQtyInfinite()) {
+                    $source->setQty($source->getQty() - $component->getSource()->getTotalQty());
+                }
             }
         }
     }
