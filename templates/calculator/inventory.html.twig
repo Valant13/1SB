@@ -11,6 +11,7 @@
             <div class="float-left">
                 <label>Maximize by:</label>
                 {{ include('calculator/_maximization_param_list.html.twig', {list: viewModel.maximizationParamList}) }}
+                {{ include('calculator/_auction_sell_form.html.twig', {allowed: viewModel.auctionSellAllowed}) }}
             </div>
 
             <div class="float-right text-right mb-3">

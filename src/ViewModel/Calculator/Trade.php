@@ -18,6 +18,11 @@ class Trade extends AbstractViewModel
     private $maximizationParamList;
 
     /**
+     * @var bool
+     */
+    private $isAuctionSellAllowed = false;
+
+    /**
      * @var DealGrid
      */
     private $dealGrid;
@@ -46,6 +51,8 @@ class Trade extends AbstractViewModel
     {
         $this->maximizationParamList->fillFromRequest($request);
         $this->addErrors($this->maximizationParamList->getErrors());
+
+        $this->isAuctionSellAllowed = (bool)$request->request->get('auction-sell-allowed');
     }
 
     /**
@@ -54,6 +61,7 @@ class Trade extends AbstractViewModel
     public function fillFromUser(UserCalculation $userCalculation): void
     {
         $this->maximizationParamList->fillFromUserCalculation($userCalculation);
+        $this->isAuctionSellAllowed = $userCalculation->getIsAuctionSellAllowed();
     }
 
     /**
@@ -71,6 +79,7 @@ class Trade extends AbstractViewModel
     public function fillUser(UserCalculation $userCalculation): void
     {
         $this->maximizationParamList->fillUserCalculation($userCalculation);
+        $userCalculation->setIsAuctionSellAllowed($this->isAuctionSellAllowed);
     }
 
     /**
@@ -119,5 +128,21 @@ class Trade extends AbstractViewModel
     public function setHasCalculationResult(bool $hasCalculationResult): void
     {
         $this->hasCalculationResult = $hasCalculationResult;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isAuctionSellAllowed(): bool
+    {
+        return $this->isAuctionSellAllowed;
+    }
+
+    /**
+     * @param bool $isAuctionSellAllowed
+     */
+    public function setIsAuctionSellAllowed(bool $isAuctionSellAllowed): void
+    {
+        $this->isAuctionSellAllowed = $isAuctionSellAllowed;
     }
 }

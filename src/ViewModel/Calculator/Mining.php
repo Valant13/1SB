@@ -21,6 +21,11 @@ class Mining extends AbstractViewModel
     private $maximizationParamList;
 
     /**
+     * @var bool
+     */
+    private $isAuctionSellAllowed = false;
+
+    /**
      * @var DealGrid
      */
     private $dealGrid;
@@ -61,6 +66,8 @@ class Mining extends AbstractViewModel
         $this->maximizationParamList->fillFromRequest($request);
         $this->addErrors($this->maximizationParamList->getErrors());
 
+        $this->isAuctionSellAllowed = (bool)$request->request->get('auction-sell-allowed');
+
         $this->miningMaterialGrid->fillFromRequest($request);
     }
 
@@ -71,6 +78,7 @@ class Mining extends AbstractViewModel
     public function fillFromUser(UserCalculation $userCalculation, UserMining $userMining): void
     {
         $this->maximizationParamList->fillFromUserCalculation($userCalculation);
+        $this->isAuctionSellAllowed = $userCalculation->getIsAuctionSellAllowed();
         $this->miningMaterialGrid->fillFromModels($userMining->getMaterials()->toArray());
     }
 
@@ -90,6 +98,7 @@ class Mining extends AbstractViewModel
     public function fillUser(UserCalculation $userCalculation, UserMining $userMining): void
     {
         $this->maximizationParamList->fillUserCalculation($userCalculation);
+        $userCalculation->setIsAuctionSellAllowed($this->isAuctionSellAllowed);
         $this->miningMaterialGrid->fillModels($userMining->getMaterials()->toArray(), $userMining);
     }
 
@@ -155,5 +164,21 @@ class Mining extends AbstractViewModel
     public function setHasCalculationResult(bool $hasCalculationResult): void
     {
         $this->hasCalculationResult = $hasCalculationResult;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isAuctionSellAllowed(): bool
+    {
+        return $this->isAuctionSellAllowed;
+    }
+
+    /**
+     * @param bool $isAuctionSellAllowed
+     */
+    public function setIsAuctionSellAllowed(bool $isAuctionSellAllowed): void
+    {
+        $this->isAuctionSellAllowed = $isAuctionSellAllowed;
     }
 }

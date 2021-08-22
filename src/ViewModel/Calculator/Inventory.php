@@ -21,6 +21,11 @@ class Inventory extends AbstractViewModel
     private $maximizationParamList;
 
     /**
+     * @var bool
+     */
+    private $isAuctionSellAllowed = false;
+
+    /**
      * @var DealGrid
      */
     private $dealGrid;
@@ -61,6 +66,8 @@ class Inventory extends AbstractViewModel
         $this->maximizationParamList->fillFromRequest($request);
         $this->addErrors($this->maximizationParamList->getErrors());
 
+        $this->isAuctionSellAllowed = (bool)$request->request->get('auction-sell-allowed');
+
         $this->inventoryMaterialGrid->fillFromRequest($request);
     }
 
@@ -71,6 +78,7 @@ class Inventory extends AbstractViewModel
     public function fillFromUser(UserCalculation $userCalculation, UserInventory $userInventory): void
     {
         $this->maximizationParamList->fillFromUserCalculation($userCalculation);
+        $this->isAuctionSellAllowed = $userCalculation->getIsAuctionSellAllowed();
         $this->inventoryMaterialGrid->fillFromModels($userInventory->getMaterials()->toArray());
     }
 
@@ -90,6 +98,7 @@ class Inventory extends AbstractViewModel
     public function fillUser(UserCalculation $userCalculation, UserInventory $userInventory): void
     {
         $this->maximizationParamList->fillUserCalculation($userCalculation);
+        $userCalculation->setIsAuctionSellAllowed($this->isAuctionSellAllowed);
         $this->inventoryMaterialGrid->fillModels($userInventory->getMaterials()->toArray(), $userInventory);
     }
 
@@ -155,5 +164,21 @@ class Inventory extends AbstractViewModel
     public function setHasCalculationResult(bool $hasCalculationResult): void
     {
         $this->hasCalculationResult = $hasCalculationResult;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isAuctionSellAllowed(): bool
+    {
+        return $this->isAuctionSellAllowed;
+    }
+
+    /**
+     * @param bool $isAuctionSellAllowed
+     */
+    public function setIsAuctionSellAllowed(bool $isAuctionSellAllowed): void
+    {
+        $this->isAuctionSellAllowed = $isAuctionSellAllowed;
     }
 }

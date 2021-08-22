@@ -31,6 +31,11 @@ class UserCalculation
      */
     private $maximizationParamCode;
 
+    /**
+     * @ORM\Column(type="boolean")
+     */
+    private $isAuctionSellAllowed;
+
     public function __construct()
     {
         $this->maximizationParamCode = UserCalculation::CREDIT_CODE;
@@ -61,6 +66,18 @@ class UserCalculation
     public function setMaximizationParamCode(?string $maximizationParamCode): self
     {
         $this->maximizationParamCode = $maximizationParamCode;
+
+        return $this;
+    }
+
+    public function getIsAuctionSellAllowed(): ?bool
+    {
+        return $this->isAuctionSellAllowed;
+    }
+
+    public function setIsAuctionSellAllowed(bool $isAuctionSellAllowed): self
+    {
+        $this->isAuctionSellAllowed = $isAuctionSellAllowed;
 
         return $this;
     }

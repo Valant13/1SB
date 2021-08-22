@@ -163,7 +163,8 @@ class CalculatorController extends AbstractController implements AuthorizedInter
                 $calculatorParams = $this->calculatorParamsFactory->createParamsForInventory(
                     $materials,
                     $devices,
-                    $userInventory->getMaterialQtys()
+                    $userInventory->getMaterialQtys(),
+                    $userCalculation->getIsAuctionSellAllowed()
                 );
 
                 $deals = $this->calculatorService->calculateForInventory(
@@ -216,7 +217,8 @@ class CalculatorController extends AbstractController implements AuthorizedInter
                 $calculatorParams = $this->calculatorParamsFactory->createParamsForMining(
                     $materials,
                     $devices,
-                    $userMining->getAcceptableMaterialIds()
+                    $userMining->getAcceptableMaterialIds(),
+                    $userCalculation->getIsAuctionSellAllowed()
                 );
 
                 $deals = $this->calculatorService->calculateForMining(
@@ -264,7 +266,11 @@ class CalculatorController extends AbstractController implements AuthorizedInter
             if (!$viewModel->hasErrors()) {
                 $this->getDoctrine()->getManager()->flush();
 
-                $calculatorParams = $this->calculatorParamsFactory->createParamsForTrade($materials, $devices);
+                $calculatorParams = $this->calculatorParamsFactory->createParamsForTrade(
+                    $materials,
+                    $devices,
+                    $userCalculation->getIsAuctionSellAllowed()
+                );
 
                 $deals = $this->calculatorService->calculateForTrade(
                     $calculatorParams,

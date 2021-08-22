@@ -18,40 +18,46 @@ class CalculatorParamsFactory
      * @param Material[] $materials
      * @param Device[] $devices
      * @param int[] $inventoryQtys
+     * @param bool $isAuctionSellAllowed
      * @return CalculatorParams
      */
     public function createParamsForInventory(
         array $materials,
         array $devices,
-        array $inventoryQtys
+        array $inventoryQtys,
+        bool $isAuctionSellAllowed = true
     ): CalculatorParams {
-        return $this->createParams($materials, $devices, $inventoryQtys);
+        return $this->createParams($materials, $devices, $inventoryQtys, [], $isAuctionSellAllowed);
     }
 
     /**
      * @param Material[] $materials
      * @param Device[] $devices
      * @param int[] $miningAcceptableIds
+     * @param bool $isAuctionSellAllowed
      * @return CalculatorParams
      */
     public function createParamsForMining(
         array $materials,
         array $devices,
-        array $miningAcceptableIds
+        array $miningAcceptableIds,
+        bool $isAuctionSellAllowed = true
     ): CalculatorParams {
-        return $this->createParams($materials, $devices, [], $miningAcceptableIds);
+        return $this->createParams($materials, $devices, [], $miningAcceptableIds, $isAuctionSellAllowed);
     }
 
     /**
      * @param Material[] $materials
      * @param Device[] $devices
+     * @param bool $isAuctionSellAllowed
      * @return CalculatorParams
      */
     public function createParamsForTrade(
         array $materials,
-        array $devices
+        array $devices,
+        bool $isAuctionSellAllowed = true
     ): CalculatorParams {
-        return $this->createParams($materials, $devices);
+        return $this->createParams($materials, $devices, [], [], $isAuctionSellAllowed);
     }
 
     /**
@@ -59,23 +65,26 @@ class CalculatorParamsFactory
      * @param Device[] $devices
      * @param int[] $inventoryQtys
      * @param int[] $miningAcceptableIds
+     * @param bool $isAuctionSellAllowed
      * @return CalculatorParams
      */
     public function createParams(
         array $materials,
         array $devices,
         array $inventoryQtys = [],
-        array $miningAcceptableIds = []
+        array $miningAcceptableIds = [],
+        bool $isAuctionSellAllowed = true
     ): CalculatorParams {
         $params = new CalculatorParams();
 
         $params->setMaterialStockItems($this->createMaterialStockItems(
             $materials,
             $inventoryQtys,
-            $miningAcceptableIds
+            $miningAcceptableIds,
+            $isAuctionSellAllowed
         ));
 
-        $params->setDeviceStockItems($this->createDeviceStockItems($devices));
+        $params->setDeviceStockItems($this->createDeviceStockItems($devices, $isAuctionSellAllowed));
 
         return $params;
     }
@@ -84,10 +93,15 @@ class CalculatorParamsFactory
      * @param Material[] $materials
      * @param int[] $inventoryQtys
      * @param int[] $miningAcceptableIds
+     * @param bool $isAuctionSellAllowed
      * @return MaterialStockItem[]
      */
-    private function createMaterialStockItems(array $materials, array $inventoryQtys, array $miningAcceptableIds): array
-    {
+    private function createMaterialStockItems(
+        array $materials,
+        array $inventoryQtys,
+        array $miningAcceptableIds,
+        bool $isAuctionSellAllowed
+    ): array {
         /** @var MaterialStockItem[] $materialItems */
         $materialItems = [];
 
@@ -121,7 +135,7 @@ class CalculatorParamsFactory
                 $destinations[] = $this->createMarketplaceDestination($marketplacePrice);
             }
 
-            if ($auctionPrice !== null) {
+            if ($auctionPrice !== null && $isAuctionSellAllowed) {
                 $destinations[] = $this->createAuctionDestination($auctionPrice);
             }
 
@@ -136,9 +150,10 @@ class CalculatorParamsFactory
 
     /**
      * @param Device[] $devices
+     * @param bool $isAuctionSellAllowed
      * @return DeviceStockItem[]
      */
-    private function createDeviceStockItems(array $devices): array
+    private function createDeviceStockItems(array $devices, bool $isAuctionSellAllowed): array
     {
         /** @var DeviceStockItem[] $deviceItems */
         $deviceItems = [];
@@ -169,7 +184,7 @@ class CalculatorParamsFactory
                 $destinations[] = $this->createMarketplaceDestination($marketplacePrice);
             }
 
-            if ($auctionPrice !== null) {
+            if ($auctionPrice !== null && $isAuctionSellAllowed) {
                 $destinations[] = $this->createAuctionDestination($auctionPrice);
             }
 
