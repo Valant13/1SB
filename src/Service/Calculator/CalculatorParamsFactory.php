@@ -80,8 +80,7 @@ class CalculatorParamsFactory
         $params->setMaterialStockItems($this->createMaterialStockItems(
             $materials,
             $inventoryQtys,
-            $miningAcceptableIds,
-            $isAuctionSellAllowed
+            $miningAcceptableIds
         ));
 
         $params->setDeviceStockItems($this->createDeviceStockItems($devices, $isAuctionSellAllowed));
@@ -93,15 +92,10 @@ class CalculatorParamsFactory
      * @param Material[] $materials
      * @param int[] $inventoryQtys
      * @param int[] $miningAcceptableIds
-     * @param bool $isAuctionSellAllowed
      * @return MaterialStockItem[]
      */
-    private function createMaterialStockItems(
-        array $materials,
-        array $inventoryQtys,
-        array $miningAcceptableIds,
-        bool $isAuctionSellAllowed
-    ): array {
+    private function createMaterialStockItems(array $materials, array $inventoryQtys, array $miningAcceptableIds): array
+    {
         /** @var MaterialStockItem[] $materialItems */
         $materialItems = [];
 
@@ -135,7 +129,7 @@ class CalculatorParamsFactory
                 $destinations[] = $this->createMarketplaceDestination($marketplacePrice);
             }
 
-            if ($auctionPrice !== null && $isAuctionSellAllowed) {
+            if ($auctionPrice !== null) {
                 $destinations[] = $this->createAuctionDestination($auctionPrice);
             }
 

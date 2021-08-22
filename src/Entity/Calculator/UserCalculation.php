@@ -39,6 +39,7 @@ class UserCalculation
     public function __construct()
     {
         $this->maximizationParamCode = UserCalculation::CREDIT_CODE;
+        $this->isAuctionSellAllowed = true;
     }
 
     public function getId(): ?int
