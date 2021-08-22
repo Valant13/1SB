@@ -43,6 +43,8 @@ class MaximizationParamList extends AbstractViewModel
 
             $this->options[$code] = "$name ($icon)";
         }
+
+        $this->options[UserCalculation::TOTAL_EXPERIENCE_CODE] = "Total experience";
     }
 
     /**
@@ -52,8 +54,9 @@ class MaximizationParamList extends AbstractViewModel
     {
         $maximizationParam = $request->request->get('maximization-param');
 
-        if ($maximizationParam === UserCalculation::CREDIT_CODE
-            || array_key_exists($maximizationParam, $this->indexedResearchPoints)) {
+        if (array_key_exists($maximizationParam, $this->indexedResearchPoints)
+            || $maximizationParam === UserCalculation::CREDIT_CODE
+            || $maximizationParam === UserCalculation::TOTAL_EXPERIENCE_CODE) {
             $this->selected = $maximizationParam;
         } else {
             $this->errors[] = 'Invalid maximization param';

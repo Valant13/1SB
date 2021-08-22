@@ -12,6 +12,7 @@ use Doctrine\ORM\Mapping as ORM;
 class UserCalculation
 {
     const CREDIT_CODE = 'credit';
+    const TOTAL_EXPERIENCE_CODE = 'total_experience';
 
     /**
      * @ORM\Id

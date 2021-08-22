@@ -17,6 +17,7 @@ use App\Service\Calculator\Data\StockSource;
 class DealProcessor
 {
     const CREDIT_PARAM = 'credit';
+    const TOTAL_EXPERIENCE_PARAM = 'total_experience';
 
     /**
      * @param DealInterface[] $deals
@@ -491,7 +492,7 @@ class DealProcessor
         $dealsMissingExperience = [];
 
         foreach ($deals as $deal) {
-            if ($deal instanceof CraftingDeal && array_key_exists($researchPointCode, $deal->getTotalExperience())) {
+            if ($deal instanceof CraftingDeal && $this->hasCraftingDealExperience($deal, $researchPointCode)) {
                 $dealsHavingExperience[] = $deal;
                 continue;
             }
@@ -529,12 +530,12 @@ class DealProcessor
         $aTotalExperience = 0.0;
         $bTotalExperience = 0.0;
 
-        if ($a instanceof CraftingDeal && array_key_exists($researchPointCode, $a->getTotalExperience())) {
-            $aTotalExperience = $a->getTotalExperience()[$researchPointCode];
+        if ($a instanceof CraftingDeal) {
+            $aTotalExperience = $this->getCraftingDealExperience($a, $researchPointCode);
         }
 
-        if ($b instanceof CraftingDeal && array_key_exists($researchPointCode, $b->getTotalExperience())) {
-            $bTotalExperience = $b->getTotalExperience()[$researchPointCode];
+        if ($b instanceof CraftingDeal) {
+            $bTotalExperience = $this->getCraftingDealExperience($b, $researchPointCode);
         }
 
         if ($aTotalExperience === 0.0 && $bTotalExperience !== 0.0) {
@@ -555,5 +556,37 @@ class DealProcessor
         } else {
             return $this->compareDealsByProfitability($a, $b);
         }
+    }
+
+    /**
+     * @param CraftingDeal $deal
+     * @param string $researchPointCode
+     * @return float
+     */
+    private function getCraftingDealExperience(CraftingDeal $deal, string $researchPointCode): float
+    {
+        if ($researchPointCode === self::TOTAL_EXPERIENCE_PARAM) {
+            $experience = 0.0;
+
+            foreach ($deal->getTotalExperience() as $value) {
+                $experience += $value;
+            }
+
+            return $experience;
+        } elseif (array_key_exists($researchPointCode, $deal->getTotalExperience())) {
+            return $deal->getTotalExperience()[$researchPointCode];
+        } else {
+            return 0.0;
+        }
+    }
+
+    /**
+     * @param CraftingDeal $deal
+     * @param string $researchPointCode
+     * @return bool
+     */
+    private function hasCraftingDealExperience(CraftingDeal $deal, string $researchPointCode): bool
+    {
+        return $this->getCraftingDealExperience($deal, $researchPointCode) !== 0.0;
     }
 }
