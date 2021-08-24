@@ -18,4 +18,6 @@ class Config
     const INVENTORY_DEALS_LIMIT = 10;
     const MINING_DEALS_LIMIT = 10;
     const TRADE_DEALS_LIMIT = 10;
+
+    const AUCTION_PRICES_API_URL = 'https://atherdev.nl/sb/api/v2';
 }

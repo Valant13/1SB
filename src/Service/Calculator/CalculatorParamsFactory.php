@@ -77,6 +77,7 @@ class CalculatorParamsFactory
     ): CalculatorParams {
         $params = new CalculatorParams();
 
+        // Do not exclude auction destinations for materials to avoid incorrect device cost calculation
         $params->setMaterialStockItems($this->createMaterialStockItems(
             $materials,
             $inventoryQtys,
