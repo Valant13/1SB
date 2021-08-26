@@ -54,7 +54,7 @@ class ImportMaterialPricesCommand extends Command
     protected function configure(): void
     {
         $url = Config::AUCTION_PRICES_API_URL;
-        $this->setDescription("Imports material prices from external API $url");
+        $this->setDescription("Import material prices from external API $url");
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int
@@ -131,11 +131,28 @@ class ImportMaterialPricesCommand extends Command
         $newestRecord = end($records);
         reset($records);
 
-        $recordDate = new \DateTime();
-        $recordDate->setTimestamp((int)$newestRecord->date);
+        $recordDate = $this->getLocalDateTime((int)$newestRecord->date);
         $recordPrice = $newestRecord->price;
 
         return ['modification_time' => $recordDate, 'value' => $recordPrice];
+    }
+
+    /**
+     * @param int $timestamp
+     * @return \DateTime
+     */
+    private function getLocalDateTime(int $timestamp): \DateTime
+    {
+        $dateTime = new \DateTime();
+
+        $serverTimezone = $dateTime->getTimezone();
+        $apiTimezone = new \DateTimeZone('UTC');
+
+        $dateTime->setTimezone($apiTimezone);
+        $dateTime->setTimestamp($timestamp);
+        $dateTime->setTimezone($serverTimezone);
+
+        return $dateTime;
     }
 
     /**
