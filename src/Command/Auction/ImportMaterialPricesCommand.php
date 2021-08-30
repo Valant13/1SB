@@ -56,7 +56,7 @@ class ImportMaterialPricesCommand extends Command
     protected function configure(): void
     {
         $url = Config::AUCTION_PRICES_API_URL;
-        $this->setDescription("Import material prices from external API $url");
+        $this->setDescription("Import material prices from external API <href=$url>$url</>");
     }
 
     /**
@@ -67,7 +67,7 @@ class ImportMaterialPricesCommand extends Command
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $url = Config::AUCTION_PRICES_API_URL;
-        $output->writeln("Importing prices from $url...");
+        $output->writeln("Importing prices from <href=$url>$url</>...");
 
         $materials = $this->materialRepository->findAll();
 
@@ -157,9 +157,20 @@ class ImportMaterialPricesCommand extends Command
     private function convertTimestampToDateTime(int $timestamp): \DateTime
     {
         $dateTime = new \DateTime();
-
-        $dateTime->setTimezone(new \DateTimeZone(Config::CONSOLE_TIMEZONE));
         $dateTime->setTimestamp($timestamp);
+
+        $consoleDateTime = new \DateTime();
+        $emulatedDateTime = new \DateTime('now', new \DateTimeZone(Config::CONSOLE_TIMEZONE));
+
+        // Since the ORM reads DateTime field from the database in a string form, in case of incorrect timezone
+        // configured for PHP, the timestamp of the field is incorrect and has extra offset. So for the correct
+        // comparison and saving to the database, the same offset should be added to the new DateTime value.
+        //
+        // For example, if PHP uses UTC timezone but the database uses Europe/Kiev, ORM reads Europe/Kiev time
+        // as a UTC time adding extra offset 10800 (in summer) to the timestamp
+        $emulatedOffset = $emulatedDateTime->getOffset() - $consoleDateTime->getOffset();
+
+        $dateTime->setTimestamp($timestamp + $emulatedOffset);
 
         return $dateTime;
     }

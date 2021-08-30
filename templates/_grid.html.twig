@@ -46,7 +46,7 @@
                             {% endif %}
                         {% elseif cell.type == "link" %}
                             {% if cell.href %}
-                                <a href="{{ cell.href }}">{{ cell.text }}</a>
+                                <a href="{{ cell.href }}" target="_blank" rel="nofollow">{{ cell.text }}</a>
                             {% else %}
                                 {{ cell.text }}
                             {% endif %}
