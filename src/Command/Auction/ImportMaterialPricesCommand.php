@@ -50,12 +50,20 @@ class ImportMaterialPricesCommand extends Command
         $this->materialRepository = $materialRepository;
     }
 
+    /**
+     *
+     */
     protected function configure(): void
     {
         $url = Config::AUCTION_PRICES_API_URL;
         $this->setDescription("Import material prices from external API $url");
     }
 
+    /**
+     * @param InputInterface $input
+     * @param OutputInterface $output
+     * @return int
+     */
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $url = Config::AUCTION_PRICES_API_URL;
@@ -124,29 +132,22 @@ class ImportMaterialPricesCommand extends Command
         $responseBody = $response->getContent();
 
         $records = json_decode($responseBody);
-        if ($records === null) {
+        if (empty($records)) { // There can be invalid JSON or empty JSON array
             throw new \Exception();
         }
 
         $newestRecord = end($records);
         reset($records);
 
-        $recordDate = $this->getLocalDateTime((int)$newestRecord->date);
-        $recordPrice = $newestRecord->price;
+        $timestamp = (int)$newestRecord->date;
+        if ($timestamp === 0) { // There can be dummy record with zero time and price
+            throw new \Exception();
+        }
 
-        return ['modification_time' => $recordDate, 'value' => $recordPrice];
-    }
-
-    /**
-     * @param int $timestamp
-     * @return \DateTime
-     */
-    private function getLocalDateTime(int $timestamp): \DateTime
-    {
-        $dateTime = new \DateTime();
-        $dateTime->setTimestamp($timestamp);
-
-        return $dateTime;
+        return [
+            'modification_time' => (new \DateTime())->setTimestamp($timestamp),
+            'value' => (int)$newestRecord->price ?: null
+        ];
     }
 
     /**
