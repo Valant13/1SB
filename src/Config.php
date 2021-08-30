@@ -20,4 +20,12 @@ class Config
     const TRADE_DEALS_LIMIT = 10;
 
     const AUCTION_PRICES_API_URL = 'https://atherdev.nl/sb/api/v2';
+
+    /**
+     * Since there is no permission to specify timezone for console PHP on the server,
+     * the timezone is hardcoded here to avoid time difference during the import
+     *
+     * @note Use for console commands only!
+     */
+    const CONSOLE_TIMEZONE = 'Europe/Kiev';
 }

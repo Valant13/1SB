@@ -145,9 +145,23 @@ class ImportMaterialPricesCommand extends Command
         }
 
         return [
-            'modification_time' => (new \DateTime())->setTimestamp($timestamp),
+            'modification_time' => $this->convertTimestampToDateTime($timestamp),
             'value' => (int)$newestRecord->price ?: null
         ];
+    }
+
+    /**
+     * @param int $timestamp
+     * @return \DateTime
+     */
+    private function convertTimestampToDateTime(int $timestamp): \DateTime
+    {
+        $dateTime = new \DateTime();
+
+        $dateTime->setTimezone(new \DateTimeZone(Config::CONSOLE_TIMEZONE));
+        $dateTime->setTimestamp($timestamp);
+
+        return $dateTime;
     }
 
     /**
