@@ -7,7 +7,6 @@ use App\Entity\Catalog\Material;
 use App\Repository\Catalog\MaterialRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Console\Command\Command;
-use Symfony\Component\Console\Helper\Table;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
@@ -59,28 +58,31 @@ class ImportMaterialPricesCommand extends Command
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
+        $url = Config::AUCTION_PRICES_API_URL;
+        $output->writeln("Importing prices from $url...");
+
         $materials = $this->materialRepository->findAll();
 
-        $importResults = $this->importMaterialPrices($materials);
-        $this->entityManager->flush();
+        $this->importMaterialPrices($materials, function ($materialName, $result) use ($output) {
+            $this->writeImportLine($output, $materialName, $result);
+        });
 
-        $this->createOutputTable($output, $importResults)->render();
+        $this->entityManager->flush();
 
         return Command::SUCCESS;
     }
 
     /**
      * @param Material[] $materials
-     * @return string[]
+     * @param callable $callback
      */
-    private function importMaterialPrices(array $materials): array
+    private function importMaterialPrices(array $materials, callable $callback): void
     {
-        $importResults = [];
         foreach ($materials as $material) {
             $materialName = $material->getProduct()->getName();
 
             try {
-                $importedPrice = $this->getMaterialPriceByName($materialName);
+                $importedPrice = $this->importMaterialPriceByName($materialName);
                 $materialPrice = $material->getProduct()->getAuctionPrice();
 
                 if ($importedPrice['modification_time'] >= $materialPrice->getModificationTime()) {
@@ -96,10 +98,8 @@ class ImportMaterialPricesCommand extends Command
                 $result = self::RESULT_FAILED;
             }
 
-            $importResults[$materialName] = $result;
+            $callback($materialName, $result);
         }
-
-        return $importResults;
     }
 
     /**
@@ -107,7 +107,7 @@ class ImportMaterialPricesCommand extends Command
      * @return array
      * @throws \Exception
      */
-    private function getMaterialPriceByName(string $materialName): array
+    private function importMaterialPriceByName(string $materialName): array
     {
         sleep(1); // Wait some time to avoid API overloading
 
@@ -144,31 +144,30 @@ class ImportMaterialPricesCommand extends Command
     private function getLocalDateTime(int $timestamp): \DateTime
     {
         $dateTime = new \DateTime();
-
-        $serverTimezone = $dateTime->getTimezone();
-        $apiTimezone = new \DateTimeZone('UTC');
-
-        $dateTime->setTimezone($apiTimezone);
         $dateTime->setTimestamp($timestamp);
-        $dateTime->setTimezone($serverTimezone);
 
         return $dateTime;
     }
 
     /**
      * @param OutputInterface $output
-     * @param array $importResults
-     * @return Table
+     * @param string $materialName
+     * @param string $result
      */
-    private function createOutputTable(OutputInterface $output, array $importResults): Table
+    private function writeImportLine(OutputInterface $output, string $materialName, string $result): void
     {
-        $table = new Table($output);
-        $table->setHeaders(['Material', 'Result']);
+        $output->write("$materialName: ");
 
-        foreach ($importResults as $materialName => $importResult) {
-            $table->addRow([$materialName, $importResult]);
+        switch ($result) {
+            case self::RESULT_IMPORTED:
+                $output->writeln('<info>imported</info>');
+                break;
+            case self::RESULT_MISSED:
+                $output->writeln('<comment>missed</comment>');
+                break;
+            case self::RESULT_FAILED:
+            default:
+                $output->writeln('<error>failed</error>');
         }
-
-        return $table;
     }
 }
