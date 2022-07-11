@@ -36,11 +36,11 @@ jobs:
       - name: Build NPM dependencies
         run: npm run build
 
-      - name: Exclude dependencies from .gitignore file
+      - name: Exclude dependencies from Git ignore
         run: |
-          sed -i '' '/\/vendor\//d' .gitignore
-          sed -i '' '/\/node_modules\//d' .gitignore
-          sed -i '' '/\/public\/build\//d' .gitignore
+          sed -i '/\/vendor\//d' .gitignore
+          sed -i '/\/node_modules\//d' .gitignore
+          sed -i '/\/public\/build\//d' .gitignore
 
       - name: Authorize Git account
         run: |
