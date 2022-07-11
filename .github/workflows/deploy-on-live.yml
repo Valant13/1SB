@@ -1,4 +1,4 @@
-name: deploy
+name: Deploy on Live
 
 concurrency: live
 
@@ -9,7 +9,7 @@ on:
   workflow_dispatch:
 
 jobs:
-  build-and-deploy:
+  build:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
@@ -22,14 +22,6 @@ jobs:
         with:
           php-version: 7.2
 
-      - name: Get public IP
-        id: ip
-        uses: haythem/public-ip@v1.2
-
-      - name: Add IP to whitelist
-        run: |
-          curl -H "Content-Type: application/json" -H "Authorization: Bearer ${{ secrets.ADM_TOOLS_API_TOKEN }}" --request POST --data '{"account_id": "${{ secrets.ADM_TOOLS_ACCOUNT_ID }}", "ip": "${{ steps.ip.outputs.ipv4 }}"}' https://adm.tools/action/hosting/account/ssh/ip/send/
-
       - name: Prepare .env file
         run: |
           echo "APP_ENV=prod" >> .env
@@ -38,17 +30,50 @@ jobs:
       - name: Install Composer dependencies
         run: composer install --no-dev --optimize-autoloader
 
-        # Add a test script to composer.json, for instance: "test": "vendor/bin/phpunit"
-        # Docs: https://getcomposer.org/doc/articles/scripts.md
-
-        # - name: Run test suite
-        #   run: composer run-script test
-
       - name: Install NPM dependencies
         run: npm install
 
       - name: Build NPM dependencies
         run: npm run build
+
+      - name: Exclude dependencies from .gitignore file
+        run: |
+          sed -i '' '/\/vendor\//d' .gitignore
+          sed -i '' '/\/node_modules\//d' .gitignore
+          sed -i '' '/\/public\/build\//d' .gitignore
+
+      - name: Authorize Git account
+        run: |
+          git config user.name github-actions
+          git config user.email github-actions@github.com
+
+      - name: Create live branch
+        run: |
+          git push -d origin live
+          git branch -D live
+          git checkout -b live
+
+      - name: Commit code
+        run: |
+          git add .
+          git commit -m "Live deployment"
+          git push --set-upstream origin live
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          ref: live
+
+      - name: Get public IP
+        id: ip
+        uses: haythem/public-ip@v1.2
+
+      - name: Add IP to whitelist
+        run: |
+          curl -H "Content-Type: application/json" -H "Authorization: Bearer ${{ secrets.ADM_TOOLS_API_TOKEN }}" --request POST --data '{"account_id": "${{ secrets.ADM_TOOLS_ACCOUNT_ID }}", "ip": "${{ steps.ip.outputs.ipv4 }}"}' https://adm.tools/action/hosting/account/ssh/ip/send/
 
       - name: Store .env file
         uses: appleboy/ssh-action@master
