@@ -27,3 +27,8 @@ jobs:
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
             ls -l
+
+      - name: Removing IP from whitelist
+        id: removeip
+        run: |
+          curl -H "Content-Type: application/json" -H "Authorization: Bearer ${{ secrets.ADM_TOOLS_API_TOKEN }}" --request POST --data '{"account_id": "${{ secrets.ADM_TOOLS_ACCOUNT_ID }}", "ip": "${{ steps.ip.outputs.ipv4 }}"}' https://adm.tools/action/hosting/account/ssh/ip/delete_by_ip/
