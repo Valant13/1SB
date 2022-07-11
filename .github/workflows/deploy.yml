@@ -1,37 +1,38 @@
 name: deploy
+
 on:
   push:
     branches:
       - master
   workflow_dispatch:
+
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
     steps:
-      - name: Getting public IP
-        id: ip
+      - uses: actions/checkout@v3
+
+      - uses: actions/setup-node@v1
+        with:
+          node-version: 14
+
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: 7.2
+
+      - name: Get public IP
         uses: haythem/public-ip@v1.2
 
-      - name: Adding IP to whitelist
-        id: addip
+      - name: Add IP to whitelist
         run: |
           curl -H "Content-Type: application/json" -H "Authorization: Bearer ${{ secrets.ADM_TOOLS_API_TOKEN }}" --request POST --data '{"account_id": "${{ secrets.ADM_TOOLS_ACCOUNT_ID }}", "ip": "${{ steps.ip.outputs.ipv4 }}"}' https://adm.tools/action/hosting/account/ssh/ip/send/
 
-      - uses: actions/checkout@v3
-      - uses: actions/setup-node@v1
-      - uses: shivammathur/setup-php@v2
-        with:
-          php-version: '7.2'
-
-      - name: Preparing .env file
-        id: prepareenv
+      - name: Prepare .env file
         run: |
-          echo "" >> .env
           echo "APP_ENV=prod" >> .env
           echo "APP_DEBUG=0" >> .env
 
-      - name: Installing Composer dependencies
-        id: installcomposer
+      - name: Install Composer dependencies
         run: composer install --no-dev --optimize-autoloader
 
         # Add a test script to composer.json, for instance: "test": "vendor/bin/phpunit"
@@ -40,17 +41,13 @@ jobs:
         # - name: Run test suite
         #   run: composer run-script test
 
-      - name: Installing NPM dependencies
-        id: installnpm
-        run: |
-          npm install
+      - name: Install NPM dependencies
+        run: npm install
 
-      - name: Building NPM dependencies
-        id: buildnpm
-        run: |
-          npm run build
+      - name: Build NPM dependencies
+        run: npm run build
 
-      - name: Storing .env file
+      - name: Store .env file
         uses: appleboy/ssh-action@master
         with:
           host: ${{ secrets.SSH_HOST }}
@@ -60,7 +57,7 @@ jobs:
             cd ${{ secrets.SSH_PATH }}
             mv .env ../.env
 
-      - name: Deploying with Rsync
+      - name: Deploy with Rsync
         uses: burnett01/rsync-deployments@5.2
         with:
           switches: -avzr --delete
@@ -70,7 +67,7 @@ jobs:
           remote_key: ${{ secrets.SSH_PRIVATE_KEY }}
           remote_path: ${{ secrets.SSH_PATH }}
 
-      - name: Restoring .env file
+      - name: Restore .env file
         uses: appleboy/ssh-action@master
         with:
           host: ${{ secrets.SSH_HOST }}
@@ -81,7 +78,7 @@ jobs:
             rm -f .env
             mv ../.env .env
 
-      - name: Clearing cache
+      - name: Clear cache
         uses: appleboy/ssh-action@master
         with:
           host: ${{ secrets.SSH_HOST }}
@@ -91,7 +88,7 @@ jobs:
             cd ${{ secrets.SSH_PATH }}
             php bin/console cache:clear
 
-      - name: Runnig migrations
+      - name: Run migrations
         uses: appleboy/ssh-action@master
         with:
           host: ${{ secrets.SSH_HOST }}
@@ -101,7 +98,6 @@ jobs:
             cd ${{ secrets.SSH_PATH }}
             php bin/console doctrine:migrations:migrate
 
-      - name: Removing IP from whitelist
-        id: removeip
+      - name: Remove IP from whitelist
         run: |
           curl -H "Content-Type: application/json" -H "Authorization: Bearer ${{ secrets.ADM_TOOLS_API_TOKEN }}" --request POST --data '{"account_id": "${{ secrets.ADM_TOOLS_ACCOUNT_ID }}", "ip": "${{ steps.ip.outputs.ipv4 }}"}' https://adm.tools/action/hosting/account/ssh/ip/delete_by_ip/
