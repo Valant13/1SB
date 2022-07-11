@@ -61,9 +61,25 @@ jobs:
           git commit -m "Live deployment"
           git push
 
+  test:
+    name: Test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: 7.2
+
+      - name: Install Composer dependencies
+        run: composer install
+
+      - name: Run unit tests
+        run: php bin/phpunit
+
   deploy:
     name: Deploy
-    needs: build
+    needs: [build, test]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
