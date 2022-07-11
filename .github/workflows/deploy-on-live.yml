@@ -50,14 +50,14 @@ jobs:
       - name: Create live branch
         run: |
           git push -d origin live
-          git branch -D live
           git checkout -b live
+          git push --set-upstream origin live
 
       - name: Commit code
         run: |
           git add .
           git commit -m "Live deployment"
-          git push --set-upstream origin live
+          git push
 
   deploy:
     needs: build
