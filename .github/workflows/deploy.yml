@@ -50,6 +50,16 @@ jobs:
         run: |
           npm run build
 
+      - name: Storing .env file
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          script: |
+            cd ${{ secrets.SSH_PATH }}
+            mv .env ../.env
+
       - name: Deploying with Rsync
         uses: burnett01/rsync-deployments@5.2
         with:
@@ -60,14 +70,35 @@ jobs:
           remote_key: ${{ secrets.SSH_PRIVATE_KEY }}
           remote_path: ${{ secrets.SSH_PATH }}
 
-      - name: Connecting via SSH
+      - name: Restoring .env file
         uses: appleboy/ssh-action@master
         with:
           host: ${{ secrets.SSH_HOST }}
           username: ${{ secrets.SSH_USER }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
-            ls -l
+            cd ${{ secrets.SSH_PATH }}
+            mv ../.env .env
+
+      - name: Clearing cache
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          script: |
+            cd ${{ secrets.SSH_PATH }}
+            php bin/console cache:clear
+
+      - name: Runnig migrations
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          script: |
+            cd ${{ secrets.SSH_PATH }}
+            php bin/console doctrine:migrations:migrate
 
       - name: Removing IP from whitelist
         id: removeip
