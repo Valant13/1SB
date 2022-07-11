@@ -5,11 +5,13 @@ concurrency: live
 on:
   push:
     branches:
+      - main
       - master
   workflow_dispatch:
 
 jobs:
   build:
+    name: Build
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
@@ -60,6 +62,7 @@ jobs:
           git push
 
   deploy:
+    name: Deploy
     needs: build
     runs-on: ubuntu-latest
     steps:
@@ -76,7 +79,7 @@ jobs:
           curl -H "Content-Type: application/json" -H "Authorization: Bearer ${{ secrets.ADM_TOOLS_API_TOKEN }}" --request POST --data '{"account_id": "${{ secrets.ADM_TOOLS_ACCOUNT_ID }}", "ip": "${{ steps.ip.outputs.ipv4 }}"}' https://adm.tools/action/hosting/account/ssh/ip/send/
 
       - name: Store .env file
-        uses: appleboy/ssh-action@master
+        uses: appleboy/ssh-action@v0.1.4
         with:
           host: ${{ secrets.SSH_HOST }}
           username: ${{ secrets.SSH_USER }}
@@ -96,7 +99,7 @@ jobs:
           remote_path: ${{ secrets.SSH_PATH }}
 
       - name: Restore .env file
-        uses: appleboy/ssh-action@master
+        uses: appleboy/ssh-action@v0.1.4
         with:
           host: ${{ secrets.SSH_HOST }}
           username: ${{ secrets.SSH_USER }}
@@ -107,7 +110,7 @@ jobs:
             mv ../.env .env
 
       - name: Clear cache
-        uses: appleboy/ssh-action@master
+        uses: appleboy/ssh-action@v0.1.4
         with:
           host: ${{ secrets.SSH_HOST }}
           username: ${{ secrets.SSH_USER }}
@@ -117,7 +120,7 @@ jobs:
             php bin/console cache:clear
 
       - name: Run migrations
-        uses: appleboy/ssh-action@master
+        uses: appleboy/ssh-action@v0.1.4
         with:
           host: ${{ secrets.SSH_HOST }}
           username: ${{ secrets.SSH_USER }}
