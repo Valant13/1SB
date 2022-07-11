@@ -78,6 +78,7 @@ jobs:
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
             cd ${{ secrets.SSH_PATH }}
+            rm -f .env
             mv ../.env .env
 
       - name: Clearing cache
